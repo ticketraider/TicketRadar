@@ -1,7 +1,7 @@
 package com.codersgate.ticketraider.domain.category.model
 
 
-import com.codersgate.ticketraider.global.common.BaseTime
+import com.codersgate.ticketraider.global.common.BaseEntity
 import jakarta.persistence.*
 import org.hibernate.annotations.SQLDelete
 import org.hibernate.annotations.SQLRestriction
@@ -23,7 +23,7 @@ class Category(
 //    )
 //    var eventList: MutableList<Event> = mutableListOf(),
 
-    ) : BaseTime() {
+    ) : BaseEntity() {
 
     @Id
     @Column(name = "id")

@@ -9,7 +9,7 @@ import java.time.LocalDateTime
 
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener::class)
-abstract class BaseTime {
+abstract class BaseEntity {
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
     val createdAt: LocalDateTime? = null
