@@ -24,9 +24,10 @@ class SecurityConfig(
             .csrf { it.disable() }
             .authorizeHttpRequests {
                 it.requestMatchers(
-                    "/users/**",
+                    "/members/**",
                     "/swagger-ui/**",
                     "/v3/api-docs/**",
+                    "/h2-console/**"
                 ).permitAll()
                     .requestMatchers("/admin/**").hasRole("ADMIN")
                     // 위 URI를 제외하곤 모두 인증이 되어야 함.
