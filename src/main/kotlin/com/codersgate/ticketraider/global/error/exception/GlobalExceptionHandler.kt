@@ -1,8 +1,8 @@
-package com.codersgate.ticketraider.error.exception
+package com.codersgate.ticketraider.global.error.exception
 
-import com.codersgate.ticketraider.error.exception.dto.BaseResponse
-import com.codersgate.ticketraider.error.exception.dto.ErrorResponse
-import com.codersgate.ticketraider.error.exception.status.ResultCode
+import com.codersgate.ticketraider.global.error.exception.dto.BaseResponse
+import com.codersgate.ticketraider.global.error.exception.dto.ErrorResponse
+import com.codersgate.ticketraider.global.error.exception.status.ResultCode
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.FieldError
