@@ -1,7 +1,7 @@
 package com.codersgate.ticketraider.domain.category.model
 
 
-import com.codersgate.ticketraider.common.BaseTime
+import com.codersgate.ticketraider.global.common.BaseTime
 import jakarta.persistence.*
 import org.hibernate.annotations.SQLDelete
 import org.hibernate.annotations.SQLRestriction

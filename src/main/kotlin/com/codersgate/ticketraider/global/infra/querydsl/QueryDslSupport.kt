@@ -1,4 +1,4 @@
-package com.codersgate.ticketraider.infra.querydsl
+package com.codersgate.ticketraider.global.infra.querydsl
 
 import com.querydsl.jpa.impl.JPAQueryFactory
 import jakarta.persistence.EntityManager
