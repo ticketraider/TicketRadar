@@ -5,7 +5,7 @@ import com.codersgate.ticketraider.domain.category.dto.CreateCategoryRequest
 import com.codersgate.ticketraider.domain.category.dto.UpdateCategoryRequest
 import com.codersgate.ticketraider.domain.category.model.Category
 import com.codersgate.ticketraider.domain.category.repository.CategoryRepository
-import com.codersgate.ticketraider.error.exception.ModelNotFoundException
+import com.codersgate.ticketraider.global.error.exception.ModelNotFoundException
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.findByIdOrNull

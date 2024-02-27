@@ -1,6 +1,6 @@
-package com.codersgate.ticketraider.error.exception.dto
+package com.codersgate.ticketraider.global.error.exception.dto
 
-import com.codersgate.ticketraider.error.exception.status.ResultCode
+import com.codersgate.ticketraider.global.error.exception.status.ResultCode
 
 
 data class BaseResponse<T>(
