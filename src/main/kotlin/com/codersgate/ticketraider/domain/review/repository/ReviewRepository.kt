@@ -5,5 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
 
 
-interface ReviewRepository : JpaRepository<Review, Long>{
+interface ReviewRepository : JpaRepository<Review, Long>, CustomReviewRepository{
 }

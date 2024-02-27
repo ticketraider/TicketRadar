@@ -1,5 +1,6 @@
 package com.codersgate.ticketraider.domain.review.model
 
+import com.codersgate.ticketraider.global.common.BaseEntity
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
@@ -13,7 +14,7 @@ import org.hibernate.annotations.GenericGenerator
 
 @Entity
 @Table(name = "reviews")
-class Review(
+class Review (
     @Column(name = "title")
     val title : String,
 
@@ -30,11 +31,11 @@ class Review(
 //    @ManyToOne
 //    @Column(name = "event")
 //    val event : Event,
-)
-{
-    @Id
-    @GeneratedValue( strategy = GenerationType.IDENTITY)
-    val id : Long? = null
+    ) : BaseEntity()
+    {
+        @Id
+        @GeneratedValue( strategy = GenerationType.IDENTITY)
+        val id : Long? = null
 }
 
 
