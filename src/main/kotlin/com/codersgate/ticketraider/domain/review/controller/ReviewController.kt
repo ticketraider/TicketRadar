@@ -5,6 +5,7 @@ import com.codersgate.ticketraider.domain.review.dto.ReviewResponse
 import com.codersgate.ticketraider.domain.review.dto.UpdateReviewRequest
 import com.codersgate.ticketraider.domain.review.repository.ReviewRepository
 import com.codersgate.ticketraider.domain.review.service.ReviewService
+import io.swagger.v3.oas.annotations.Operation
 import org.apache.catalina.User
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -22,6 +23,7 @@ class ReviewController(
     private val reviewRepository: ReviewRepository,
 ) {
 
+    @Operation(summary = "리뷰 생성")
     @PostMapping()
     fun createReview(
         @RequestBody request: CreateReviewRequest
@@ -31,6 +33,7 @@ class ReviewController(
         return ResponseEntity.status(HttpStatus.OK).build()
     }
 
+    @Operation(summary = "통합 조회(전체/유저ID/이벤트ID")
     @GetMapping()
     fun getReviewList_V2(
         @PageableDefault(size = 5, sort = ["id"]) pageable: Pageable,
@@ -42,6 +45,7 @@ class ReviewController(
     }
 
 
+    @Operation(summary = "전체 조회")
     @GetMapping()
     fun getReviewList(
         @PageableDefault(size = 5, sort = ["id"]) pageable: Pageable
@@ -50,6 +54,7 @@ class ReviewController(
         return ResponseEntity.status(HttpStatus.OK).body(reviewService.getReviewList(pageable))
     }
 
+    @Operation(summary = "이벤트 ID 별 조회")
     @GetMapping("/{eventId}")
     fun getReviewListByEvent(
         @PageableDefault(size = 5, sort = ["id"]) pageable: Pageable,
@@ -58,6 +63,7 @@ class ReviewController(
         return ResponseEntity.status(HttpStatus.OK).body(reviewService.getReviewListByEvent(pageable, eventId))
     }
 
+    @Operation(summary = "유저 ID 별 조회")
     @GetMapping("/{userId}")
     fun getReviewListByUser(
         @PageableDefault(size = 5, sort = ["id"]) pageable: Pageable,
@@ -67,6 +73,7 @@ class ReviewController(
     }
 
 
+    @Operation(summary = "리뷰 ID 단건 조회")
     @GetMapping("/{reviewId}")
     fun getReview(
         @PathVariable reviewId : Long,
@@ -74,7 +81,7 @@ class ReviewController(
         return ResponseEntity.status(HttpStatus.OK).body(reviewService.getReview(reviewId))
     }
 
-
+    @Operation(summary = "리뷰 수정")
     @PutMapping("/{reviewId}")
     fun updateReview(
         @PathVariable reviewId : Long,
@@ -84,6 +91,7 @@ class ReviewController(
         return ResponseEntity.status(HttpStatus.OK).build()
     }
 
+    @Operation(summary = "리뷰 삭제")
     @DeleteMapping("/{reviewId}")
    fun deleteReview(
         @PathVariable reviewId : Long,
