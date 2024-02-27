@@ -2,6 +2,7 @@ package com.codersgate.ticketraider.domain.review.service
 
 import com.codersgate.ticketraider.domain.review.dto.CreateReviewRequest
 import com.codersgate.ticketraider.domain.review.dto.ReviewResponse
+import com.codersgate.ticketraider.domain.review.dto.UpdateReviewRequest
 import com.codersgate.ticketraider.domain.review.model.Review
 import com.codersgate.ticketraider.domain.review.repository.ReviewRepository
 import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException
@@ -48,11 +49,19 @@ class ReviewServiceImpl(
         )
     }
 
-    override fun updateReview(reviewId: Long) {
-        TODO("Not yet implemented")
+    override fun updateReview(reviewId: Long, request: UpdateReviewRequest) {
+        val review = reviewRepository.findByIdOrNull(reviewId)
+            ?: throw NotFoundException()
+        review.title = request.title
+        review.content = request.content
+        review.rating = request.rating
+
+        reviewRepository.save(review)
     }
 
     override fun deleteReview(reviewId: Long) {
-        TODO("Not yet implemented")
+        val review = reviewRepository.findByIdOrNull(reviewId)
+            ?: throw NotFoundException()
+        reviewRepository.delete(review)
     }
 }

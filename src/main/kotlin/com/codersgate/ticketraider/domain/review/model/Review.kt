@@ -16,13 +16,13 @@ import org.hibernate.annotations.GenericGenerator
 @Table(name = "reviews")
 class Review (
     @Column(name = "title")
-    val title : String,
+    var title : String,
 
     @Column(name = "content")
-    val content : String,
+    var content : String,
 
     @Column(name = "rating")
-    val rating : Int,
+    var rating : Int,
 
 //    @ManyToOne
 //    @Column(name = "user")
