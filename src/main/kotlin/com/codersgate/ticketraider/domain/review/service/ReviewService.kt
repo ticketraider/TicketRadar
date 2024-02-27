@@ -1,5 +1,6 @@
 package com.codersgate.ticketraider.domain.review.service
 
+import com.codersgate.ticketraider.domain.review.dto.CreateReviewRequest
 import com.codersgate.ticketraider.domain.review.dto.ReviewResponse
 import com.codersgate.ticketraider.domain.review.model.Review
 import org.apache.catalina.User
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service
 @Service
 interface ReviewService {
 
+    fun createReview(request: CreateReviewRequest)
     fun getReviewList(pageable : Pageable) : Page<ReviewResponse>
 
     fun getReviewList_V2(pageable: Pageable,userId : Long,eventId : Long) : Page<ReviewResponse>
