@@ -2,27 +2,104 @@ package com.codersgate.ticketraider.domain.review.repository
 
 import com.codersgate.ticketraider.domain.review.dto.ReviewResponse
 import com.codersgate.ticketraider.domain.review.model.QReview
+import com.codersgate.ticketraider.domain.review.model.Review
 import com.codersgate.ticketraider.global.infra.querydsl.QueryDslSupport
-import com.sun.java.accessibility.util.EventID
+import com.querydsl.core.BooleanBuilder
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
 
 class CustomReviewRepositoryImpl : CustomReviewRepository, QueryDslSupport(){
     private var q_review = QReview.review
-    override fun getReviewList(pageable: Pageable): Page<ReviewResponse> {
-         queryFactory.selectFrom(q_review)
-            .fetchAll()
 
-       // return PageImpl(totalCounts, pageable, contents)
-        TODO()
+    override fun getReviewList_V2(pageable: Pageable, userId: Long, eventId: Long): Page<Review> {
+
+        val whereClause = BooleanBuilder()
+
+        //userId?.whereClause.and(q_review.userId.eq(userId))
+        //eventId?.whereClause.and(q_review.eventId.eq(eventId))
+
+        val totalCounts = queryFactory
+            .select(q_review.count())
+            .from(q_review)
+            .where(whereClause)
+            .fetchOne()
+            ?:0L
+
+        val contents = queryFactory.selectFrom(q_review)
+            .where(whereClause)
+            .orderBy(q_review.createdAt.desc())
+            .offset(pageable.offset)
+            .limit(pageable.pageSize.toLong())
+            .fetch()
+
+
+        return PageImpl(contents, pageable, totalCounts)
+
+    }
+    override fun getReviewList(pageable: Pageable): Page<Review> {
+        val totalCounts = queryFactory
+            .select(q_review.count())
+            .from(q_review)
+            .fetchOne()
+            ?:0L
+
+        val contents = queryFactory.selectFrom(q_review)
+            .orderBy(q_review.createdAt.desc())
+            .offset(pageable.offset)
+            .limit(pageable.pageSize.toLong())
+            .fetch()
+
+
+        return PageImpl(contents, pageable, totalCounts)
+
     }
 
-    override fun getReviewListByUserId(pageable: Pageable, userId:Long): Page<ReviewResponse> {
-        TODO("Not yet implemented")
+    override fun getReviewListByUserId(pageable: Pageable, userId:Long): Page<Review> {
+
+        val whereClause = BooleanBuilder()
+
+        //whereClause.and(q_review.userId.eq(userId))
+
+        val totalCounts = queryFactory
+            .select(q_review.count())
+            .where(whereClause)
+            .from(q_review)
+            .fetchOne()
+            ?:0L
+
+        val contents = queryFactory.selectFrom(q_review)
+            .orderBy(q_review.createdAt.desc())
+            .where(whereClause)
+            .offset(pageable.offset)
+            .limit(pageable.pageSize.toLong())
+            .fetch()
+
+
+        return PageImpl(contents, pageable, totalCounts)
     }
 
-    override fun getReviewListEventId(pageable: Pageable, eventId: Long): Page<ReviewResponse> {
-        TODO("Not yet implemented")
+    override fun getReviewListByEventId(pageable: Pageable, eventId: Long): Page<Review> {
+
+        val whereClause = BooleanBuilder()
+
+        //whereClause.and(q_review.eventId.eq(eventId))
+
+        val totalCounts = queryFactory
+            .select(q_review.count())
+            .where(whereClause)
+            .from(q_review)
+            .fetchOne()
+            ?:0L
+
+        val contents = queryFactory.selectFrom(q_review)
+            .orderBy(q_review.createdAt.desc())
+            .where(whereClause)
+            .offset(pageable.offset)
+            .limit(pageable.pageSize.toLong())
+            .fetch()
+
+
+        return PageImpl(contents, pageable, totalCounts)
     }
 }

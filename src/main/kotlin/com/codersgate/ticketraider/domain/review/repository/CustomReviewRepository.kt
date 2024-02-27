@@ -1,11 +1,14 @@
 package com.codersgate.ticketraider.domain.review.repository
 
 import com.codersgate.ticketraider.domain.review.dto.ReviewResponse
+import com.codersgate.ticketraider.domain.review.model.Review
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 
 interface CustomReviewRepository {
-    fun getReviewList(pageable: Pageable) : Page<ReviewResponse>
-    fun getReviewListByUserId(pageable: Pageable, userId : Long) : Page<ReviewResponse>
-    fun getReviewListEventId(pageable: Pageable, eventId : Long): Page<ReviewResponse>
+    fun getReviewList(pageable: Pageable) : Page<Review>
+
+    fun getReviewList_V2(pageable: Pageable,userId : Long,eventId : Long) : Page<Review>
+    fun getReviewListByUserId(pageable: Pageable, userId : Long) : Page<Review>
+    fun getReviewListByEventId(pageable: Pageable, eventId : Long): Page<Review>
 }
