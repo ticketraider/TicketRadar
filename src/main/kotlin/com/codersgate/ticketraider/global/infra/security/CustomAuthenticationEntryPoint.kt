@@ -1,4 +1,4 @@
-package com.codersgate.ticketraider.infra.security
+package com.codersgate.ticketraider.global.infra.security
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import jakarta.servlet.http.HttpServletRequest
