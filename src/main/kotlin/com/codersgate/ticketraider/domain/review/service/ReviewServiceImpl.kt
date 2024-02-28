@@ -1,5 +1,6 @@
 package com.codersgate.ticketraider.domain.review.service
 
+import com.codersgate.ticketraider.domain.event.repository.EventRepository
 import com.codersgate.ticketraider.domain.member.repository.MemberRepository
 import com.codersgate.ticketraider.domain.review.dto.CreateReviewRequest
 import com.codersgate.ticketraider.domain.review.dto.ReviewResponse
@@ -16,10 +17,14 @@ import org.springframework.stereotype.Service
 class ReviewServiceImpl(
     private val reviewRepository: ReviewRepository,
     private val memberRepository: MemberRepository,
+    private val eventRepository: EventRepository,
 ) : ReviewService{
 
     override fun createReview(request: CreateReviewRequest) {
         val member = memberRepository.findByIdOrNull(request.memberId)
+            ?:throw NotFoundException()
+
+        val event = eventRepository.findByIdOrNull(request.eventId)
             ?:throw NotFoundException()
 
         reviewRepository.save(
@@ -28,7 +33,7 @@ class ReviewServiceImpl(
             request.content,
             request.rating,
                 member,
-//            request.eventId
+                event,
             )
         )
     }
