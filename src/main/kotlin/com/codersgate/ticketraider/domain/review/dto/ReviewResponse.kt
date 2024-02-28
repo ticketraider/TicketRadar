@@ -9,9 +9,9 @@ data class ReviewResponse(
 
     val rating: Int,
 
-//    val userId : Long,
-//
-//    val eventId : Long,
+    val userId : Long,
+
+    val eventId : Long,
 
 ) {
     companion object {
@@ -20,8 +20,8 @@ data class ReviewResponse(
                 title = review.title,
                 content = review.content,
                 rating = review.rating,
-        //        userId = review.userId,
-        //        eventId = review.eventId,
+                userId = review.member.id!!,
+                eventId = review.event.id!!,
             )
         }
     }

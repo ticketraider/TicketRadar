@@ -38,11 +38,11 @@ class ReviewController(
     @GetMapping("/v2")
     fun getReviewList_V2(
         @PageableDefault(size = 5, sort = ["id"]) pageable: Pageable,
-        @RequestParam(required = false) userId: Long,
+        @RequestParam(required = false) memberId: Long,
         @RequestParam(required = false) eventId: Long,
     ) : ResponseEntity<Page<ReviewResponse>>
     {
-        return ResponseEntity.status(HttpStatus.OK).body(reviewService.getReviewList_V2(pageable, userId, eventId))
+        return ResponseEntity.status(HttpStatus.OK).body(reviewService.getReviewList_V2(pageable, memberId, eventId))
     }
 
 
@@ -64,13 +64,13 @@ class ReviewController(
         return ResponseEntity.status(HttpStatus.OK).body(reviewService.getReviewListByEvent(pageable, eventId))
     }
 
-    @Operation(summary = "유저 ID 별 조회")
-    @GetMapping("/{userId}")
+    @Operation(summary = "멤버 ID 별 조회")
+    @GetMapping("/{memberId}")
     fun getReviewListByUser(
         @PageableDefault(size = 5, sort = ["id"]) pageable: Pageable,
-        @PathVariable userId : Long
+        @PathVariable memberId : Long
     ): ResponseEntity<Page<ReviewResponse>> {
-        return ResponseEntity.status(HttpStatus.OK).body(reviewService.getReviewListByUser(pageable, userId))
+        return ResponseEntity.status(HttpStatus.OK).body(reviewService.getReviewListByUser(pageable, memberId))
     }
 
 
