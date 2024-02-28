@@ -6,6 +6,7 @@ import com.codersgate.ticketraider.domain.member.dto.MemberResponse
 import com.codersgate.ticketraider.domain.member.dto.MemberRequest
 import com.codersgate.ticketraider.domain.member.service.MemberService
 import com.codersgate.ticketraider.global.infra.security.UserPrincipal
+
 import io.swagger.v3.oas.annotations.Operation
 import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
