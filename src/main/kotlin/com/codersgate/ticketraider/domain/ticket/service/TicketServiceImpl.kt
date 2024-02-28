@@ -54,6 +54,6 @@ class TicketServiceImpl(
     }
 
     override fun getTicketListByUserId(userId: Long, pageable: Pageable): Page<TicketResponse> {
-        return ticketRepository.findByUserId(pageable, userId).map { TicketResponse.from(it) }
+        return ticketRepository.getListByUserId(pageable, userId).map { TicketResponse.from(it) }
     }
 }

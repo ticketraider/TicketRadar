@@ -40,7 +40,7 @@ class TicketController(
     }
 
     @Operation(summary = "멤버 티켓리스트 조회")
-    @GetMapping("/{userId}")
+    @GetMapping("/get/{userId}")
     fun getTicketListByUserId(
         @PageableDefault(
             size = 15, sort = ["id"]
@@ -63,13 +63,13 @@ class TicketController(
 //            .body(ticketService.updateTicket(request))
 //    }
     @Operation(summary = "티켓 삭제")
-    @DeleteMapping("/{ticketId}")
+    @DeleteMapping("/delete/{ticketId}")
     fun deleteTicket(
         @PathVariable ticketId: Long,
         @AuthenticationPrincipal user: UserPrincipal
     ): ResponseEntity<Unit> {
         return ResponseEntity
-            .status(HttpStatus.NOT_FOUND)
+            .status(HttpStatus.OK)
             .body(ticketService.deleteTicket(ticketId, user))
     }
 

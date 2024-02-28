@@ -6,5 +6,5 @@ import org.springframework.data.domain.Pageable
 
 interface CustomTicketRepository {
 
-    fun findByUserId(pageable: Pageable, userId: Long): Page<Ticket>
+    fun getListByUserId(pageable: Pageable, userId: Long): Page<Ticket>
 }
