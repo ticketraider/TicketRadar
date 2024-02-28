@@ -55,7 +55,7 @@ class MemberController(
     @PreAuthorize("hasAnyRole('MEMBER')")
     @PutMapping("/members/update")
     fun updateProfile(
-        @RequestParam memberRequest: MemberRequest,
+        @Valid @RequestParam memberRequest: MemberRequest,
         @AuthenticationPrincipal user: UserPrincipal
     ): ResponseEntity<Unit> {
         return ResponseEntity
