@@ -18,7 +18,7 @@ data class CreateReviewRequest(
     val rating : Int,
 
     @field:NotNull
-    val userId : Long,
+    val memberId : Long,
 
     @field:NotNull
     var eventId : Long,

@@ -22,7 +22,6 @@ import org.springframework.web.bind.annotation.*
 
 class ReviewController(
     private val reviewService: ReviewService,
-    private val reviewRepository: ReviewRepository,
 ) {
 
     @Operation(summary = "리뷰 생성")
