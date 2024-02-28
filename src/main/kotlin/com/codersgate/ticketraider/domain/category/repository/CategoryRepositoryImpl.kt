@@ -3,7 +3,7 @@ package com.codersgate.ticketraider.domain.category.repository
 
 import com.codersgate.ticketraider.domain.category.model.Category
 import com.codersgate.ticketraider.domain.category.model.QCategory
-import com.codersgate.ticketraider.infra.querydsl.QueryDslSupport
+import com.codersgate.ticketraider.global.infra.querydsl.QueryDslSupport
 import com.querydsl.core.types.Expression
 import com.querydsl.core.types.Order
 import com.querydsl.core.types.OrderSpecifier
