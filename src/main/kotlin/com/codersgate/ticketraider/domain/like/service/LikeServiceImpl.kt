@@ -5,6 +5,7 @@ import com.codersgate.ticketraider.domain.like.dto.LikeResponse
 import com.codersgate.ticketraider.domain.like.model.Like
 import com.codersgate.ticketraider.domain.like.repository.LikeRepository
 import com.codersgate.ticketraider.domain.member.repository.MemberRepository
+import org.hibernate.annotations.NotFound
 import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -24,6 +25,12 @@ class LikeServiceImpl(
                 throw NotFoundException()
             else
                 likeRepository.getLikeList(pageable, memberId,eventId).map{ LikeResponse.from(it)}
+    }
+
+    override fun getLike(likeId: Long): LikeResponse {
+        return LikeResponse.from(likeRepository.findByIdOrNull(likeId)
+            ?: throw NotFoundException()
+        )
     }
 
     override fun createLike(memberId: Long, eventId: Long) {

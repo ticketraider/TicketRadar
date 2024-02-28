@@ -28,6 +28,15 @@ class LikeController(
         return ResponseEntity.status(HttpStatus.OK).body(likeService.getLikeList(pageable, userId, eventId))
     }
 
+    @Operation(summary = "좋아요 단건 조회")
+    @GetMapping("/{likeId}")
+    fun getLike(
+        @PathVariable likeId : Long
+    ) : ResponseEntity<LikeResponse>
+    {
+        return ResponseEntity.status(HttpStatus.OK).body(likeService.getLike(likeId))
+    }
+
     @Operation(summary = "좋아요 생성")
     @PostMapping()
     fun createLike(
