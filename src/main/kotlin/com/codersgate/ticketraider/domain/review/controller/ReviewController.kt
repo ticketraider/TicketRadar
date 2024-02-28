@@ -36,7 +36,7 @@ class ReviewController(
     }
 
     @Operation(summary = "통합 조회(전체/유저ID/이벤트ID")
-    @GetMapping()
+    @GetMapping("/v2")
     fun getReviewList_V2(
         @PageableDefault(size = 5, sort = ["id"]) pageable: Pageable,
         @RequestParam(required = false) userId: Long,
@@ -101,6 +101,4 @@ class ReviewController(
         reviewService.deleteReview(reviewId)
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build()
     }
-
-
 }
