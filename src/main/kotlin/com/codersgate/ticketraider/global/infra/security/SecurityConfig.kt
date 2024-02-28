@@ -22,6 +22,7 @@ class SecurityConfig(
             .httpBasic { it.disable() }
             .formLogin { it.disable() }
             .csrf { it.disable() }
+            .headers { it.frameOptions{ option -> option.sameOrigin() } } // H2 설정
             .authorizeHttpRequests {
                 it.requestMatchers(
                     "/members/**",
