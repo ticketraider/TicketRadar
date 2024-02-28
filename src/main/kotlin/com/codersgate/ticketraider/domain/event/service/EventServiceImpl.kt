@@ -3,15 +3,11 @@ package com.codersgate.ticketraider.domain.event.service
 import com.codersgate.ticketraider.domain.event.dto.CreateEventRequest
 import com.codersgate.ticketraider.domain.event.dto.EventResponse
 import com.codersgate.ticketraider.domain.event.dto.UpdateEventRequest
-import com.codersgate.ticketraider.domain.event.model.Bookable
 import com.codersgate.ticketraider.domain.event.model.Event
 import com.codersgate.ticketraider.domain.event.repository.EventRepository
-import com.codersgate.ticketraider.error.exception.ModelNotFoundException
-import org.springframework.data.domain.Page
-import org.springframework.data.domain.Pageable
+import com.codersgate.ticketraider.global.error.exception.ModelNotFoundException
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
-import org.springframework.ui.Model
 
 @Service
 class EventServiceImpl(
