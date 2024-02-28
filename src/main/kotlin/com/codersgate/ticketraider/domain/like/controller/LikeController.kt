@@ -45,6 +45,6 @@ class LikeController(
         @RequestParam(required = true) eventId : Long,
     ): ResponseEntity<Unit> {
         likeService.deleteLike(memberId, eventId)
-        return ResponseEntity.status(HttpStatus.OK).build()
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build()
     }
 }

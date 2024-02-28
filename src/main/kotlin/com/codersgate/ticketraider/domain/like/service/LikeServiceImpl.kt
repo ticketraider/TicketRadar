@@ -5,7 +5,6 @@ import com.codersgate.ticketraider.domain.like.dto.LikeResponse
 import com.codersgate.ticketraider.domain.like.model.Like
 import com.codersgate.ticketraider.domain.like.repository.LikeRepository
 import com.codersgate.ticketraider.domain.member.repository.MemberRepository
-import org.springframework.data.crossstore.ChangeSetPersister
 import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -19,16 +18,20 @@ class LikeServiceImpl(
     private var likeRepository: LikeRepository,
 ) : LikeService{
 
-    override fun getLikeList(pageable: Pageable, memberId: Long, eventId: Long) : Page<LikeResponse> {
-        return likeRepository.getLikeList(pageable, memberId,eventId).map{ LikeResponse.from(it)}
+    override fun getLikeList(pageable: Pageable, memberId: Long?, eventId: Long?) : Page<LikeResponse> {
+
+        return if( memberId == null && eventId == null)
+                throw NotFoundException()
+            else
+                likeRepository.getLikeList(pageable, memberId,eventId).map{ LikeResponse.from(it)}
     }
 
     override fun createLike(memberId: Long, eventId: Long) {
         val member = memberRepository.findByIdOrNull(memberId)
-            ?:throw ChangeSetPersister.NotFoundException()
+            ?:throw NotFoundException()
 
         val event = eventRepository.findByIdOrNull(eventId)
-            ?:throw ChangeSetPersister.NotFoundException()
+            ?:throw NotFoundException()
 
        likeRepository.findLikeByMemberIdAndEventId(memberId, eventId)
            ?.let{
@@ -41,10 +44,10 @@ class LikeServiceImpl(
 
     override fun deleteLike(memberId: Long, eventId: Long) {
         val member = memberRepository.findByIdOrNull(memberId)
-            ?:throw ChangeSetPersister.NotFoundException()
+            ?:throw NotFoundException()
 
         val event = eventRepository.findByIdOrNull(eventId)
-            ?:throw ChangeSetPersister.NotFoundException()
+            ?:throw NotFoundException()
 
         likeRepository.findLikeByMemberIdAndEventId(memberId, eventId)
             ?.let{
