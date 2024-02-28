@@ -22,7 +22,7 @@ class Member(
 
     @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false)
-    val role: String
+    val role: MemberRole
 
 //    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
 //    val tickets : List<ticket> = emptyList()
