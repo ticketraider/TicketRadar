@@ -1,0 +1,5 @@
+auth:
+  jwt:
+    issuer: team.sparta.com
+    secret: c5t6gzuXneIM3d0Eafy2F3MrkK41BUfD
+    accessTokenExpirationHour: 168
