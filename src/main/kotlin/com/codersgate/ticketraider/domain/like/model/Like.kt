@@ -1,28 +1,23 @@
 package com.codersgate.ticketraider.domain.like.model
 
+import com.codersgate.ticketraider.domain.event.model.Event
 import com.codersgate.ticketraider.domain.member.entity.Member
+import com.codersgate.ticketraider.global.common.BaseEntity
 import jakarta.persistence.*
 
 @Entity
 class Like (
 
-
-    @Column(name = "userId")
-    val userId : Long,
-
-    @Column(name = "eventId")
-    val eventId : Long,
+    @ManyToOne
+    @JoinColumn(name = "member_id")
+    val member: Member,
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
-    val user: Member,
-//
-//    @ManyToOne
-//    @JoinColumn(name = "event_id")
-//    val event:Event,
+    @JoinColumn(name = "event_id")
+    val event : Event,
 
 
-    ){
+    ) : BaseEntity() {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id:Long? = null
