@@ -12,12 +12,12 @@ import org.springframework.data.domain.Pageable
 class CustomReviewRepositoryImpl : CustomReviewRepository, QueryDslSupport(){
     private var q_review = QReview.review
 
-    override fun getReviewList_V2(pageable: Pageable, userId: Long, eventId: Long): Page<Review> {
+    override fun getReviewList_V2(pageable: Pageable, memberId: Long?, eventId: Long?): Page<Review> {
 
         val whereClause = BooleanBuilder()
 
-        //userId?.whereClause.and(q_review.userId.eq(userId))
-        //eventId?.whereClause.and(q_review.eventId.eq(eventId))
+        memberId?.let{whereClause.and(q_review.member.id.eq(memberId))}
+        eventId?.let{whereClause.and(q_review.event.id.eq(eventId))}
 
         val totalCounts = queryFactory
             .select(q_review.count())
@@ -55,11 +55,11 @@ class CustomReviewRepositoryImpl : CustomReviewRepository, QueryDslSupport(){
 
     }
 
-    override fun getReviewListByUserId(pageable: Pageable, userId:Long): Page<Review> {
+    override fun getReviewListByUserId(pageable: Pageable, memberId:Long): Page<Review> {
 
         val whereClause = BooleanBuilder()
 
-        //whereClause.and(q_review.userId.eq(userId))
+        whereClause.and(q_review.member.id.eq(memberId))
 
         val totalCounts = queryFactory
             .select(q_review.count())
@@ -83,7 +83,7 @@ class CustomReviewRepositoryImpl : CustomReviewRepository, QueryDslSupport(){
 
         val whereClause = BooleanBuilder()
 
-        //whereClause.and(q_review.eventId.eq(eventId))
+        whereClause.and(q_review.event.id.eq(eventId))
 
         val totalCounts = queryFactory
             .select(q_review.count())

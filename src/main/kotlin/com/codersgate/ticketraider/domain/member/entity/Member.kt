@@ -1,6 +1,9 @@
 package com.codersgate.ticketraider.domain.member.entity
 
+import com.codersgate.ticketraider.domain.like.model.Like
 import com.codersgate.ticketraider.domain.member.dto.MemberRequest
+import com.codersgate.ticketraider.domain.review.model.Review
+import com.codersgate.ticketraider.domain.ticket.entity.Ticket
 import com.codersgate.ticketraider.global.common.BaseEntity
 import jakarta.persistence.*
 import org.hibernate.annotations.SQLDelete
@@ -22,12 +25,18 @@ class Member(
 
     @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false)
-    val role: MemberRole
+    val role: MemberRole,
 
-//    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
-//    val tickets : List<ticket> = emptyList()
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
+    val tickets: List<Ticket> = emptyList(),
 
-    ): BaseEntity() {
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
+    val likes: List<Like> = emptyList(),
+
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
+    val reviews: List<Review> = emptyList()
+
+) : BaseEntity() {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null

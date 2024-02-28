@@ -5,4 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository
 
 interface EventRepository : JpaRepository<Event, Long> {
 //    fun findByPageable(pageable: Pageable): Page<Event>
+
 }

@@ -1,5 +1,7 @@
 package com.codersgate.ticketraider.domain.review.service
 
+import com.codersgate.ticketraider.domain.event.repository.EventRepository
+import com.codersgate.ticketraider.domain.member.repository.MemberRepository
 import com.codersgate.ticketraider.domain.review.dto.CreateReviewRequest
 import com.codersgate.ticketraider.domain.review.dto.ReviewResponse
 import com.codersgate.ticketraider.domain.review.dto.UpdateReviewRequest
@@ -14,24 +16,33 @@ import org.springframework.stereotype.Service
 @Service
 class ReviewServiceImpl(
     private val reviewRepository: ReviewRepository,
+    private val memberRepository: MemberRepository,
+    private val eventRepository: EventRepository,
 ) : ReviewService{
 
     override fun createReview(request: CreateReviewRequest) {
+        val member = memberRepository.findByIdOrNull(request.memberId)
+            ?:throw NotFoundException()
+
+        val event = eventRepository.findByIdOrNull(request.eventId)
+            ?:throw NotFoundException()
+
         reviewRepository.save(
             Review(
             request.title,
             request.content,
             request.rating,
-//            request.userId,
-//            request.eventId
+                member,
+                event,
             )
         )
     }
 
-    override fun getReviewList_V2(pageable: Pageable, userId : Long, eventId : Long) : Page<ReviewResponse>
+    override fun getReviewList_V2(pageable: Pageable, userId : Long?, eventId : Long?) : Page<ReviewResponse>
     {
         return reviewRepository.getReviewList_V2(pageable, userId, eventId).map{ ReviewResponse.from(it) }
     }
+
     override fun getReviewList(pageable : Pageable): Page<ReviewResponse> {
         return reviewRepository.getReviewList(pageable).map{ ReviewResponse.from(it) }
     }

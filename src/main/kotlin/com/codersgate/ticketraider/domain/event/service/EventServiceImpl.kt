@@ -69,13 +69,21 @@ class EventServiceImpl(
         priceRepository.save(price)
         eventRepository.save(event)
     }
-
-    override fun updateEvent(eventId: Long, eventRequest: UpdateEventRequest) {
+    @Transactional
+    override fun updateEvent(eventId: Long, request: UpdateEventRequest) {
         val event = eventRepository.findByIdOrNull(eventId)
             ?: throw ModelNotFoundException("Event", eventId)
-        event.title = eventRequest.title
+        Event(
+            posterImage = request.posterImage,
+            title = request.title,
+            eventInfo = request.eventInfo,
+            startDate = request.startDate,
+            endDate = request.endDate
+        )
+        eventRepository.save(event)
     }
 
+    @Transactional
     override fun deleteEvent(eventId: Long) {
         val event = eventRepository.findByIdOrNull(eventId)
             ?: throw ModelNotFoundException("Event", eventId)
