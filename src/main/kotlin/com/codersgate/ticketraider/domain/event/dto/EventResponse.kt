@@ -1,8 +1,7 @@
 package com.codersgate.ticketraider.domain.event.dto
 
-import com.codersgate.ticketraider.domain.event.model.Bookable
 import com.codersgate.ticketraider.domain.event.model.Event
-import com.codersgate.ticketraider.domain.event.repository.EventRepository
+import com.codersgate.ticketraider.domain.event.model.price.Price
 import java.text.SimpleDateFormat
 import java.util.Date
 
@@ -15,6 +14,7 @@ data class EventResponse(
     var eventInfo : String,
     var averageRating : Float,
     var posterImage : String,
+    val price: Price
 ){
     companion object {
         fun from(event : Event) : EventResponse{
@@ -31,6 +31,7 @@ data class EventResponse(
                 eventInfo = event.eventInfo,
                 averageRating = event.averageRating,
                 posterImage = event.posterImage,
+                price = event.price
             )
         }
     }

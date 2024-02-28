@@ -1,5 +1,7 @@
 package com.codersgate.ticketraider.domain.event.model
 
+import com.codersgate.ticketraider.domain.event.model.price.Price
+import com.codersgate.ticketraider.domain.event.model.seat.Seat
 import jakarta.persistence.*
 
 @Entity
@@ -33,8 +35,12 @@ class Event (
     // ERD 변경으로 인해 미사용
 //    @Column(name = "location")
 //    var location: String,
-//    @Column(name = "price")
-//    var price: Int,
+    @OneToOne(mappedBy = "event")
+    @Column(name = "price_id")
+    val price: Price,
+
+    @OneToMany(mappedBy = "event")
+    val seat: MutableList<Seat> = mutableListOf()
 )
 {
     @Id

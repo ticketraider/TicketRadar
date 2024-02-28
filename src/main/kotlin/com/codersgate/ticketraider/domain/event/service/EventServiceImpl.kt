@@ -3,28 +3,36 @@ package com.codersgate.ticketraider.domain.event.service
 import com.codersgate.ticketraider.domain.event.dto.CreateEventRequest
 import com.codersgate.ticketraider.domain.event.dto.EventResponse
 import com.codersgate.ticketraider.domain.event.dto.UpdateEventRequest
-import com.codersgate.ticketraider.domain.event.model.Bookable
+import com.codersgate.ticketraider.domain.event.dto.price.CreatePriceRequest
 import com.codersgate.ticketraider.domain.event.model.Event
+import com.codersgate.ticketraider.domain.event.model.price.Price
 import com.codersgate.ticketraider.domain.event.repository.EventRepository
-import com.codersgate.ticketraider.error.exception.ModelNotFoundException
-import org.springframework.data.domain.Page
-import org.springframework.data.domain.Pageable
+import com.codersgate.ticketraider.domain.event.repository.price.PriceRepository
+import com.codersgate.ticketraider.global.error.exception.ModelNotFoundException
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
-import org.springframework.ui.Model
 
 @Service
 class EventServiceImpl(
-    private val eventRepository: EventRepository
+    private val eventRepository: EventRepository,
+    private val priceRepository: PriceRepository,
 ) : EventService {
-    override fun createEvent(request: CreateEventRequest) {
-        val event = Event(
-            posterImage = request.posterImage,
-            title = request.title,
-            eventInfo = request.eventInfo,
-            startDate = request.startDate,
-            endDate = request.endDate,
+    override fun createEvent(createEventRequest: CreateEventRequest,createPriceRequest: CreatePriceRequest) {
+        val price = Price(
+            rPrice = createPriceRequest.rPrice,
+            sPrice = createPriceRequest.sPrice,
+            aPrice = createPriceRequest.aPrice
         )
+        val event = Event(
+            posterImage = createEventRequest.posterImage,
+            title = createEventRequest.title,
+            eventInfo = createEventRequest.eventInfo,
+            startDate = createEventRequest.startDate,
+            endDate = createEventRequest.endDate,
+            price = price
+        )
+        price.event = event
+        priceRepository.save(price)
         eventRepository.save(event)
     }
 
