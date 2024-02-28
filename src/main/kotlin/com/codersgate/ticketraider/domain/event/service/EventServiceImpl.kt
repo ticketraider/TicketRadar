@@ -45,6 +45,7 @@ class EventServiceImpl(
             endDate = eventRequest.endDate,
             place = place,
             category = category,
+            price = price
         )
         price.event = event
         eventRepository.save(event)

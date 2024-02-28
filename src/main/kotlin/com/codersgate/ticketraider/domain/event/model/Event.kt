@@ -46,8 +46,8 @@ class Event (
     @JoinColumn(name = "category_id")
     val category: Category,
 
-    @OneToMany(mappedBy = "event", fetch = FetchType.EAGER, cascade = [CascadeType.ALL], orphanRemoval = true)
-    val price: MutableList<Price> = mutableListOf(),
+    @OneToOne(mappedBy = "event", fetch = FetchType.EAGER, cascade = [CascadeType.ALL], orphanRemoval = true)
+    val price: Price,
 
     @OneToMany(mappedBy = "event", fetch = FetchType.EAGER, cascade = [CascadeType.ALL], orphanRemoval = true)
     val seat: MutableList<Seat?> = mutableListOf()

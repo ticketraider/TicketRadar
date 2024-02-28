@@ -11,7 +11,7 @@ import org.hibernate.annotations.SQLRestriction
 @SQLRestriction("is_deleted = false")
 @Table(name = "price")
 class Price (
-    @ManyToOne()
+    @OneToOne()
     @JoinColumn(name = "event_id")
     var event: Event? = null,
 
