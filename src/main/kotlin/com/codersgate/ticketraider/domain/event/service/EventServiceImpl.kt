@@ -5,7 +5,10 @@ import com.codersgate.ticketraider.domain.event.dto.EventResponse
 import com.codersgate.ticketraider.domain.event.dto.UpdateEventRequest
 import com.codersgate.ticketraider.domain.event.model.Event
 import com.codersgate.ticketraider.domain.event.repository.EventRepository
-import com.codersgate.ticketraider.global.error.exception.ModelNotFoundException
+import com.codersgate.ticketraider.error.exception.ModelNotFoundException
+import jakarta.transaction.Transactional
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 
@@ -13,6 +16,8 @@ import org.springframework.stereotype.Service
 class EventServiceImpl(
     private val eventRepository: EventRepository
 ) : EventService {
+
+    @Transactional
     override fun createEvent(request: CreateEventRequest) {
         val event = Event(
             posterImage = request.posterImage,
@@ -24,12 +29,21 @@ class EventServiceImpl(
         eventRepository.save(event)
     }
 
+    @Transactional
     override fun updateEvent(eventId: Long, request: UpdateEventRequest) {
         val event = eventRepository.findByIdOrNull(eventId)
             ?: throw ModelNotFoundException("Event", eventId)
-        event.title = request.title
+        Event(
+            posterImage = request.posterImage,
+            title = request.title,
+            eventInfo = request.eventInfo,
+            startDate = request.startDate,
+            endDate = request.endDate
+        )
+        eventRepository.save(event)
     }
 
+    @Transactional
     override fun deleteEvent(eventId: Long) {
         val event = eventRepository.findByIdOrNull(eventId)
             ?: throw ModelNotFoundException("Event", eventId)
