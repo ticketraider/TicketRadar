@@ -23,7 +23,7 @@ class MemberServiceImpl(
     private val passwordEncoder: PasswordEncoder,
     private val jwtPlugin: JwtPlugin,
 ): MemberService {
-    override fun signUp(memberRequest: MemberRequest) {
+    override fun signUp(memberRequest: MemberRequest,  role:MemberRole) {
         if (memberRepository.existsByEmail(memberRequest.email)) {
             throw EmailAlreadyExistException(memberRequest.email)
         }
@@ -32,7 +32,7 @@ class MemberServiceImpl(
                 email = memberRequest.email,
                 nickname = memberRequest.nickname,
                 password = passwordEncoder.encode(memberRequest.password),
-                role = MemberRole.MEMBER
+                role = role
             )
         )
     }

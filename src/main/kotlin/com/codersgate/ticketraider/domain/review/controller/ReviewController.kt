@@ -15,6 +15,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.parameters.P
+import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.*
 
 @RestController
@@ -33,6 +34,7 @@ class ReviewController(
         reviewService.createReview(request)
         return ResponseEntity.status(HttpStatus.OK).build()
     }
+
 
     @Operation(summary = "통합 조회(전체/유저ID/이벤트ID")
     @GetMapping("/v2")

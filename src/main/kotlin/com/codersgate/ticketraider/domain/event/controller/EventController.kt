@@ -26,21 +26,22 @@ class EventController(
         @RequestBody seatRequest: CreateSeatRequest
 
     ): ResponseEntity<Unit> {
+
         return ResponseEntity
         .status(HttpStatus.CREATED)
         .body(eventService.createEvent(categoryId, eventRequest, priceRequest, seatRequest))
     }
 
-    @Operation(summary = " 이벤트 수정")
-    @PutMapping("/{eventId}")
-fun updateEvent(
-    @PathVariable eventId : Long,
-    @RequestBody updateEventRequest: UpdateEventRequest
-    ): ResponseEntity<Unit> {
-    return ResponseEntity
-        .status(HttpStatus.OK)
-        .body(eventService.updateEvent(eventId,updateEventRequest))
-}
+//    @Operation(summary = " 이벤트 수정")
+//    @PutMapping("/{eventId}")
+//fun updateEvent(
+//    @PathVariable eventId : Long,
+//    @RequestBody updateEventRequest: UpdateEventRequest
+//    ): ResponseEntity<Unit> {
+//    return ResponseEntity
+//        .status(HttpStatus.OK)
+//        .body(eventService.updateEvent(eventId,updateEventRequest))
+//}
 
     @Operation(summary = "이벤트 삭제")
     @DeleteMapping("/{eventId}")

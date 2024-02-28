@@ -18,16 +18,21 @@ spring:
     open-in-view: false
 
   datasource:
-    driver-class-name: org.h2.Driver
-    url: jdbc:h2:mem:test
-    username: sa
-    password:
-  sql:
-    init:
-      mode: embedded
-  h2:
-    console:
-      enabled: true
+    driver-class-name: org.postgresql.Driver
+    url : jdbc:postgresql://aws-0-ap-northeast-2.pooler.supabase.com:5432/postgres
+    username : postgres.quydnpzzesfybdmsddyu
+    password : MygnlKjWIgchzP9k
+
+#    driver-class-name: org.postgresql.Driver
+#    url: jdbc:h2:mem:test
+#    username: sa
+#    password:
+#  sql:
+#    init:
+#      mode: embedded
+#  h2:
+#    console:
+#      enabled: true
 
 logging:
   level:

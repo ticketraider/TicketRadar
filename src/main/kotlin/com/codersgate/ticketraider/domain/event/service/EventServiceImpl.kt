@@ -17,6 +17,7 @@ import com.codersgate.ticketraider.global.error.exception.ModelNotFoundException
 import jakarta.persistence.Column
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
 
 @Service
@@ -71,16 +72,18 @@ class EventServiceImpl(
     }
     @Transactional
     override fun updateEvent(eventId: Long, request: UpdateEventRequest) {
-        val event = eventRepository.findByIdOrNull(eventId)
-            ?: throw ModelNotFoundException("Event", eventId)
-        Event(
-            posterImage = request.posterImage,
-            title = request.title,
-            eventInfo = request.eventInfo,
-            startDate = request.startDate,
-            endDate = request.endDate
-        )
-        eventRepository.save(event)
+//        val event = eventRepository.findByIdOrNull(eventId)
+//            ?: throw ModelNotFoundException("Event", eventId)
+//        Event(
+//            posterImage = request.posterImage,
+//            title = request.title,
+//            eventInfo = request.eventInfo,
+//            startDate = request.startDate,
+//            endDate = request.endDate
+//        )
+//        eventRepository.save(event)
+
+        TODO()
     }
 
     @Transactional
