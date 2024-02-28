@@ -8,7 +8,7 @@ import com.codersgate.ticketraider.domain.ticket.entity.Ticket
 import com.codersgate.ticketraider.domain.ticket.repository.TicketRepository
 import com.codersgate.ticketraider.global.error.exception.InvalidCredentialException
 import com.codersgate.ticketraider.global.error.exception.ModelNotFoundException
-import com.codersgate.ticketraider.global.infra.security.UserPrincipal
+import com.codersgate.ticketraider.global.infra.security.jwt.UserPrincipal
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.findByIdOrNull

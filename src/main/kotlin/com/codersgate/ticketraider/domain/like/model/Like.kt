@@ -6,6 +6,7 @@ import com.codersgate.ticketraider.global.common.BaseEntity
 import jakarta.persistence.*
 
 @Entity
+@Table(name = "likes")
 class Like (
 
     @ManyToOne

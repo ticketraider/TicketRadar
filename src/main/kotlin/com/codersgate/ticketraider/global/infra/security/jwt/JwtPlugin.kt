@@ -17,11 +17,12 @@ class JwtPlugin(
     @Value("\${auth.jwt.secret}") private val secret: String,
     @Value("\${auth.jwt.accessTokenExpirationHour}") private val accessTokenExpirationHour: Long,
 ) {
-    fun validateToken(jwt: String): Result<Jws<Claims>> { // kotlin 에서는 try catch 대신 result 사용
+
+    fun validateToken(jwt: String): Result<Jws<Claims>> {
         return kotlin.runCatching {
             val key = Keys.hmacShaKeyFor(secret.toByteArray(StandardCharsets.UTF_8))
-            // key 로 서명 거증, 만료시간체크
             Jwts.parser().verifyWith(key).build().parseSignedClaims(jwt)
+
         }
     }
 
@@ -29,14 +30,13 @@ class JwtPlugin(
         return generateToken(subject, email, role, Duration.ofHours(accessTokenExpirationHour))
     }
 
-
     private fun generateToken(subject: String, email: String, role: String, expirationPeriod: Duration): String {
         val claims: Claims = Jwts.claims()
-            .add(mapOf("role" to role, "email" to email))
+            .add(mapOf("email" to email, "role" to role))
             .build()
 
-        val now = Instant.now()
         val key = Keys.hmacShaKeyFor(secret.toByteArray(StandardCharsets.UTF_8))
+        val now = Instant.now()
 
         return Jwts.builder()
             .subject(subject)
@@ -47,5 +47,4 @@ class JwtPlugin(
             .signWith(key)
             .compact()
     }
-
 }

@@ -1,5 +1,5 @@
 package com.codersgate.ticketraider.global.infra.security.jwt
-import com.codersgate.ticketraider.global.infra.security.UserPrincipal
+
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
@@ -29,25 +29,21 @@ class JwtAuthenticationFilter(
             jwtPlugin.validateToken(jwt)
                 .onSuccess {
                     val userId = it.payload.subject.toLong()
-                    val role = it.payload.get("role", String::class.java)
                     val email = it.payload.get("email", String::class.java)
+                    val role = it.payload.get("role", String::class.java)
 
                     val principal = UserPrincipal(
                         id = userId,
                         email = email,
                         roles = setOf(role)
                     )
-                    // Authentication 구현체 생성
                     val authentication = JwtAuthenticationToken(
                         principal = principal,
-                        // request로 부터 요청 상세정보 생성
                         details = WebAuthenticationDetailsSource().buildDetails(request)
                     )
-                    // SecurityContext에 authentication 객체 저장
                     SecurityContextHolder.getContext().authentication = authentication
                 }
         }
-
         filterChain.doFilter(request, response)
     }
 

@@ -18,13 +18,13 @@ class Place(
     var totalSeat: Int,
 
     @Column(name = "rSeat")
-    var rSeat: Int,
+    var seatR: Int,
 
     @Column(name = "sSeat")
-    var sSeat: Int,
+    var seatS: Int,
 
     @Column(name = "aSeat")
-    var aSeat: Int,
+    var seatA: Int,
 
     ) : BaseEntity() {
 

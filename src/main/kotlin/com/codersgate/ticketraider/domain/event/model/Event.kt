@@ -4,9 +4,14 @@ import com.codersgate.ticketraider.domain.category.model.Category
 import com.codersgate.ticketraider.domain.event.model.price.Price
 import com.codersgate.ticketraider.domain.event.model.seat.Seat
 import com.codersgate.ticketraider.domain.place.model.Place
+import com.codersgate.ticketraider.global.common.BaseEntity
 import jakarta.persistence.*
+import org.hibernate.annotations.SQLDelete
+import org.hibernate.annotations.SQLRestriction
 
 @Entity
+@SQLDelete(sql = "UPDATE event SET is_deleted = true WHERE id = ?") // DELETE 쿼리 날아올 시 대신 실행
+@SQLRestriction("is_deleted = false")
 @Table(name = "event")
 class Event (
     @Column(name = "title")
@@ -41,14 +46,12 @@ class Event (
     @JoinColumn(name = "category_id")
     val category: Category,
 
-    @OneToOne()
-    @JoinColumn(name = "price_id")
-    val price: Price,
+    @OneToMany(mappedBy = "event", fetch = FetchType.EAGER, cascade = [CascadeType.ALL], orphanRemoval = true)
+    val price: MutableList<Price> = mutableListOf(),
 
     @OneToMany(mappedBy = "event", fetch = FetchType.EAGER, cascade = [CascadeType.ALL], orphanRemoval = true)
     val seat: MutableList<Seat?> = mutableListOf()
-)
-{
+) : BaseEntity(){
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)

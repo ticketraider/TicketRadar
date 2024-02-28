@@ -1,4 +1,4 @@
-package com.codersgate.ticketraider.global.infra.security
+package com.codersgate.ticketraider.global.infra.security.jwt
 
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.SimpleGrantedAuthority
@@ -11,5 +11,6 @@ data class UserPrincipal(
     constructor(id: Long, email: String, roles: Set<String>) : this(
         id,
         email,
-        roles.map { SimpleGrantedAuthority("ROLE_$it") })
+        roles.map { SimpleGrantedAuthority("ROLE_$it") }
+    )
 }

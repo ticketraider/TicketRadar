@@ -17,10 +17,10 @@ class PlaceServiceImpl(
     override fun createPlace(request: CreatePlaceRequest) {
         val place = Place(
             name = request.name,
-            rSeat = request.rSeat,
-            sSeat = request.sSeat,
-            aSeat = request.aSeat,
-            totalSeat = (request.rSeat + request.sSeat + request.aSeat)
+            seatR = request.seatR,
+            seatS = request.seatS,
+            seatA = request.seatA,
+            totalSeat = (request.seatR + request.seatS + request.seatA)
         )
         placeRepository.save(place)
 
@@ -30,10 +30,10 @@ class PlaceServiceImpl(
         val place = placeRepository.findByIdOrNull(placeId)
             ?: throw ModelNotFoundException("place", placeId)
         place.name = request.name
-        place.rSeat = request.rSeat
-        place.sSeat = request.sSeat
-        place.aSeat = request.aSeat
-        place.totalSeat = (request.rSeat + request.sSeat + request.aSeat)
+        place.seatR = request.seatR
+        place.seatS = request.seatS
+        place.seatA = request.seatA
+        place.totalSeat = (request.seatR + request.seatS + request.seatA)
     }
 
     override fun deletePlace(placeId: Long) {

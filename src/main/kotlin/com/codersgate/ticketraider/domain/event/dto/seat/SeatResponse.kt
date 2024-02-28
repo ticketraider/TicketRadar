@@ -6,18 +6,18 @@ import java.time.LocalDate
 data class SeatResponse(
     val date: LocalDate,
     val totalSeat: Int,
-    val rSeat: Int,
-    val sSeat: Int,
-    val aSeat: Int,
+    val seatR: Int,
+    val seatS: Int,
+    val seatA: Int,
 ){
     companion object {
         fun from(seat: Seat): SeatResponse {
             return SeatResponse(
                 date = seat.date,
                 totalSeat = seat.totalSeat,
-                rSeat = seat.rSeat,
-                sSeat = seat.sSeat,
-                aSeat = seat.aSeat
+                seatR = seat.seatR,
+                seatS = seat.seatS,
+                seatA = seat.seatA
             )
         }
     }

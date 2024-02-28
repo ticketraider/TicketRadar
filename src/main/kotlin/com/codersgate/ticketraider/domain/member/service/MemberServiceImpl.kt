@@ -10,8 +10,8 @@ import com.codersgate.ticketraider.domain.member.repository.MemberRepository
 import com.codersgate.ticketraider.global.error.exception.EmailAlreadyExistException
 import com.codersgate.ticketraider.global.error.exception.InvalidCredentialException
 import com.codersgate.ticketraider.global.error.exception.ModelNotFoundException
-import com.codersgate.ticketraider.global.infra.security.UserPrincipal
 import com.codersgate.ticketraider.global.infra.security.jwt.JwtPlugin
+import com.codersgate.ticketraider.global.infra.security.jwt.UserPrincipal
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
