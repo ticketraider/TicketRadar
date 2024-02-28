@@ -1,6 +1,6 @@
-package com.codersgate.ticketraider.infra.security.jwt
+package com.codersgate.ticketraider.global.infra.security.jwt
 
-import com.codersgate.ticketraider.infra.security.UserPrincipal
+import com.codersgate.ticketraider.global.infra.security.UserPrincipal
 import org.springframework.security.authentication.AbstractAuthenticationToken
 import org.springframework.security.web.authentication.WebAuthenticationDetails
 import java.io.Serializable

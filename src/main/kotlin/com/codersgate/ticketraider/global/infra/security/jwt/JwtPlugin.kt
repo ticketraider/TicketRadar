@@ -1,4 +1,4 @@
-package com.codersgate.ticketraider.infra.security.jwt
+package com.codersgate.ticketraider.global.infra.security.jwt
 
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jws

@@ -1,5 +1,5 @@
-package com.codersgate.ticketraider.infra.security.jwt
-import com.codersgate.ticketraider.infra.security.UserPrincipal
+package com.codersgate.ticketraider.global.infra.security.jwt
+import com.codersgate.ticketraider.global.infra.security.UserPrincipal
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse

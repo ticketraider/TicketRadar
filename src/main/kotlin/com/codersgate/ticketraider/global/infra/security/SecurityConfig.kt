@@ -1,5 +1,5 @@
-package com.codersgate.ticketraider.infra.security
-import com.codersgate.ticketraider.infra.security.jwt.JwtAuthenticationFilter
+package com.codersgate.ticketraider.global.infra.security
+import com.codersgate.ticketraider.global.infra.security.jwt.JwtAuthenticationFilter
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
