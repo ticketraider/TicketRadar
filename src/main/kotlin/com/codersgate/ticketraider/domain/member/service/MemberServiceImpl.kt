@@ -49,7 +49,7 @@ class MemberServiceImpl(
             token = jwtPlugin.generateAccessToken(
                 subject = member.id.toString(),
                 email = member.email,
-                role = MemberRole.MEMBER.name
+                role = member.role.name
             )
         )
     }
