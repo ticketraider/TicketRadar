@@ -38,10 +38,11 @@ class ReviewServiceImpl(
         )
     }
 
-    override fun getReviewList_V2(pageable: Pageable, userId : Long, eventId : Long) : Page<ReviewResponse>
+    override fun getReviewList_V2(pageable: Pageable, userId : Long?, eventId : Long?) : Page<ReviewResponse>
     {
         return reviewRepository.getReviewList_V2(pageable, userId, eventId).map{ ReviewResponse.from(it) }
     }
+
     override fun getReviewList(pageable : Pageable): Page<ReviewResponse> {
         return reviewRepository.getReviewList(pageable).map{ ReviewResponse.from(it) }
     }

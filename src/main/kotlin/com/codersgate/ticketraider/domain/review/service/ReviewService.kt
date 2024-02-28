@@ -14,7 +14,7 @@ interface ReviewService {
 
     fun createReview(request: CreateReviewRequest)
     fun getReviewList(pageable : Pageable) : Page<ReviewResponse>
-    fun getReviewList_V2(pageable: Pageable,userId : Long,eventId : Long) : Page<ReviewResponse>
+    fun getReviewList_V2(pageable: Pageable,userId : Long?,eventId : Long?) : Page<ReviewResponse>
     fun getReviewListByEvent(pageable : Pageable, eventId : Long) : Page<ReviewResponse>
     fun getReviewListByUser(pageable : Pageable, userId: Long) : Page<ReviewResponse>
     fun getReview(reviewId : Long) : ReviewResponse
