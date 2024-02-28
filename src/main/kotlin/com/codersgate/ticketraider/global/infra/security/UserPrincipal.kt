@@ -1,4 +1,4 @@
-package com.codersgate.ticketraider.infra.security
+package com.codersgate.ticketraider.global.infra.security
 
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.SimpleGrantedAuthority
