@@ -4,6 +4,7 @@ import com.codersgate.ticketraider.domain.event.dto.CreateEventRequest
 import com.codersgate.ticketraider.domain.event.dto.EventResponse
 import com.codersgate.ticketraider.domain.event.dto.UpdateEventRequest
 import com.codersgate.ticketraider.domain.event.dto.price.CreatePriceRequest
+import com.codersgate.ticketraider.domain.event.dto.seat.CreateSeatRequest
 import com.codersgate.ticketraider.domain.event.service.EventService
 import io.swagger.v3.oas.annotations.Operation
 import org.springframework.http.HttpStatus
@@ -19,13 +20,15 @@ class EventController(
     @Operation(summary = " 이벤트 생성")
     @PostMapping
     fun createEvent(
-        @RequestBody createEventRequest: CreateEventRequest,
-        @RequestBody createPriceRequest: CreatePriceRequest,
+        @RequestParam categoryId: Long,
+        @RequestBody eventRequest: CreateEventRequest,
+        @RequestBody priceRequest: CreatePriceRequest,
+        @RequestBody seatRequest: CreateSeatRequest
 
     ): ResponseEntity<Unit> {
         return ResponseEntity
         .status(HttpStatus.CREATED)
-        .body(eventService.createEvent(createEventRequest))
+        .body(eventService.createEvent(categoryId, eventRequest, priceRequest, seatRequest))
     }
 
     @Operation(summary = " 이벤트 수정")

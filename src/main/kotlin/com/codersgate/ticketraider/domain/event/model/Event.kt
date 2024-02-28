@@ -1,7 +1,9 @@
 package com.codersgate.ticketraider.domain.event.model
 
+import com.codersgate.ticketraider.domain.category.model.Category
 import com.codersgate.ticketraider.domain.event.model.price.Price
 import com.codersgate.ticketraider.domain.event.model.seat.Seat
+import com.codersgate.ticketraider.domain.place.model.Place
 import jakarta.persistence.*
 
 @Entity
@@ -25,22 +27,26 @@ class Event (
     @Column(name = "endDate")
     var endDate: String,
 
-//    @Enumerated(EnumType.STRING)
-//    @Column(name = "bookable")
-//    var bookable: Bookable = Bookable.OPEN,
-
     @Column(name = "eventInfo")
     var eventInfo: String,
 
     // ERD 변경으로 인해 미사용
 //    @Column(name = "location")
 //    var location: String,
-    @OneToOne(mappedBy = "event")
-    @Column(name = "price_id")
+    @ManyToOne
+    @JoinColumn(name = "place_id")
+    val place: Place,
+
+    @ManyToOne
+    @JoinColumn(name = "category_id")
+    val category: Category,
+
+    @OneToOne()
+    @JoinColumn(name = "price_id")
     val price: Price,
 
-    @OneToMany(mappedBy = "event")
-    val seat: MutableList<Seat> = mutableListOf()
+    @OneToMany(mappedBy = "event", fetch = FetchType.EAGER, cascade = [CascadeType.ALL], orphanRemoval = true)
+    val seat: MutableList<Seat?> = mutableListOf()
 )
 {
     @Id

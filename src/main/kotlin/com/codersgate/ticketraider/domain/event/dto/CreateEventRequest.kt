@@ -1,11 +1,9 @@
 package com.codersgate.ticketraider.domain.event.dto
 
 data class CreateEventRequest (
-    var posterImage : String,
-    var title : String,
-    var eventInfo : String,
-    var startDate : String,
-    var endDate : String,
+    val posterImage : String,
+    val title : String,
+    val eventInfo : String,
 )
 
 
