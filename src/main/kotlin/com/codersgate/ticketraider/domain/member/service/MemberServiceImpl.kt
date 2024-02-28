@@ -32,7 +32,7 @@ class MemberServiceImpl(
                 email = memberRequest.email,
                 nickname = memberRequest.nickname,
                 password = passwordEncoder.encode(memberRequest.password),
-                role = MemberRole.USER
+                role = MemberRole.MEMBER
             )
         )
     }
@@ -49,7 +49,7 @@ class MemberServiceImpl(
             token = jwtPlugin.generateAccessToken(
                 subject = member.id.toString(),
                 email = member.email,
-                role = MemberRole.USER.name
+                role = MemberRole.MEMBER.name
             )
         )
     }
