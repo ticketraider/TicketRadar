@@ -33,9 +33,6 @@ class Member(
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
     val likes: List<Like> = emptyList(),
 
-    @Column(name = "likeCount")
-    var likeCount : Long = 0,
-
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
     val reviews: List<Review> = emptyList()
 

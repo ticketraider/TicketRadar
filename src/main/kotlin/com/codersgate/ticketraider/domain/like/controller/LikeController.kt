@@ -37,13 +37,13 @@ class LikeController(
         return ResponseEntity.status(HttpStatus.OK).body(likeService.getLike(likeId))
     }
 
-    @Operation(summary = "좋아요 생성")
+    @Operation(summary = "좋아요 체크")
     @PostMapping()
-    fun createLike(
+    fun chkLike(
         @RequestParam(required = true) memberId : Long,
         @RequestParam(required = true) eventId : Long,
     ): ResponseEntity<Unit> {
-        likeService.createLike(memberId, eventId)
+        likeService.chkLike(memberId, eventId)
         return ResponseEntity.status(HttpStatus.OK).build()
     }
 
@@ -55,7 +55,7 @@ class LikeController(
         return ResponseEntity.status(HttpStatus.OK).build()
     }
 
-    @Operation(summary = "좋아요 취소")
+    @Operation(summary = "좋아요 취소(체크로 통합)")
     @DeleteMapping()
     fun deleteLike(
         @RequestParam(required = true) memberId : Long,

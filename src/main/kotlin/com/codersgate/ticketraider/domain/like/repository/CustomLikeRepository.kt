@@ -7,5 +7,6 @@ import org.springframework.data.domain.Pageable
 interface CustomLikeRepository {
     fun getLikeList(pageable:Pageable, memberId: Long?, eventId: Long?) : Page<Like>
 
-    fun getMemberIdList() : List<Long>
+    fun getEventIdList(): List<Long>
+    fun countEventId(eventId: Long) : Long
 }
