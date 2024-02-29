@@ -4,8 +4,12 @@ import com.codersgate.ticketraider.domain.event.model.Event
 import com.codersgate.ticketraider.domain.member.entity.Member
 import com.codersgate.ticketraider.global.common.BaseEntity
 import jakarta.persistence.*
+import org.hibernate.annotations.SQLDelete
+import org.hibernate.annotations.SQLRestriction
 
 @Entity
+@SQLDelete(sql = "UPDATE likes SET is_deleted = true WHERE id = ?") // DELETE 쿼리 날아올 시 대신 실행
+@SQLRestriction("is_deleted = false")
 @Table(name = "likes")
 class Like (
 

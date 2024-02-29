@@ -13,7 +13,7 @@ import org.hibernate.annotations.SQLRestriction
 @Table(name = "categories")
 class Category(
 
-    @Column(name = "title")
+    @Column(name = "title", unique = true)
     var title: String,
 
     @OneToMany(

@@ -66,7 +66,6 @@ data class EventRequest(
     }
 
     fun toPriceAndEvent(category: Category, place: Place): Pair<Price, Event> {
-
         val event = Event(
             posterImage = posterImage,
             title = title,
