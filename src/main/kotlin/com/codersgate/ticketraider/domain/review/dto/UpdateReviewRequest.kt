@@ -13,10 +13,4 @@ data class UpdateReviewRequest (
 
     @field:Range(min=1, max=5)
     val rating : Int,
-
-    @field:NotNull
-    val userId : Long,
-
-    @field:NotNull
-    var eventId : Long,
 )
