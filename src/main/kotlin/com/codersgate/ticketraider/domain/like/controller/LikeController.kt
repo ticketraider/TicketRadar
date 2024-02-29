@@ -47,6 +47,14 @@ class LikeController(
         return ResponseEntity.status(HttpStatus.OK).build()
     }
 
+    @Operation(summary = "좋아요 최신화")
+    @PatchMapping("/update")
+    fun updateLike() : ResponseEntity<Unit>
+    {
+        likeService.updateLike()
+        return ResponseEntity.status(HttpStatus.OK).build()
+    }
+
     @Operation(summary = "좋아요 취소")
     @DeleteMapping()
     fun deleteLike(

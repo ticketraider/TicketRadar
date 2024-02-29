@@ -35,4 +35,11 @@ class CustomLikeRepositoryImpl : CustomLikeRepository, QueryDslSupport() {
 
         return PageImpl(contents, pageable, totalCounts)
     }
+
+    override fun getMemberIdList(): List<Long> {
+        return queryFactory.select(q_like.member.id)
+            .from(q_like)
+            .groupBy(q_like.member)
+            .fetch()
+    }
 }

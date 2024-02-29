@@ -11,5 +11,6 @@ interface LikeService {
     fun getLike(likeId:Long) : LikeResponse
     fun createLike(memberId: Long, eventId : Long)
 
+    fun updateLike()
     fun deleteLike(memberId: Long, eventId : Long)
 }
