@@ -28,7 +28,7 @@ class EventController(
     @Operation(summary = " 이벤트 수정")
     @PutMapping("/{eventId}")
 fun updateEvent(
-        @PathVariable eventId: String,
+        @PathVariable eventId: Long,
         @RequestBody eventRequest: EventRequest,
     ): ResponseEntity<Unit> {
     return ResponseEntity

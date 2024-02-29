@@ -40,7 +40,7 @@ class EventServiceImpl(
     }
 
     @Transactional
-    override fun updateEvent(eventId: String, eventRequest: EventRequest) {
+    override fun updateEvent(eventId: Long,eventRequest: EventRequest) {
         val date = eventRequest.startDate
         val duration = eventRequest.endDate.compareTo(eventRequest.startDate)
         for (i in 0..duration) {

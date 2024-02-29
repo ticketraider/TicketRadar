@@ -9,7 +9,7 @@ interface EventService {
 
     fun createEvent(eventRequest: EventRequest)
 
-    fun updateEvent(eventId: String, eventRequest: EventRequest)
+    fun updateEvent(eventId: Long, eventRequest: EventRequest)
 
     fun deleteEvent(eventId: Long)
 
