@@ -9,7 +9,8 @@ interface LikeService {
     fun getLikeList(pageable: Pageable, memberId: Long?, eventId: Long?) : Page<LikeResponse>
 
     fun getLike(likeId:Long) : LikeResponse
-    fun createLike(memberId: Long, eventId : Long)
+    fun chkLike(memberId: Long, eventId : Long)
 
+    fun updateLike()
     fun deleteLike(memberId: Long, eventId : Long)
 }

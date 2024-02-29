@@ -6,6 +6,7 @@ import com.codersgate.ticketraider.domain.like.model.Like
 import com.codersgate.ticketraider.domain.like.repository.LikeRepository
 import com.codersgate.ticketraider.domain.member.repository.MemberRepository
 import org.hibernate.annotations.NotFound
+import org.slf4j.LoggerFactory
 import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -33,7 +34,7 @@ class LikeServiceImpl(
         )
     }
 
-    override fun createLike(memberId: Long, eventId: Long) {
+    override fun chkLike(memberId: Long, eventId: Long) {
         val member = memberRepository.findByIdOrNull(memberId)
             ?:throw NotFoundException()
 
@@ -42,11 +43,30 @@ class LikeServiceImpl(
 
        likeRepository.findLikeByMemberIdAndEventId(memberId, eventId)
            ?.let{
-               it.isDeleted=false
+               it.isDeleted = !it.isDeleted
+               event.likeCount += if(it.isDeleted) 1 else -1
                likeRepository.save(it)
-           }
-           ?: likeRepository.save(Like(member,event))
 
+           }
+           ?:run{
+               event.likeCount++
+               likeRepository.save(Like(member,event))
+           }
+
+        eventRepository.save(event)
+    }
+
+    override fun updateLike() {
+        // 이벤트 id 리스트를 Like 에서 가져와서
+        likeRepository.getEventIdList().map{e_id ->
+            // 각 id 마다 해당하는 like 가 몇개인지 확인하고   // 각 이벤트 객체의 count 를 저장
+            val event = eventRepository.findByIdOrNull(e_id)
+                ?.also {e ->
+                    e.likeCount = likeRepository.countEventId(e.id!!).toInt()
+                }
+                ?: throw NotFoundException()
+            eventRepository.save(event)
+        }
     }
 
     override fun deleteLike(memberId: Long, eventId: Long) {

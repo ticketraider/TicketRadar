@@ -7,4 +7,7 @@ import org.springframework.stereotype.Repository
 
 interface LikeRepository : JpaRepository<Like, Long> , CustomLikeRepository{
     fun findLikeByMemberIdAndEventId(memberId:Long, eventId:Long) : Like?
+
+    fun findAllByMemberId(memberId: Long) : List<Like>
+
 }
