@@ -2,7 +2,7 @@ package com.codersgate.ticketraider.domain.event.model
 
 import com.codersgate.ticketraider.domain.category.model.Category
 import com.codersgate.ticketraider.domain.event.model.price.Price
-import com.codersgate.ticketraider.domain.event.model.seat.Seat
+import com.codersgate.ticketraider.domain.event.model.seat.AvailableSeat
 import com.codersgate.ticketraider.domain.place.model.Place
 import com.codersgate.ticketraider.global.common.BaseEntity
 import jakarta.persistence.*
@@ -36,9 +36,6 @@ class Event(
     @Column(name = "event_info")
     var eventInfo: String,
 
-    // ERD 변경으로 인해 미사용
-//    @Column(name = "location")
-//    var location: String,
     @ManyToOne
     @JoinColumn(name = "place_id")
     val place: Place,
@@ -51,7 +48,7 @@ class Event(
     var price: Price? = null,
 
     @OneToMany(mappedBy = "event", fetch = FetchType.EAGER, cascade = [CascadeType.ALL], orphanRemoval = true)
-    val seat: MutableList<Seat?> = mutableListOf()
+    val availableSeats: MutableList<AvailableSeat> = mutableListOf()
 ) : BaseEntity() {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

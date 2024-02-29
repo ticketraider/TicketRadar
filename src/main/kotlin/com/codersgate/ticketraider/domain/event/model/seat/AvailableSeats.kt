@@ -8,10 +8,10 @@ import org.hibernate.annotations.SQLRestriction
 import java.time.LocalDate
 
 @Entity
-@SQLDelete(sql = "UPDATE seats SET is_deleted = true WHERE id = ?") // DELETE 쿼리 날아올 시 대신 실행
+@SQLDelete(sql = "UPDATE available_seats SET is_deleted = true WHERE id = ?") // DELETE 쿼리 날아올 시 대신 실행
 @SQLRestriction("is_deleted = false")
-@Table(name = "seats")
-class Seat(
+@Table(name = "available_seats")
+class AvailableSeat(
     @ManyToOne
     @JoinColumn(name = "event_id")
     val event: Event? = null,

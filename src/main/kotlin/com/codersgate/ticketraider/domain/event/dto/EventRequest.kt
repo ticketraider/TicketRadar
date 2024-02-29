@@ -3,7 +3,7 @@ package com.codersgate.ticketraider.domain.event.dto
 import com.codersgate.ticketraider.domain.category.model.Category
 import com.codersgate.ticketraider.domain.event.model.Event
 import com.codersgate.ticketraider.domain.event.model.price.Price
-import com.codersgate.ticketraider.domain.event.model.seat.Seat
+import com.codersgate.ticketraider.domain.event.model.seat.AvailableSeat
 import com.codersgate.ticketraider.domain.place.model.Place
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
@@ -85,14 +85,14 @@ data class EventRequest(
         return Pair(price, event)
     }
 
-    fun toSeat(event: Event, place: Place, localDate: LocalDate): Seat {
-        val seat = Seat(
+    fun toAvailableSeat(event: Event, place: Place, localDate: LocalDate): AvailableSeat {
+        val availableSeat = AvailableSeat(
             event = event,
             date = localDate,//여기도 알맞은 날짜 넣도록하기
             seatR = place.seatR,
             seatS = place.seatS,
             seatA = place.seatA
         )
-        return seat
+        return availableSeat
     }
 }
