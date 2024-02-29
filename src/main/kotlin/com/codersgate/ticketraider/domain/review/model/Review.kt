@@ -11,10 +11,14 @@ import jakarta.persistence.Id
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.Table
+import org.hibernate.annotations.SQLDelete
+import org.hibernate.annotations.SQLRestriction
 
 
 @Entity
 @Table(name = "reviews")
+@SQLDelete(sql = "UPDATE reviews SET is_deleted = true WHERE id = ?") // DELETE 쿼리 날아올 시 대신 실행
+@SQLRestriction("is_deleted = false")
 class Review (
     @Column(name = "title")
     var title : String,

@@ -26,7 +26,8 @@ class ReviewController(
 ) {
 
     @Operation(summary = "리뷰 생성")
-    @PostMapping()
+    @Transactional
+    @PostMapping("/create")
     fun createReview(
         @Valid @RequestBody request: CreateReviewRequest
     ) : ResponseEntity<Unit>
@@ -40,8 +41,8 @@ class ReviewController(
     @GetMapping("/v2")
     fun getReviewList_V2(
         @PageableDefault(size = 5, sort = ["id"]) pageable: Pageable,
-        @RequestParam(required = false) memberId: Long,
-        @RequestParam(required = false) eventId: Long,
+        @RequestParam(required = false) memberId: Long?,
+        @RequestParam(required = false) eventId: Long?,
     ) : ResponseEntity<Page<ReviewResponse>>
     {
         return ResponseEntity.status(HttpStatus.OK).body(reviewService.getReviewList_V2(pageable, memberId, eventId))
@@ -58,7 +59,7 @@ class ReviewController(
     }
 
     @Operation(summary = "이벤트 ID 별 조회")
-    @GetMapping("/{eventId}")
+    @GetMapping("/events/{eventId}")
     fun getReviewListByEvent(
         @PageableDefault(size = 5, sort = ["id"]) pageable: Pageable,
         @PathVariable eventId : Long,
@@ -67,7 +68,7 @@ class ReviewController(
     }
 
     @Operation(summary = "멤버 ID 별 조회")
-    @GetMapping("/{memberId}")
+    @GetMapping("/members/{memberId}")
     fun getReviewListByUser(
         @PageableDefault(size = 5, sort = ["id"]) pageable: Pageable,
         @PathVariable memberId : Long
@@ -85,7 +86,8 @@ class ReviewController(
     }
 
     @Operation(summary = "리뷰 수정")
-    @PutMapping("/{reviewId}")
+    @Transactional
+    @PutMapping("/update/{reviewId}")
     fun updateReview(
         @PathVariable reviewId : Long,
         @Valid @RequestBody request : UpdateReviewRequest
@@ -95,7 +97,8 @@ class ReviewController(
     }
 
     @Operation(summary = "리뷰 삭제")
-    @DeleteMapping("/{reviewId}")
+    @Transactional
+    @DeleteMapping("/delete/{reviewId}")
    fun deleteReview(
         @PathVariable reviewId : Long,
    ) :  ResponseEntity<Unit>{
