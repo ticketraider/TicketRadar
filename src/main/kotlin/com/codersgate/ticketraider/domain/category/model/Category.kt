@@ -1,6 +1,7 @@
 package com.codersgate.ticketraider.domain.category.model
 
 
+import com.codersgate.ticketraider.domain.event.model.Event
 import com.codersgate.ticketraider.global.common.BaseEntity
 import jakarta.persistence.*
 import org.hibernate.annotations.SQLDelete
@@ -15,13 +16,13 @@ class Category(
     @Column(name = "title")
     var title: String,
 
-//    @OneToMany(
-//        mappedBy = "category",
-//        fetch = FetchType.LAZY,
-//        cascade = [CascadeType.ALL],
-//        orphanRemoval = true
-//    )
-//    var eventList: MutableList<Event> = mutableListOf(),
+    @OneToMany(
+        mappedBy = "category",
+        fetch = FetchType.LAZY,
+        cascade = [CascadeType.ALL],
+        orphanRemoval = true
+    )
+    var eventList: MutableList<Event> = mutableListOf(),
 
     ) : BaseEntity() {
 

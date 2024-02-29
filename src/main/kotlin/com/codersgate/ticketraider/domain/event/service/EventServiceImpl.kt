@@ -1,10 +1,8 @@
 package com.codersgate.ticketraider.domain.event.service
 
 import com.codersgate.ticketraider.domain.category.repository.CategoryRepository
-import com.codersgate.ticketraider.domain.event.dto.CreateEventRequest
+import com.codersgate.ticketraider.domain.event.dto.EventRequest
 import com.codersgate.ticketraider.domain.event.dto.EventResponse
-import com.codersgate.ticketraider.domain.event.model.Event
-import com.codersgate.ticketraider.domain.event.model.price.Price
 import com.codersgate.ticketraider.domain.event.model.seat.Seat
 import com.codersgate.ticketraider.domain.event.repository.EventRepository
 import com.codersgate.ticketraider.domain.event.repository.price.PriceRepository
@@ -15,6 +13,8 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 @Service
 class EventServiceImpl(
@@ -24,61 +24,33 @@ class EventServiceImpl(
     private val seatRepository: SeatRepository,
     private val placeRepository: PlaceRepository
 ) : EventService {
-    override fun createEvent(
-        categoryId: Long,
-        eventRequest: CreateEventRequest,
-    ) {
-        val category = categoryRepository.findByIdOrNull(categoryId)
-            ?: throw ModelNotFoundException("category", categoryId)
+    override fun createEvent(eventRequest: EventRequest) {
+        val category = categoryRepository.findByIdOrNull(eventRequest.categoryId)
+            ?: throw ModelNotFoundException("category", eventRequest.categoryId)
         val place = placeRepository.findPlaceByName(eventRequest.place)
-            ?: throw ModelNotFoundException("place", 0)
-        val price = Price(
-            seatRPrice = eventRequest.seatRPrice,
-            seatSPrice = eventRequest.seatSPrice,
-            seatAPrice = eventRequest.seatAPrice
-        )
-        val event = Event(
-            posterImage = eventRequest.posterImage,
-            title = eventRequest.title,
-            eventInfo = eventRequest.eventInfo,
-            startDate = eventRequest.startDate,
-            endDate = eventRequest.endDate,
-            place = place,
-            category = category,
-            price = price
-        )
-        price.event = event
+            ?: throw ModelNotFoundException("place", 0)//예외 추가 필요함
+        val (price, event) = eventRequest.toPriceAndEvent(category, place)
+        event.price = price
         eventRepository.save(event)
         priceRepository.save(price)
-        //place 네임 기반으로 place리포지토리에서 조회후 넣어주기
-        //startDate와 endDate를 기반으로 날짜 계산후 for반복문 완성해주기
-        for (i in 1..3) {
-            val seat = Seat(
-                event = event,
-                date = LocalDate.now(),//여기도 알맞은 날짜 넣도록하기
-                seatR = place.seatR,
-                seatS = place.seatS,
-                seatA = place.seatA
-            )
+
+        val date = eventRequest.startDate
+        val duration = eventRequest.endDate.compareTo(eventRequest.startDate)
+        for (i in 0..duration) {
+            val seat = eventRequest.toSeat(event,place,date.plusDays(i.toLong()))
             event.seat.add(seat)
             seatRepository.save(seat)
         }
-
     }
-//    @Transactional
-//    override fun updateEvent(eventId: Long, request: UpdateEventRequest) {
-//        val event = eventRepository.findByIdOrNull(eventId)
-//            ?: throw ModelNotFoundException("Event", eventId)
-//        Event(
-//            posterImage = request.posterImage,
-//            title = request.title,
-//            eventInfo = request.eventInfo,
-//            startDate = request.startDate,
-//            endDate = request.endDate
-//        )
-//        eventRepository.save(event)
-//        TODO()
-//    }
+    @Transactional
+    override fun updateEvent(eventId: String, eventRequest: EventRequest) {
+        val date = eventRequest.startDate
+        val duration = eventRequest.endDate.compareTo(eventRequest.startDate)
+        for (i in 0..duration) {
+            println(date)
+            println(duration)
+        }
+    }
 
     @Transactional
     override fun deleteEvent(eventId: Long) {

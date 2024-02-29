@@ -8,31 +8,32 @@ import com.codersgate.ticketraider.global.common.BaseEntity
 import jakarta.persistence.*
 import org.hibernate.annotations.SQLDelete
 import org.hibernate.annotations.SQLRestriction
+import java.time.LocalDate
 
 @Entity
-@SQLDelete(sql = "UPDATE event SET is_deleted = true WHERE id = ?") // DELETE 쿼리 날아올 시 대신 실행
+@SQLDelete(sql = "UPDATE events SET is_deleted = true WHERE id = ?") // DELETE 쿼리 날아올 시 대신 실행
 @SQLRestriction("is_deleted = false")
-@Table(name = "event")
-class Event (
+@Table(name = "events")
+class Event(
     @Column(name = "title")
     var title: String,
 
-    @Column(name = "posterImage")
+    @Column(name = "poster_image")
     var posterImage: String,
 
-    @Column(name = "likeCount")
+    @Column(name = "like_count")
     var likeCount: Int = 0,
 
-    @Column(name = "averageRating")
+    @Column(name = "average_rating")
     var averageRating: Float = 0F,
 
-    @Column(name = "startDate")
-    var startDate: String,
+    @Column(name = "start_date")
+    var startDate: LocalDate,
 
-    @Column(name = "endDate")
-    var endDate: String,
+    @Column(name = "end_date")
+    var endDate: LocalDate,
 
-    @Column(name = "eventInfo")
+    @Column(name = "event_info")
     var eventInfo: String,
 
     // ERD 변경으로 인해 미사용
@@ -47,13 +48,12 @@ class Event (
     val category: Category,
 
     @OneToOne(mappedBy = "event", fetch = FetchType.EAGER, cascade = [CascadeType.ALL], orphanRemoval = true)
-    val price: Price,
+    var price: Price? = null,
 
     @OneToMany(mappedBy = "event", fetch = FetchType.EAGER, cascade = [CascadeType.ALL], orphanRemoval = true)
     val seat: MutableList<Seat?> = mutableListOf()
-) : BaseEntity(){
+) : BaseEntity() {
     @Id
-    @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null
 }

@@ -8,9 +8,9 @@ import org.hibernate.annotations.SQLRestriction
 import java.time.LocalDate
 
 @Entity
-@SQLDelete(sql = "UPDATE seat SET is_deleted = true WHERE id = ?") // DELETE 쿼리 날아올 시 대신 실행
+@SQLDelete(sql = "UPDATE seats SET is_deleted = true WHERE id = ?") // DELETE 쿼리 날아올 시 대신 실행
 @SQLRestriction("is_deleted = false")
-@Table(name = "seat")
+@Table(name = "seats")
 class Seat(
     @ManyToOne
     @JoinColumn(name = "event_id")
@@ -23,20 +23,20 @@ class Seat(
     @Column(name = "bookable")
     var bookable: Bookable = Bookable.OPEN,
 
-    @Column(name = "rSeat")
+    @Column(name = "seat_r")
     var seatR: Int,
 
-    @Column(name = "sSeat")
+    @Column(name = "seat_s")
     var seatS: Int,
 
-    @Column(name = "aSeat")
+    @Column(name = "seat_a")
     var seatA: Int,
 
-    @Column(name = "totalSeat")
-    var totalSeat: Int = seatR+seatS+seatA
+    @Column(name = "total_seat")
+    var totalSeat: Int = seatR + seatS + seatA
 
 
-    ): BaseEntity() {
+) : BaseEntity() {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null
