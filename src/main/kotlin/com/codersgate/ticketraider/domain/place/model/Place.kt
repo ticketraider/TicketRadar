@@ -6,9 +6,9 @@ import org.hibernate.annotations.SQLDelete
 import org.hibernate.annotations.SQLRestriction
 
 @Entity
-@SQLDelete(sql = "UPDATE place SET is_deleted = true WHERE id = ?") // DELETE 쿼리 날아올 시 대신 실행
+@SQLDelete(sql = "UPDATE places SET is_deleted = true WHERE id = ?") // DELETE 쿼리 날아올 시 대신 실행
 @SQLRestriction("is_deleted = false")
-@Table(name = "place")
+@Table(name = "places")
 class Place(
 
     @Column(name = "name")

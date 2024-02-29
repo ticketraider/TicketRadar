@@ -1,8 +1,8 @@
 package com.codersgate.ticketraider.domain.event.repository.seat
 
-import com.codersgate.ticketraider.domain.event.model.seat.Seat
+import com.codersgate.ticketraider.domain.event.model.seat.AvailableSeat
 import org.springframework.data.jpa.repository.JpaRepository
 
-interface SeatRepository : JpaRepository<Seat, Long>{
-    fun findAllByEventId(eventId: Long): List<Seat?>
+interface SeatRepository : JpaRepository<AvailableSeat, Long> {
+    fun findAllByEventId(eventId: Long): List<AvailableSeat?>
 }

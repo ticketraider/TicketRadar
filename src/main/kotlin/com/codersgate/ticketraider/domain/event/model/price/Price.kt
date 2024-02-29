@@ -7,21 +7,21 @@ import org.hibernate.annotations.SQLDelete
 import org.hibernate.annotations.SQLRestriction
 
 @Entity
-@SQLDelete(sql = "UPDATE price SET is_deleted = true WHERE id = ?") // DELETE 쿼리 날아올 시 대신 실행
+@SQLDelete(sql = "UPDATE prices SET is_deleted = true WHERE id = ?") // DELETE 쿼리 날아올 시 대신 실행
 @SQLRestriction("is_deleted = false")
-@Table(name = "price")
+@Table(name = "prices")
 class Price (
     @OneToOne()
     @JoinColumn(name = "event_id")
-    var event: Event? = null,
+    var event: Event,
 
-    @Column(name = "r_price")
+    @Column(name = "seat_r_price")
     var seatRPrice: Int,
 
-    @Column(name = "s_price")
+    @Column(name = "seat_s_price")
     var seatSPrice: Int,
 
-    @Column(name = "a_price")
+    @Column(name = "seat_a_price")
     var seatAPrice: Int,
 
 ): BaseEntity(){

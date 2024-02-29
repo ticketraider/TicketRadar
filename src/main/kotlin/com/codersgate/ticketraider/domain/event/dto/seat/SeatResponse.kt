@@ -1,6 +1,6 @@
 package com.codersgate.ticketraider.domain.event.dto.seat
 
-import com.codersgate.ticketraider.domain.event.model.seat.Seat
+import com.codersgate.ticketraider.domain.event.model.seat.AvailableSeat
 import java.time.LocalDate
 
 data class SeatResponse(
@@ -9,15 +9,15 @@ data class SeatResponse(
     val seatR: Int,
     val seatS: Int,
     val seatA: Int,
-){
+) {
     companion object {
-        fun from(seat: Seat): SeatResponse {
+        fun from(availableSeat: AvailableSeat): SeatResponse {
             return SeatResponse(
-                date = seat.date,
-                totalSeat = seat.totalSeat,
-                seatR = seat.seatR,
-                seatS = seat.seatS,
-                seatA = seat.seatA
+                date = availableSeat.date,
+                totalSeat = availableSeat.totalSeat,
+                seatR = availableSeat.seatR,
+                seatS = availableSeat.seatS,
+                seatA = availableSeat.seatA
             )
         }
     }

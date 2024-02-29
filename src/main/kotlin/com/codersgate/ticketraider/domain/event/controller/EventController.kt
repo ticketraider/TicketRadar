@@ -1,7 +1,7 @@
 package com.codersgate.ticketraider.domain.event.controller
 
 
-import com.codersgate.ticketraider.domain.event.dto.CreateEventRequest
+import com.codersgate.ticketraider.domain.event.dto.EventRequest
 import com.codersgate.ticketraider.domain.event.dto.EventResponse
 import com.codersgate.ticketraider.domain.event.service.EventService
 import io.swagger.v3.oas.annotations.Operation
@@ -18,24 +18,23 @@ class EventController(
     @Operation(summary = " 이벤트 생성")
     @PostMapping
     fun createEvent(
-        @RequestParam categoryId: Long,
-        @RequestBody eventRequest: CreateEventRequest
+        @RequestBody eventRequest: EventRequest
     ): ResponseEntity<Unit> {
         return ResponseEntity
         .status(HttpStatus.CREATED)
-        .body(eventService.createEvent(categoryId, eventRequest))
+        .body(eventService.createEvent(eventRequest))
     }
 
-//    @Operation(summary = " 이벤트 수정")
-//    @PutMapping("/{eventId}")
-//fun updateEvent(
-//    @PathVariable eventId : Long,
-//    @RequestBody updateEventRequest: UpdateEventRequest
-//    ): ResponseEntity<Unit> {
-//    return ResponseEntity
-//        .status(HttpStatus.OK)
-//        .body(eventService.updateEvent(eventId,updateEventRequest))
-//}
+    @Operation(summary = " 이벤트 수정")
+    @PutMapping("/{eventId}")
+fun updateEvent(
+        @PathVariable eventId: Long,
+        @RequestBody eventRequest: EventRequest,
+    ): ResponseEntity<Unit> {
+    return ResponseEntity
+        .status(HttpStatus.OK)
+        .body(eventService.updateEvent(eventId, eventRequest))
+}
 
     @Operation(summary = "이벤트 삭제")
     @DeleteMapping("/{eventId}")

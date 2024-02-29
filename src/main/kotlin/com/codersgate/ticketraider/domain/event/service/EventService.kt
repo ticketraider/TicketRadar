@@ -1,18 +1,15 @@
 package com.codersgate.ticketraider.domain.event.service
 
-import com.codersgate.ticketraider.domain.event.dto.CreateEventRequest
+import com.codersgate.ticketraider.domain.event.dto.EventRequest
 import com.codersgate.ticketraider.domain.event.dto.EventResponse
 import org.springframework.stereotype.Service
 
 @Service
 interface EventService {
 
-    fun createEvent(
-        categoryId: Long,
-        eventRequest: CreateEventRequest,
-    )
+    fun createEvent(eventRequest: EventRequest)
 
-//    fun updateEvent(eventId: Long, updateEventRequest: UpdateEventRequest)
+    fun updateEvent(eventId: Long, eventRequest: EventRequest)
 
     fun deleteEvent(eventId: Long)
 
