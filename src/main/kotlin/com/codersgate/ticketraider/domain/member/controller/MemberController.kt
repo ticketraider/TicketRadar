@@ -54,10 +54,10 @@ class MemberController(
     }
 
     @Operation(summary = "프로필 수정")
-    @PreAuthorize("hasAnyRole('MEMBER')")
-    @PutMapping("/members/update")
+    @PreAuthorize("hasAnyRole('MEMBER', 'ADMIN')")
+    @PutMapping("/update")
     fun updateProfile(
-        @Valid @RequestParam memberRequest: MemberRequest,
+        @Valid @RequestBody memberRequest: MemberRequest,
         @AuthenticationPrincipal user: UserPrincipal
     ): ResponseEntity<Unit> {
         return ResponseEntity
@@ -66,7 +66,7 @@ class MemberController(
     }
 
     @Operation(summary = "회원 탈퇴")
-    @PreAuthorize("hasAnyRole('MEMBER')")
+    @PreAuthorize("hasAnyRole('MEMBER', 'ADMIN')")
     @DeleteMapping("/members/unregister")
     fun unregister(
         @AuthenticationPrincipal user: UserPrincipal

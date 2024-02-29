@@ -62,10 +62,9 @@ class MemberServiceImpl(
 
     @Transactional
     override fun updateProfile(memberRequest: MemberRequest, user: UserPrincipal) {
-        val member = memberRepository.findByEmail(memberRequest.email)
+        val member = memberRepository.findByIdOrNull(user.id)
             ?: throw InvalidCredentialException("")
-        if (member.id != user.id) throw InvalidCredentialException("")
-        memberRepository.save(member.updateProfile(memberRequest))
+        member.updateProfile(memberRequest)
     }
 
     @Transactional
