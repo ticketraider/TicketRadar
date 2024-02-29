@@ -29,7 +29,6 @@ class TicketServiceImpl(
             Ticket(
                 date = createTicketRequest.date,
                 grade = createTicketRequest.grade,
-                price = createTicketRequest.price,
                 seatNo = createTicketRequest.seatNo,
                 event = event,
                 member = member
@@ -53,7 +52,7 @@ class TicketServiceImpl(
         ticketRepository.delete(ticket)
     }
 
-    override fun getTicketListByUserId(userId: Long, pageable: Pageable): Page<TicketResponse> {
-        return ticketRepository.getListByUserId(pageable, userId).map { TicketResponse.from(it) }
+    override fun getTicketListByUserId(user: UserPrincipal, pageable: Pageable): Page<TicketResponse> {
+        return ticketRepository.getListByUserId(pageable, user.id).map { TicketResponse.from(it) }
     }
 }
