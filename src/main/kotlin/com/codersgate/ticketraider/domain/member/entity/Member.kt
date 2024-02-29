@@ -11,7 +11,7 @@ import org.hibernate.annotations.SQLRestriction
 
 @Table(name = "members")
 @Entity
-@SQLDelete(sql = "UPDATE category SET is_deleted = true WHERE id = ?") // DELETE 쿼리 날아올 시 대신 실행
+@SQLDelete(sql = "UPDATE members SET is_deleted = true WHERE id = ?") // DELETE 쿼리 날아올 시 대신 실행
 @SQLRestriction("is_deleted = false")
 class Member(
     @Column(name = "email", unique = true)
@@ -41,10 +41,9 @@ class Member(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null
 
-    fun updateProfile(memberRequest: MemberRequest): Member {
+    fun updateProfile(memberRequest: MemberRequest) {
         this.email = memberRequest.email
         this.password = memberRequest.password
         this.nickname = memberRequest.nickname
-        return this
     }
 }
