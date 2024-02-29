@@ -9,12 +9,11 @@ spring:
     hibernate:
       ddl-auto: update
     properties:
-      format_sql: true
       highlight_sql: true
       use_sql_comments: true
       default_batch_fetch_size: 500
       hibernate:
-        show_sql: true
+        format_sql: true
     open-in-view: false
 
   datasource:
@@ -33,7 +32,6 @@ spring:
 #  h2:
 #    console:
 #      enabled: true
-
 logging:
   level:
     org:
