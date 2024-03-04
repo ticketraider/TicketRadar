@@ -15,6 +15,12 @@ spring:
       hibernate:
         format_sql: true
     open-in-view: false
+  data:
+    redis:
+      port: 6379  # 레디스 포트( 기본 6379 ) , 호스트 설정
+      host: localhost
+  cache:
+    type: redis # 캐싱 타입
 
   datasource:
     driver-class-name: org.postgresql.Driver

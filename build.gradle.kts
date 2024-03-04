@@ -75,6 +75,7 @@ dependencies {
     testImplementation("org.postgresql:postgresql")//테스트용 데이터소스URL
 
     implementation("org.springframework.boot:spring-boot-starter-data-redis") //Lettuce
+    implementation("org.springframework.boot:spring-boot-starter-cache") // 레디스 캐시
     implementation("org.redisson:redisson-spring-boot-starter:3.21.1") //Redisson
 
 }
