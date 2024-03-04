@@ -9,6 +9,7 @@ import com.codersgate.ticketraider.domain.ticket.repository.TicketRepository
 import com.codersgate.ticketraider.global.error.exception.InvalidCredentialException
 import com.codersgate.ticketraider.global.error.exception.ModelNotFoundException
 import com.codersgate.ticketraider.global.infra.security.jwt.UserPrincipal
+import org.springframework.cache.annotation.Cacheable
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.findByIdOrNull
@@ -20,6 +21,13 @@ class TicketServiceImpl(
     val memberRepository: MemberRepository,
     val eventRepository: EventRepository
 ): TicketService {
+
+    @Cacheable(cacheNames = ["tickets"],
+        key="#createTicketRequest.eventId + '_' " +
+                "+ #createTicketRequest.date + '_' " +
+                "+ #createTicketRequest.grade + '_' " +
+                "+ #createTicketRequest.seatNo"
+    )
     override fun createTicket(createTicketRequest: CreateTicketRequest) {
         val event = eventRepository.findByIdOrNull(createTicketRequest.eventId)
             ?: throw ModelNotFoundException("event", createTicketRequest.eventId)
