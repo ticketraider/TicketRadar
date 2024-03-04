@@ -8,10 +8,11 @@ import com.codersgate.ticketraider.domain.event.repository.price.PriceRepository
 import com.codersgate.ticketraider.domain.event.repository.seat.AvailableSeatRepository
 import com.codersgate.ticketraider.domain.place.repository.PlaceRepository
 import com.codersgate.ticketraider.global.error.exception.ModelNotFoundException
-import org.hibernate.query.sqm.tree.SqmNode.log
+import org.springframework.data.domain.Page
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import org.springframework.data.domain.Pageable
 
 @Service
 class EventServiceImpl(
@@ -35,14 +36,35 @@ class EventServiceImpl(
         val duration = eventRequest.endDate.compareTo(eventRequest.startDate)
         for (i in 0..duration) {
             val seat = eventRequest.toAvailableSeat(event, place, date.plusDays(i.toLong()))
-            event.availableSeats.add(seat)
             availableSeatRepository.save(seat)
         }
     }
 
-    @Transactional
-    override fun updateEvent(eventId: Long,eventRequest: EventRequest) {
-        TODO()
+
+    override fun updateEvent(eventId: Long, eventRequest: EventRequest) {
+        var event = eventRepository.findByIdOrNull(eventId)
+            ?: throw ModelNotFoundException("Event", eventId)
+        var price = priceRepository.findByEventId(eventId)
+            ?: throw ModelNotFoundException("Price", eventId)
+        val category = categoryRepository.findByIdOrNull(eventRequest.categoryId)
+            ?: throw ModelNotFoundException("category", eventRequest.categoryId)
+        val place = placeRepository.findPlaceByName(eventRequest.place)
+            ?: throw ModelNotFoundException("place", 0)
+
+        check(eventRequest.startDate != event.startDate || eventRequest.endDate != event.endDate) {
+            availableSeatRepository.findAllByEventId(event.id!!).map { availableSeatRepository.delete(it!!) }
+            val date = eventRequest.startDate
+            val duration = eventRequest.endDate.compareTo(eventRequest.startDate)
+            for (i in 0..duration) {
+                val seat = eventRequest.toAvailableSeat(event, place, date.plusDays(i.toLong()))
+                availableSeatRepository.save(seat)
+            }
+        }
+
+        val (newPrice, newEvent) = eventRequest.toPriceAndEvent(category, place)
+        event.price = newPrice
+        price = newPrice
+        event = newEvent
     }
 
     @Transactional
@@ -52,23 +74,18 @@ class EventServiceImpl(
         eventRepository.delete(event)
     }
 
-    override fun getEventList(): List<EventResponse> {
-//        val eventList = eventRepository.findAll()
-//        return eventList.map { EventResponse.from( it ) }
-        TODO()
+    override fun getPaginatedEventList(pageable: Pageable, status: String?, categoryId: Long?): Page<EventResponse>? {
+
+        val category = categoryRepository.findByIdOrNull(categoryId)
+            ?: throw ModelNotFoundException("Category", categoryId)
+
+        val eventList = eventRepository.findByPageable(pageable, category)
+        return eventList.map { EventResponse.from(it) }
     }
 
     override fun getEvent(eventId: Long): EventResponse {
         val event = eventRepository.findByIdOrNull(eventId)
             ?: throw ModelNotFoundException("Event", eventId)
-        val price = priceRepository.findByIdOrNull(event.price!!.id)
-            ?: throw ModelNotFoundException("Event", eventId)
-        val seat = availableSeatRepository.findByIdOrNull(1)
-            ?: throw ModelNotFoundException("Event", eventId)
-        return EventResponse.from(event,price,seat)
+        return EventResponse.from(event)
     }
-
-//    override fun getPaginatedEventList(pageable: Pageable, status: String?): Page<EventResponse>? {
-//        return  eventRepository.findByPageable(pageable).map{EventResponse.from(it)}
-//    }
 }
