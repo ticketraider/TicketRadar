@@ -5,6 +5,8 @@ import com.codersgate.ticketraider.domain.member.repository.MemberRepository
 import com.codersgate.ticketraider.domain.ticket.dto.CreateTicketRequest
 import com.codersgate.ticketraider.domain.ticket.dto.TicketResponse
 import com.codersgate.ticketraider.domain.ticket.entity.Ticket
+import com.codersgate.ticketraider.domain.ticket.entity.TicketGrade
+import com.codersgate.ticketraider.domain.ticket.entity.TicketStatus
 import com.codersgate.ticketraider.domain.ticket.repository.TicketRepository
 import com.codersgate.ticketraider.global.error.exception.InvalidCredentialException
 import com.codersgate.ticketraider.global.error.exception.ModelNotFoundException
@@ -19,7 +21,7 @@ class TicketServiceImpl(
     val ticketRepository: TicketRepository,
     val memberRepository: MemberRepository,
     val eventRepository: EventRepository
-): TicketService {
+) : TicketService {
     override fun createTicket(createTicketRequest: CreateTicketRequest) {
         val event = eventRepository.findByIdOrNull(createTicketRequest.eventId)
             ?: throw ModelNotFoundException("event", createTicketRequest.eventId)
@@ -31,7 +33,14 @@ class TicketServiceImpl(
                 grade = createTicketRequest.grade,
                 seatNo = createTicketRequest.seatNo,
                 event = event,
-                member = member
+                member = member,
+                price = when (createTicketRequest.grade) {
+                    TicketGrade.R -> event.price!!.seatRPrice
+                    TicketGrade.S -> event.price!!.seatSPrice
+                    TicketGrade.A -> event.price!!.seatAPrice
+                },
+                ticketStatus = TicketStatus.UNPAID,
+                place = event.place.toString()
             )
         )
     }
@@ -46,7 +55,7 @@ class TicketServiceImpl(
     override fun deleteTicket(ticketId: Long, user: UserPrincipal) {
         val ticket = ticketRepository.findByIdOrNull(ticketId)
             ?: throw ModelNotFoundException("Ticket", ticketId)
-        if(ticket.member.id!! != user.id) {
+        if (ticket.member.id!! != user.id) {
             throw InvalidCredentialException("")
         }
         ticketRepository.delete(ticket)
