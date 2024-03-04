@@ -29,10 +29,26 @@ class Ticket(
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "member_id", nullable = false)
-    val member: Member
+    val member: Member,
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "ticket_status", nullable = false)
+    var ticketStatus: TicketStatus,
+
+    @Column(name = "price", nullable = false)
+    val price: Int,
+
+    @Column(name = "place", nullable = false)
+    val place: String
 
 ): BaseEntity() {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null
+
+    fun toggleTicketStatus() {
+        ticketStatus = if (ticketStatus == TicketStatus.UNPAID) {
+            TicketStatus.PAID
+        } else TicketStatus.UNPAID
+    }
 }
