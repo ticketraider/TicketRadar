@@ -3,8 +3,17 @@ auth:
     issuer: team.sparta.com
     secret: c5t6gzuXneIM3d0Eafy2F3MrkK41BUfD
     accessTokenExpirationHour: 168
-
 spring:
+  data:
+    redis:
+      host: 127.0.0.1
+      port: 6379
+#      password: ${REDIS_PASSWORD}
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
   jpa:
     hibernate:
       ddl-auto: update
@@ -15,23 +24,45 @@ spring:
       hibernate:
         format_sql: true
     open-in-view: false
-
   datasource:
     driver-class-name: org.postgresql.Driver
-    url : jdbc:postgresql://aws-0-ap-northeast-2.pooler.supabase.com:5432/postgres
-    username : postgres.quydnpzzesfybdmsddyu
-    password : MygnlKjWIgchzP9k
-
-#    driver-class-name: org.postgresql.Driver
-#    url: jdbc:h2:mem:test
-#    username: sa
-#    password:
-#  sql:
-#    init:
-#      mode: embedded
-#  h2:
-#    console:
-#      enabled: true
+    url : ${DB_URL}
+    username : ${DB_USERNAME}
+    password : ${DB_PASSWORD}
+logging:
+  level:
+    org:
+      hibernate:
+        SQL: debug
+        orm:
+          jdbc:
+            bind: trace
+      springframework:
+        security: debug
+---
+spring:
+  config:
+    activate:
+      on-profile: test
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      highlight_sql: true
+      use_sql_comments: true
+      default_batch_fetch_size: 500
+      hibernate:
+        format_sql: true
+    open-in-view: false
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:tcp://localhost/~/test
+    username: sa
+    password:
+  h2:
+    console:
+      enabled: true # 콘솔을 enable 해야 H2 콘솔에 접근할 수 있다.
+      path: /h2-console
 logging:
   level:
     org:
