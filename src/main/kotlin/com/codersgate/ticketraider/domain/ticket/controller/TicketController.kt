@@ -40,16 +40,16 @@ class TicketController(
     }
 
     @Operation(summary = "멤버 티켓리스트 조회")
-    @GetMapping("/get/{userId}")
+    @GetMapping("/getList")
     fun getTicketListByUserId(
         @PageableDefault(
             size = 15, sort = ["id"]
         ) pageable: Pageable,
-        @PathVariable userId: Long
+        @AuthenticationPrincipal user: UserPrincipal
     ): ResponseEntity<Page<TicketResponse>> {
         return ResponseEntity
             .status(HttpStatus.OK)
-            .body(ticketService.getTicketListByUserId(userId, pageable))
+            .body(ticketService.getTicketListByUserId(user, pageable))
     }
 
     // 티켓 수정 : 과정 정리 필요

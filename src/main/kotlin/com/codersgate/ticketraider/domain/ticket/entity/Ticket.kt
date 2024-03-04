@@ -6,7 +6,7 @@ import com.codersgate.ticketraider.global.common.BaseEntity
 import jakarta.persistence.*
 import org.hibernate.annotations.SQLDelete
 import org.hibernate.annotations.SQLRestriction
-import java.util.Date
+import java.time.LocalDate
 
 @Table(name = "tickets")
 @SQLDelete(sql = "UPDATE tickets SET is_deleted = true WHERE id = ?") // DELETE 쿼리 날아올 시 대신 실행
@@ -14,23 +14,20 @@ import java.util.Date
 @Entity
 class Ticket(
     @Column(name = "date")
-    val date: Date,
+    val date: LocalDate,
 
     @Enumerated(EnumType.STRING)
     @Column(name = "grade", nullable = false)
     var grade: TicketGrade,
 
-    @Column(name = "price", nullable = false)
-    val price: Int,
-
     @Column(name = "seatNo", nullable = false)
     val seatNo: Int,
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "event_id", nullable = false)
     val event: Event,
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "member_id", nullable = false)
     val member: Member
 
