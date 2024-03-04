@@ -63,7 +63,7 @@ dependencies {
     runtimeOnly("io.jsonwebtoken:jjwt-impl:0.12.3")//시큐리티
     runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.12.3")//시큐리티
     runtimeOnly("org.postgresql:postgresql")
-    runtimeOnly ("com.h2database:h2")
+    runtimeOnly("com.h2database:h2")
 
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
     testImplementation("org.springframework.boot:spring-boot-starter-test") //기본 테스트 의존성
