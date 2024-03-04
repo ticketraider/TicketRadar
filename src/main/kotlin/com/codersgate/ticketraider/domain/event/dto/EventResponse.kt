@@ -20,10 +20,9 @@ data class EventResponse(
     val posterImage: String,
     val place: String,
     val price: PriceResponse,
-    val seat: AvailableSeatResponse,
 ) {
     companion object {
-        fun from(event: Event, price: Price, availableSeat: AvailableSeat): EventResponse {
+        fun from(event: Event): EventResponse {
             return EventResponse(
                 id = event.id!!,
                 title = event.title,
@@ -34,8 +33,7 @@ data class EventResponse(
                 averageRating = event.averageRating,
                 posterImage = event.posterImage,
                 place = event.place.name,
-                price = PriceResponse.from(price),
-                seat = AvailableSeatResponse.from(availableSeat)
+                price = PriceResponse.from(event.price!!)
             )
         }
     }
