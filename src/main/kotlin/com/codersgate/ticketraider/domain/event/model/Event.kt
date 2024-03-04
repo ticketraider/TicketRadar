@@ -38,17 +38,17 @@ class Event(
 
     @ManyToOne
     @JoinColumn(name = "place_id")
-    val place: Place,
+    var place: Place,
 
     @ManyToOne
     @JoinColumn(name = "category_id")
-    val category: Category,
+    var category: Category,
 
     @OneToOne(mappedBy = "event", fetch = FetchType.EAGER, cascade = [CascadeType.ALL], orphanRemoval = true)
     var price: Price? = null,
 
     @OneToMany(mappedBy = "event", fetch = FetchType.EAGER, cascade = [CascadeType.ALL], orphanRemoval = true)
-    val availableSeats: MutableList<AvailableSeat> = mutableListOf()
+    var availableSeats: MutableList<AvailableSeat> = mutableListOf()
 ) : BaseEntity() {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

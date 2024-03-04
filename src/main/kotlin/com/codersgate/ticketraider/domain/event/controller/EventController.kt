@@ -5,9 +5,12 @@ import com.codersgate.ticketraider.domain.event.dto.EventRequest
 import com.codersgate.ticketraider.domain.event.dto.EventResponse
 import com.codersgate.ticketraider.domain.event.service.EventService
 import io.swagger.v3.oas.annotations.Operation
+import org.springframework.data.domain.Page
+import org.springframework.data.web.PageableDefault
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import org.springframework.data.domain.Pageable
 
 @RestController
 @RequestMapping("/events")
@@ -45,23 +48,23 @@ fun updateEvent(
             .body(eventService.deleteEvent(eventId))
     }
 
-//    @Operation(summary = "이벤트 목록 조회")
-//    @GetMapping
-//    fun getEventList(
-//        @PageableDefault(
-//            size = 15,
-//            sort = ["id"]
-//        ) pageable : Pageable,
-//        // 여기 리퀘스트 파람 벨유값이랑 required 값 추후 확인해서 수정해야 함
-//        @RequestParam(
-//            value = "status",
-//            required = false
-//        ) status : String?
-//    ): ResponseEntity<Page<EventResponse>>{
-//        return ResponseEntity
-//            .status(HttpStatus.OK)
-//            .body(eventService.getPaginatedEventList(pageable, status))
-//    }
+    @Operation(summary = "이벤트 목록 조회")
+    @GetMapping
+    fun getEventList(
+        @PageableDefault(
+            size = 15,
+            sort = ["id"]
+        ) pageable : Pageable,
+        @RequestParam(
+            value = "status",
+            required = false
+        ) status : String?,
+        @RequestParam categoryId: Long?
+    ): ResponseEntity<Page<EventResponse>>{
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(eventService.getPaginatedEventList(pageable, status, categoryId))
+    }
 
     @Operation(summary = "이벤트 조회")
     @GetMapping("/{eventId}")
