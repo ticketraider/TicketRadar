@@ -3,6 +3,7 @@ package com.codersgate.ticketraider.global.Redis
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module
+import com.fasterxml.jackson.datatype.jsr310.JSR310Module
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule
 import org.springframework.cache.CacheManager
@@ -27,6 +28,7 @@ class RedisCacheConfig {
         val mapper = ObjectMapper()
         mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS) // timestamp 형식 안따르도록 설정
         mapper.registerModules(JavaTimeModule(), Jdk8Module()) // LocalDateTime 매핑을 위해 모듈 활성화
+        mapper.registerModules()
         mapper.registerModule(ParameterNamesModule());
         return mapper
     }
@@ -34,7 +36,7 @@ class RedisCacheConfig {
 
     // Redis 캐시 메니저를 생성하는 메서드. 레디스 연결 팩토리 를 인자로 받아 캐시 매니저를 생성함
     @Bean
-    fun cacheManager(cf: RedisConnectionFactory): CacheManager {
+    fun cacheManager(cf: RedisConnectionFactory, objectMapper: ObjectMapper): CacheManager {
 
         // Redis 캐싱 구성을 생성하는 부분
         val redisCacheConfiguration =

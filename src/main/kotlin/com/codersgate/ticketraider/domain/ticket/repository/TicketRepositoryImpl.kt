@@ -1,6 +1,5 @@
 package com.codersgate.ticketraider.domain.ticket.repository
 
-import com.codersgate.ticketraider.domain.ticket.dto.CheckTicketRequest
 import com.codersgate.ticketraider.domain.ticket.entity.QTicket
 import com.codersgate.ticketraider.domain.ticket.entity.Ticket
 import com.codersgate.ticketraider.domain.ticket.entity.TicketGrade

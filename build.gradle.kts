@@ -78,6 +78,10 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-cache") // 레디스 캐시
     implementation("org.redisson:redisson-spring-boot-starter:3.21.1") //Redisson
 
+    implementation ("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
+    implementation ("com.fasterxml.jackson.core:jackson-databind")
+
+
 }
 
 tasks.withType<KotlinCompile> {

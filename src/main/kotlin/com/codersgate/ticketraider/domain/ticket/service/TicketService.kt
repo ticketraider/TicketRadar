@@ -3,6 +3,7 @@ package com.codersgate.ticketraider.domain.ticket.service
 import com.codersgate.ticketraider.domain.ticket.dto.CheckTicketRequest
 import com.codersgate.ticketraider.domain.ticket.dto.CreateTicketRequest
 import com.codersgate.ticketraider.domain.ticket.dto.TicketResponse
+import com.codersgate.ticketraider.domain.ticket.entity.Ticket
 import com.codersgate.ticketraider.domain.ticket.entity.TicketGrade
 import com.codersgate.ticketraider.global.infra.security.jwt.UserPrincipal
 import org.springframework.data.domain.Page
@@ -15,7 +16,7 @@ interface TicketService {
 
     fun getTicketById(ticketId: Long): TicketResponse
 
-    fun chkTicket(eventId:Long, date: LocalDate, grade:TicketGrade, seatNo:Int) : TicketResponse?
+    fun chkTicketCache(eventId:Long, date: LocalDate, grade:TicketGrade, seatNo:Int) : Ticket?
 
     fun deleteTicket(ticketId: Long, user: UserPrincipal)
 
