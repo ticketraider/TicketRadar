@@ -1,7 +1,6 @@
 package com.codersgate.ticketraider.domain.place.model
 
 import com.codersgate.ticketraider.domain.event.model.Event
-import com.codersgate.ticketraider.domain.event.model.price.Price
 import com.codersgate.ticketraider.global.common.BaseEntity
 import jakarta.persistence.*
 import org.hibernate.annotations.SQLDelete
@@ -31,7 +30,7 @@ class Place(
     @OneToMany(mappedBy = "place", fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
     var eventList: MutableList<Event> = mutableListOf()
 
-    ) : BaseEntity() {
+) : BaseEntity() {
 
     @Id
     @Column(name = "id")
