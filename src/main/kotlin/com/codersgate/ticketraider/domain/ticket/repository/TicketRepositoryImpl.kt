@@ -1,12 +1,15 @@
 package com.codersgate.ticketraider.domain.ticket.repository
 
+import com.codersgate.ticketraider.domain.ticket.dto.CheckTicketRequest
 import com.codersgate.ticketraider.domain.ticket.entity.QTicket
 import com.codersgate.ticketraider.domain.ticket.entity.Ticket
+import com.codersgate.ticketraider.domain.ticket.entity.TicketGrade
 import com.codersgate.ticketraider.global.infra.querydsl.QueryDslSupport
 import com.querydsl.core.BooleanBuilder
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
+import java.time.LocalDate
 
 class TicketRepositoryImpl : QueryDslSupport(), CustomTicketRepository {
     private val ticket = QTicket.ticket
@@ -30,5 +33,20 @@ class TicketRepositoryImpl : QueryDslSupport(), CustomTicketRepository {
             .fetch()
 
         return PageImpl(contents, pageable, totalCounts)
+    }
+
+    override fun chkTicket(eventId:Long, date: LocalDate, grade: TicketGrade, seatNo:Int): Ticket? {
+        val whereClause = BooleanBuilder()
+        whereClause.and(ticket.event.id.eq(eventId))
+        whereClause.and(ticket.date.eq(date ))
+        whereClause.and(ticket.grade.eq(grade))
+        whereClause.and(ticket.seatNo.eq(seatNo))
+
+
+        return queryFactory.select(ticket)
+            .from(ticket)
+            .where(whereClause)
+            .orderBy(ticket.date.desc())
+            .fetchOne()
     }
 }

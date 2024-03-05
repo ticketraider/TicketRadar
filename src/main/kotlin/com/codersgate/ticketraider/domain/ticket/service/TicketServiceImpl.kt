@@ -2,6 +2,7 @@ package com.codersgate.ticketraider.domain.ticket.service
 
 import com.codersgate.ticketraider.domain.event.repository.EventRepository
 import com.codersgate.ticketraider.domain.member.repository.MemberRepository
+import com.codersgate.ticketraider.domain.ticket.dto.CheckTicketRequest
 import com.codersgate.ticketraider.domain.ticket.dto.CreateTicketRequest
 import com.codersgate.ticketraider.domain.ticket.dto.TicketResponse
 import com.codersgate.ticketraider.domain.ticket.entity.Ticket
@@ -16,6 +17,7 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
+import java.time.LocalDate
 
 @Service
 class TicketServiceImpl(
@@ -31,26 +33,43 @@ class TicketServiceImpl(
                 "+ #createTicketRequest.seatNo"
     )
     override fun createTicket(createTicketRequest: CreateTicketRequest) {
-        val event = eventRepository.findByIdOrNull(createTicketRequest.eventId)
-            ?: throw ModelNotFoundException("event", createTicketRequest.eventId)
-        val member = memberRepository.findByIdOrNull(createTicketRequest.memberId)
-            ?: throw ModelNotFoundException("member", createTicketRequest.memberId)
-        ticketRepository.save(
-            Ticket(
-                date = createTicketRequest.date,
-                grade = createTicketRequest.grade,
-                seatNo = createTicketRequest.seatNo,
-                event = event,
-                member = member,
-                price = when (createTicketRequest.grade) {
-                    TicketGrade.R -> event.price!!.seatRPrice
-                    TicketGrade.S -> event.price!!.seatSPrice
-                    TicketGrade.A -> event.price!!.seatAPrice
-                },
-                ticketStatus = TicketStatus.UNPAID,
-                place = event.place.toString()
-            )
-        )
+
+        chkTicket(createTicketRequest.eventId, createTicketRequest.date, createTicketRequest.grade, createTicketRequest.seatNo)
+            ?: let {
+                val event = eventRepository.findByIdOrNull(createTicketRequest.eventId)
+                    ?: throw ModelNotFoundException("event", createTicketRequest.eventId)
+                val member = memberRepository.findByIdOrNull(createTicketRequest.memberId)
+                    ?: throw ModelNotFoundException("member", createTicketRequest.memberId)
+                ticketRepository.save(
+                    Ticket(
+                        date = createTicketRequest.date,
+                        grade = createTicketRequest.grade,
+                        seatNo = createTicketRequest.seatNo,
+                        event = event,
+                        member = member,
+                        price = when (createTicketRequest.grade) {
+                            TicketGrade.R -> event.price!!.seatRPrice
+                            TicketGrade.S -> event.price!!.seatSPrice
+                            TicketGrade.A -> event.price!!.seatAPrice
+                        },
+                        ticketStatus = TicketStatus.UNPAID,
+                        place = event.place.toString()
+                    )
+                )
+            }
+    }
+
+    @Cacheable(cacheNames = ["tickets"],
+        key="#createTicketRequest.eventId + '_' " +
+                "+ #createTicketRequest.date + '_' " +
+                "+ #createTicketRequest.grade + '_' " +
+                "+ #createTicketRequest.seatNo"
+    )
+    override fun chkTicket(eventId: Long, date: LocalDate, grade: TicketGrade, seatNo: Int): TicketResponse? {
+        return ticketRepository.chkTicket(eventId, date, grade, seatNo)
+            ?.let{
+                TicketResponse.from(it)
+            }
     }
 
     override fun getTicketById(ticketId: Long): TicketResponse {
@@ -58,7 +77,6 @@ class TicketServiceImpl(
             ?: throw ModelNotFoundException("Ticket", ticketId)
         return TicketResponse.from(ticket)
     }
-
 
     override fun deleteTicket(ticketId: Long, user: UserPrincipal) {
         val ticket = ticketRepository.findByIdOrNull(ticketId)
@@ -68,6 +86,8 @@ class TicketServiceImpl(
         }
         ticketRepository.delete(ticket)
     }
+
+
 
     override fun getTicketListByUserId(user: UserPrincipal, pageable: Pageable): Page<TicketResponse> {
         return ticketRepository.getListByUserId(pageable, user.id).map { TicketResponse.from(it) }
