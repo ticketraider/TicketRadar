@@ -28,7 +28,7 @@ class Place(
     @Column(name = "seat_a")
     var seatA: Int,
 
-    @OneToMany(mappedBy = "place", fetch = FetchType.EAGER, cascade = [CascadeType.ALL], orphanRemoval = true)
+    @OneToMany(mappedBy = "place", fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
     var eventList: MutableList<Event> = mutableListOf()
 
     ) : BaseEntity() {

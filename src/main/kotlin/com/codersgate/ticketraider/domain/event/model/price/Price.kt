@@ -11,7 +11,7 @@ import org.hibernate.annotations.SQLRestriction
 @SQLRestriction("is_deleted = false")
 @Table(name = "prices")
 class Price (
-    @OneToOne()
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "event_id")
     var event: Event,
 

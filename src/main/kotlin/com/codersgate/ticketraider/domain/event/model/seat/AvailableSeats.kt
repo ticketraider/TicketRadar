@@ -12,7 +12,7 @@ import java.time.LocalDate
 @SQLRestriction("is_deleted = false")
 @Table(name = "available_seats")
 class AvailableSeat(
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "event_id")
     val event: Event? = null,
 
