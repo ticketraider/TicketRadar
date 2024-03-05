@@ -14,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional
 
 @DataJpaTest
 @Transactional
-@Import(JpaBaseConfiguration::class)
+//@Import(JpaBaseConfiguration::class)
 @Rollback(value = false)
 @ActiveProfiles("test")
 class MemberRepositoryTest {

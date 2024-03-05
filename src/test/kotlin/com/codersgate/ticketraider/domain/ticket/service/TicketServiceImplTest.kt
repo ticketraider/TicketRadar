@@ -15,6 +15,7 @@ import com.codersgate.ticketraider.domain.ticket.dto.CreateTicketRequest
 import com.codersgate.ticketraider.domain.ticket.entity.TicketGrade
 import com.codersgate.ticketraider.global.error.exception.ModelNotFoundException
 import io.mockk.junit5.MockKExtension
+import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -110,7 +111,7 @@ class TicketServiceImplTest(
         println("fail : $fail")
 
         //then 성공50 실패50 이여야한다.
-//        Assertions.assertThat(success).isEqualTo()
-//        Assertions.assertThat(fail).isEqualTo)
+        Assertions.assertThat(success).isEqualTo(1)
+        Assertions.assertThat(fail).isEqualTo(9)
     }
 }
