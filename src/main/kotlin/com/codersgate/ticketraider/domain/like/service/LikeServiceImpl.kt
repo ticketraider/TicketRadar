@@ -56,7 +56,7 @@ class LikeServiceImpl(
         eventRepository.save(event)
     }
 
-    override fun updateLike() {
+    override fun updateLikeCount() {
         // 이벤트 id 리스트를 Like 에서 가져와서
         likeRepository.getEventIdList().map{e_id ->
             // 각 id 마다 해당하는 like 가 몇개인지 확인하고   // 각 이벤트 객체의 count 를 저장

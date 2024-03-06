@@ -51,9 +51,9 @@ class LikeController(
 
     @Operation(summary = "좋아요 최신화")
     @PatchMapping("/update")
-    fun updateLike() : ResponseEntity<Unit>
+    fun updateLikeCount() : ResponseEntity<Unit>
     {
-        likeService.updateLike()
+        likeService.updateLikeCount()
         return ResponseEntity.status(HttpStatus.OK).build()
     }
 
