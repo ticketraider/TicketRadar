@@ -1,6 +1,7 @@
 package com.codersgate.ticketraider.domain.event.model.seat
 
 import com.codersgate.ticketraider.domain.event.model.Event
+import com.codersgate.ticketraider.domain.place.model.Place
 import com.codersgate.ticketraider.domain.ticket.entity.TicketGrade
 import com.codersgate.ticketraider.global.common.BaseEntity
 import jakarta.persistence.*
@@ -25,24 +26,36 @@ class AvailableSeat(
     var bookable: Bookable = Bookable.OPEN,
 
     @Column(name = "seat_r")
-    var seatR: Int,
+    var seatR: Int = 0,
+
+    @Column(name = "max_seat_r")
+    var maxSeatR: Int,
 
     @Column(name = "seat_s")
-    var seatS: Int,
+    var seatS: Int = 0,
+
+    @Column(name = "max_seat_s")
+    var maxSeatS: Int,
 
     @Column(name = "seat_a")
-    var seatA: Int,
+    var seatA: Int = 0,
+
+    @Column(name = "max_seat_a")
+    var maxSeatA: Int,
 
     @Column(name = "total_seat")
-    var totalSeat: Int
+    var totalSeat: Int,
 
+    @ManyToOne()
+    @JoinColumn(name = "place_id")
+    val place: Place,
 
 ) : BaseEntity() {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null
     fun isFull(): Boolean {
-        return (seatR <= 0 && seatS <= 0 && seatA <= 0)
+        return (seatR >= maxSeatR && seatS >= maxSeatS && seatA >= maxSeatA)
     }
     fun isClosed(): Boolean {
         return bookable == Bookable.CLOSED

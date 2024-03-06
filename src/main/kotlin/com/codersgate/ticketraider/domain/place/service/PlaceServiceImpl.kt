@@ -24,6 +24,7 @@ class PlaceServiceImpl(
             seatR = request.seatR,
             seatS = request.seatS,
             seatA = request.seatA,
+            address = request.address,
             totalSeat = (request.seatR + request.seatS + request.seatA)
         )
         placeRepository.save(place)
@@ -37,6 +38,7 @@ class PlaceServiceImpl(
         place.seatR = request.seatR
         place.seatS = request.seatS
         place.seatA = request.seatA
+        place.address = request.address
         place.totalSeat = (request.seatR + request.seatS + request.seatA)
     }
 
