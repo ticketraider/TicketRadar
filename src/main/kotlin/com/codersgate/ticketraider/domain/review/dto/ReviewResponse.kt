@@ -9,7 +9,7 @@ data class ReviewResponse(
 
     val rating: Int,
 
-    val userId : Long,  //userId 보단 memberId로 바꾸는 게 좋을것 같음
+    val memberId : Long,  //userId 보단 memberId로 바꾸는 게 좋을것 같음
 
     val eventId : Long,
 
@@ -20,7 +20,7 @@ data class ReviewResponse(
                 title = review.title,
                 content = review.content,
                 rating = review.rating,
-                userId = review.member.id!!,
+                memberId = review.member.id!!,
                 eventId = review.event.id!!,
             )
         }
