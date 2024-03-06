@@ -8,6 +8,7 @@ import com.codersgate.ticketraider.domain.event.repository.price.PriceRepository
 import com.codersgate.ticketraider.domain.event.repository.seat.AvailableSeatRepository
 import com.codersgate.ticketraider.domain.place.repository.PlaceRepository
 import com.codersgate.ticketraider.global.error.exception.ModelNotFoundException
+import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException
 import org.springframework.data.domain.Page
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
@@ -75,13 +76,14 @@ class EventServiceImpl(
     }
 
     override fun getPaginatedEventList(pageable: Pageable, status: String?, categoryId: Long?): Page<EventResponse>? {
-        var id = categoryId
-        if(categoryId == null) {
-            id = 0
-        }
-        val category = categoryRepository.findByIdOrNull(id)
+//        var id = categoryId?:0L
+////        if(categoryId == null) {
+////            id = 0
+////        }
+//        val category = categoryRepository.findByIdOrNull(id)
 
-        val eventList = eventRepository.findByPageable(pageable, category)
+
+        val eventList = eventRepository.findByPageable(pageable)
         return eventList.map { EventResponse.from(it) }
     }
 
