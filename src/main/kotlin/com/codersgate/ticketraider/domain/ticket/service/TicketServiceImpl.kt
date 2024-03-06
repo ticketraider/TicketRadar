@@ -39,8 +39,7 @@ class TicketServiceImpl(
                     TicketGrade.S -> event.price!!.seatSPrice
                     TicketGrade.A -> event.price!!.seatAPrice
                 },
-                ticketStatus = TicketStatus.UNPAID,
-                place = event.place.toString()
+                place = event.place.name
             )
         )
     }

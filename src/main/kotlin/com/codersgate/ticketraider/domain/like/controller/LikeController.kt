@@ -40,7 +40,7 @@ class LikeController(
     @Operation(summary = "좋아요 체크")
     @PostMapping()
     fun chkLike(
-        @RequestParam(required = true) memberId : Long,
+        @RequestParam(required = true) memberId : Long, //유저가 입력할 여지를 남기는것보단 그냥 UserPrincipal로 넘기면 어떨까 생각함
         @RequestParam(required = true) eventId : Long,
     ): ResponseEntity<Unit> {
         likeService.chkLike(memberId, eventId)

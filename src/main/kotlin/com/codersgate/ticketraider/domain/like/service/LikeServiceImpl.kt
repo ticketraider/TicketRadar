@@ -79,7 +79,7 @@ class LikeServiceImpl(
         likeRepository.findLikeByMemberIdAndEventId(memberId, eventId)
             ?.let{
                 it.isDeleted = true
-                likeRepository.save(it)
+                likeRepository.save(it)  //직접 isDeleted를 true로 바꿔주는게 아닌 Delete 쿼리를 날리면 됨
             }
             ?: throw NotFoundException()
     }
