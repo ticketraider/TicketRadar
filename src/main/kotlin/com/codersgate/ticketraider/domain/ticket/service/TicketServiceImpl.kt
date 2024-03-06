@@ -5,6 +5,7 @@ import com.codersgate.ticketraider.domain.member.repository.MemberRepository
 import com.codersgate.ticketraider.domain.ticket.dto.CreateTicketRequest
 import com.codersgate.ticketraider.domain.ticket.dto.TicketResponse
 import com.codersgate.ticketraider.domain.ticket.entity.Ticket
+import com.codersgate.ticketraider.domain.ticket.entity.TicketGrade
 import com.codersgate.ticketraider.domain.ticket.repository.TicketRepository
 import com.codersgate.ticketraider.global.error.exception.InvalidCredentialException
 import com.codersgate.ticketraider.global.error.exception.ModelNotFoundException
@@ -47,7 +48,13 @@ class TicketServiceImpl(
                     grade = createTicketRequest.seatList[i].first,
                     seatNo = createTicketRequest.seatList[i].second,
                     event = event,
-                    member = member
+                    member = member,
+                    price = when(createTicketRequest.seatList[i].first) {
+                        TicketGrade.R -> event.price!!.seatRPrice
+                        TicketGrade.S -> event.price!!.seatSPrice
+                        TicketGrade.A -> event.price!!.seatAPrice
+                    },
+                    place = event.place.name
                 )
             )
             lockList[i].unlock()
