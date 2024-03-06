@@ -23,11 +23,11 @@ class LikeController(
     @GetMapping()
     fun getLikeList(
         @PageableDefault(size = 5, sort = ["id"]) pageable: Pageable,
-        @RequestParam(required = false) userId: Long,
+        @AuthenticationPrincipal userPrincipal: UserPrincipal?,
         @RequestParam(required = false) eventId: Long,
     ) : ResponseEntity<Page<LikeResponse>>
     {
-        return ResponseEntity.status(HttpStatus.OK).body(likeService.getLikeList(pageable, userId, eventId))
+        return ResponseEntity.status(HttpStatus.OK).body(likeService.getLikeList(pageable, userPrincipal?.id , eventId))
     }
 
     @Operation(summary = "좋아요 단건 조회")
