@@ -9,7 +9,7 @@ data class ReviewResponse(
 
     val rating: Int,
 
-    val userId : Long,
+    val userId : Long,  //userId 보단 memberId로 바꾸는 게 좋을것 같음
 
     val eventId : Long,
 

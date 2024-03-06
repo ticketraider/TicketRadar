@@ -10,24 +10,22 @@ data class TicketResponse(
     val price: Int,
     val grade: TicketGrade,
     val date: LocalDate,
+    val place: String,
     val eventName: String,
-    val memberName: String,
+    val memberNickname: String,
 ) {
     companion object {
         fun from(ticket: Ticket): TicketResponse {
-            val price = when(ticket.grade) {
-                TicketGrade.R -> ticket.event.price!!.seatRPrice
-                TicketGrade.S -> ticket.event.price!!.seatSPrice
-                TicketGrade.A -> ticket.event.price!!.seatAPrice
-            }
+
             return TicketResponse(
                 id = ticket.id!!,
                 seatNo = ticket.seatNo,
-                price = price,
+                price = ticket.price,
                 grade = ticket.grade,
                 date = ticket.date,
                 eventName = ticket.event.title,
-                memberName = ticket.member.nickname
+                memberNickname = ticket.member.nickname,
+                place = ticket.place
             )
         }
     }
