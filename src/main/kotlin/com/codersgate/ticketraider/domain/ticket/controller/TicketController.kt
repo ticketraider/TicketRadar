@@ -22,11 +22,12 @@ class TicketController(
     @Operation(summary = "티켓 생성")
     @PostMapping
     fun createTicket(
+        @AuthenticationPrincipal userPrincipal: UserPrincipal,
         @Valid @RequestBody request: CreateTicketRequest
     ): ResponseEntity<Unit> {
         return ResponseEntity
             .status(HttpStatus.CREATED)
-            .body(ticketService.createTicket(request))
+            .body(ticketService.createTicket(userPrincipal, request))
     }
 
     @Operation(summary = "티켓 단건 조회")

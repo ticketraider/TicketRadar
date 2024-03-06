@@ -8,13 +8,8 @@ data class CreateTicketRequest(
     @field:NotNull // 어떻게 validation?
     val date: LocalDate,
     @field:NotNull
-    val grade: TicketGrade,
-    @field:NotNull
-    val seatNo: Int,
-    @field:NotNull
     val eventId: Long,
-    @field:NotNull
-    val memberId: Long
 ) {
+    val seatList = mutableListOf<Pair<TicketGrade,Int>>()
 
 }

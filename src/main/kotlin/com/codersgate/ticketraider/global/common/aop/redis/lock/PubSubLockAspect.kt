@@ -5,6 +5,7 @@ import org.aspectj.lang.ProceedingJoinPoint
 import org.aspectj.lang.annotation.Around
 import org.aspectj.lang.annotation.Aspect
 import org.aspectj.lang.reflect.MethodSignature
+import org.redisson.api.RLock
 import org.redisson.api.RedissonClient
 import org.springframework.stereotype.Component
 import java.util.concurrent.TimeUnit
@@ -37,7 +38,7 @@ class PubSubLockAspect(
         }
     }
     private fun generateKey(request: CreateTicketRequest): String {
-        val key = "ID : ${request.eventId}, ${request.date} : ${request.grade}-${request.seatNo}"
+        val key = "ID : ${request.eventId}, ${request.date} : ${request.seatList[0].first}-${request.seatList[0].second}"
         return key
     }
 }
