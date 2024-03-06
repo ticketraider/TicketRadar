@@ -11,6 +11,6 @@ data class CreateTicketRequest(
     @field:NotNull
     val eventId: Long,
 ) {
-    val seatList = mutableListOf<Pair<TicketGrade,Int>>()
+    val seatList = mutableListOf<SeatInfo>()
 
 }

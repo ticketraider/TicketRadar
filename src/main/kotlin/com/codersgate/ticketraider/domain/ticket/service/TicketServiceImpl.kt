@@ -39,7 +39,7 @@ class TicketServiceImpl(
         val count = request.seatList.size
 
         request.seatList.map{
-            val lock = redissonClient.getLock(generateKey(request))
+            val lock = redissonClient.getLock(generateKey(request.eventId, request.date, it.ticketGrade, it.seatNumber))
             lockList.add(lock)
             //획득시도 시간, 락 점유 시간
             lock.tryLock(10, 1, TimeUnit.SECONDS)
@@ -60,17 +60,17 @@ class TicketServiceImpl(
         // 티켓 생성
         for (i in 0 until count) {
 
-            if( ! chkTicketCache(request.eventId, request.date, request.seatList[i].first, request.seatList[i].second) )
+            if( ! chkTicketCache(request.eventId, request.date, request.seatList[i].ticketGrade, request.seatList[i].seatNumber) )
                 continue
 
             ticketRepository.save(
                 Ticket(
                     date = request.date,
-                    grade = request.seatList[i].first,
-                    seatNo = request.seatList[i].second,
+                    grade = request.seatList[i].ticketGrade,
+                    seatNo = request.seatList[i].seatNumber,
                     event = event,
                     member = member,
-                    price = when(request.seatList[i].first) {
+                    price = when(request.seatList[i].ticketGrade) {
                         TicketGrade.R -> event.price!!.seatRPrice
                         TicketGrade.S -> event.price!!.seatSPrice
                         TicketGrade.A -> event.price!!.seatAPrice
@@ -84,8 +84,8 @@ class TicketServiceImpl(
                 putTicketCache(
                     request.eventId,
                     request.date,
-                    request.seatList[i].first,
-                    request.seatList[i].second,
+                    request.seatList[i].ticketGrade,
+                    request.seatList[i].seatNumber,
                     TicketResponse.from(it))
         }
     }
@@ -149,7 +149,7 @@ class TicketServiceImpl(
         return ticketRepository.getListByUserId(pageable, user.id).map { TicketResponse.from(it) }
     }
 }
-private fun generateKey(request: CreateTicketRequest): String {
-    val key = "ID : ${request.eventId}, ${request.date} : ${request.seatList[0].first}-${request.seatList[0].second}"
+private fun generateKey(eventId: Long, date: LocalDate, grade: TicketGrade, seatNo: Int): String {
+    val key = "ID : ${eventId}, $date : ${grade}-${seatNo}"
     return key
 }

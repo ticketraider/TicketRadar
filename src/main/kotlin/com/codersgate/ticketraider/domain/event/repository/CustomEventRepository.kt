@@ -6,5 +6,5 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 
 interface CustomEventRepository {
-    fun findByPageable(pageable: Pageable, category: Category?): Page<Event>
+    fun findByPageable(pageable: Pageable): Page<Event>
 }

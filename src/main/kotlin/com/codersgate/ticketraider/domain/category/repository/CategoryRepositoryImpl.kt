@@ -20,7 +20,6 @@ class CategoryRepositoryImpl : QueryDslSupport(), CustomCategoryRepository {
 
         val totalCount = queryFactory.select(category.count()).from(category).fetchOne() ?: 0L
 
-
         val contents = queryFactory.select(category)
             .offset(pageable.offset)
             .limit(pageable.pageSize.toLong())

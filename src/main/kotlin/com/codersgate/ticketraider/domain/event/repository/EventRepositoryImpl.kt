@@ -1,6 +1,7 @@
 package com.codersgate.ticketraider.domain.event.repository
 
 import com.codersgate.ticketraider.domain.category.model.Category
+import com.codersgate.ticketraider.domain.category.repository.CategoryRepository
 import com.codersgate.ticketraider.domain.event.model.Event
 import com.codersgate.ticketraider.domain.event.model.QEvent
 import com.codersgate.ticketraider.global.infra.querydsl.QueryDslSupport
@@ -17,20 +18,21 @@ import org.springframework.data.domain.Pageable
 class EventRepositoryImpl : QueryDslSupport(), CustomEventRepository {
 
     private val event = QEvent.event
-    override fun findByPageable(pageable: Pageable, category: Category?): Page<Event> {
+    override fun findByPageable(pageable: Pageable): Page<Event> {
 
         val totalCount = queryFactory.select(event.count()).from(event).fetchOne() ?: 0L
 
         val builder = BooleanBuilder()
-        check(category != null){
-            builder.and(event.category.eq(category))
-        }
 
-        val contents = queryFactory.select(event)
+//        if(categoryId != null){
+//            builder.and(event.category.id.eq(categoryId))
+//        }
+
+        val contents = queryFactory.selectFrom(event)
             .offset(pageable.offset)
             .limit(pageable.pageSize.toLong())
             .where(builder)
-            .orderBy(*getOrderSpecifier(pageable, event))
+//            .orderBy(*getOrderSpecifier(pageable, event))
             .fetch()
 
         return PageImpl(contents, pageable, totalCount)
