@@ -18,51 +18,50 @@ class LikeServiceImpl(
     private var memberRepository: MemberRepository,
     private var eventRepository: EventRepository,
     private var likeRepository: LikeRepository,
-) : LikeService {
+) : LikeService{
 
-    override fun getLikeList(pageable: Pageable, memberId: Long?, eventId: Long?): Page<LikeResponse> {
+    override fun getLikeList(pageable: Pageable, memberId: Long?, eventId: Long?) : Page<LikeResponse> {
 
-        return if (memberId == null && eventId == null)
-            throw NotFoundException()
-        else
-            likeRepository.getLikeList(pageable, memberId, eventId).map { LikeResponse.from(it) }
+        return if( memberId == null && eventId == null)
+                throw NotFoundException()
+            else
+                likeRepository.getLikeList(pageable, memberId,eventId).map{ LikeResponse.from(it)}
     }
 
     override fun getLike(likeId: Long): LikeResponse {
-        return LikeResponse.from(
-            likeRepository.findByIdOrNull(likeId)
-                ?: throw NotFoundException()
+        return LikeResponse.from(likeRepository.findByIdOrNull(likeId)
+            ?: throw NotFoundException()
         )
     }
 
     override fun chkLike(memberId: Long, eventId: Long) {
         val member = memberRepository.findByIdOrNull(memberId)
-            ?: throw NotFoundException()
+            ?:throw NotFoundException()
 
         val event = eventRepository.findByIdOrNull(eventId)
-            ?: throw NotFoundException()
+            ?:throw NotFoundException()
 
-        likeRepository.findLikeByMemberIdAndEventId(memberId, eventId)
-            ?.let {
-                it.isDeleted = !it.isDeleted
-                event.likeCount += if (it.isDeleted) 1 else -1
-                likeRepository.save(it)
+       likeRepository.findLikeByMemberIdAndEventId(memberId, eventId)
+           ?.let{
+               it.isDeleted = !it.isDeleted
+               event.likeCount += if(it.isDeleted) 1 else -1
+               likeRepository.save(it)
 
-            }
-            ?: run {
-                event.likeCount++
-                likeRepository.save(Like(member, event))
-            }
+           }
+           ?:run{
+               event.likeCount++
+               likeRepository.save(Like(member,event))
+           }
 
         eventRepository.save(event)
     }
 
     override fun updateLike() {
         // 이벤트 id 리스트를 Like 에서 가져와서
-        likeRepository.getEventIdList().map { e_id ->
+        likeRepository.getEventIdList().map{e_id ->
             // 각 id 마다 해당하는 like 가 몇개인지 확인하고   // 각 이벤트 객체의 count 를 저장
             val event = eventRepository.findByIdOrNull(e_id)
-                ?.also { e ->
+                ?.also {e ->
                     e.likeCount = likeRepository.countEventId(e.id!!).toInt()
                 }
                 ?: throw NotFoundException()
@@ -70,18 +69,17 @@ class LikeServiceImpl(
         }
     }
 
-    override fun deleteLike(memberId: Long, eventId: Long) {
-        val member = memberRepository.findByIdOrNull(memberId)
-            ?: throw NotFoundException()
-
-        val event = eventRepository.findByIdOrNull(eventId)
-            ?: throw NotFoundException()
-
-        likeRepository.findLikeByMemberIdAndEventId(memberId, eventId)
-            ?.let {
-                it.isDeleted = true
-                likeRepository.save(it)  //직접 isDeleted를 true로 바꿔주는게 아닌 Delete 쿼리를 날리면 됨
-            }
-            ?: throw NotFoundException()
-    }
+//    override fun deleteLike(memberId: Long, eventId: Long) {
+//        val member = memberRepository.findByIdOrNull(memberId)
+//            ?:throw NotFoundException()
+//
+//        val event = eventRepository.findByIdOrNull(eventId)
+//            ?:throw NotFoundException()
+//
+//        likeRepository.findLikeByMemberIdAndEventId(memberId, eventId)
+//            ?.let{
+//                likeRepository.delete(it)  //직접 isDeleted를 true로 바꿔주는게 아닌 Delete 쿼리를 날리면 됨
+//            }
+//            ?: throw NotFoundException()
+//    }
 }

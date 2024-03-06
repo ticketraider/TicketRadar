@@ -3,6 +3,7 @@ package com.codersgate.ticketraider.domain.like.controller
 import com.codersgate.ticketraider.domain.like.dto.LikeResponse
 import com.codersgate.ticketraider.domain.like.service.LikeService
 import com.codersgate.ticketraider.domain.review.dto.ReviewResponse
+import com.codersgate.ticketraider.global.infra.security.jwt.UserPrincipal
 import com.sun.java.accessibility.util.EventID
 import io.swagger.v3.oas.annotations.Operation
 import org.springframework.data.domain.Page
@@ -10,6 +11,7 @@ import org.springframework.data.domain.Pageable
 import org.springframework.data.web.PageableDefault
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
 
 @RestController
@@ -40,10 +42,10 @@ class LikeController(
     @Operation(summary = "좋아요 체크")
     @PostMapping()
     fun chkLike(
-        @RequestParam(required = true) memberId : Long, //유저가 입력할 여지를 남기는것보단 그냥 UserPrincipal로 넘기면 어떨까 생각함
+        @AuthenticationPrincipal userPrincipal: UserPrincipal,
         @RequestParam(required = true) eventId : Long,
     ): ResponseEntity<Unit> {
-        likeService.chkLike(memberId, eventId)
+        likeService.chkLike(userPrincipal.id, eventId)
         return ResponseEntity.status(HttpStatus.OK).build()
     }
 
@@ -55,13 +57,13 @@ class LikeController(
         return ResponseEntity.status(HttpStatus.OK).build()
     }
 
-    @Operation(summary = "좋아요 취소(체크로 통합)")
-    @DeleteMapping()
-    fun deleteLike(
-        @RequestParam(required = true) memberId : Long,
-        @RequestParam(required = true) eventId : Long,
-    ): ResponseEntity<Unit> {
-        likeService.deleteLike(memberId, eventId)
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build()
-    }
+//    @Operation(summary = "좋아요 취소(체크로 통합)")
+//    @DeleteMapping()
+//    fun deleteLike(
+//        @RequestParam(required = true) memberId : Long,
+//        @RequestParam(required = true) eventId : Long,
+//    ): ResponseEntity<Unit> {
+//        likeService.deleteLike(memberId, eventId)
+//        return ResponseEntity.status(HttpStatus.NO_CONTENT).build()
+//    }
 }

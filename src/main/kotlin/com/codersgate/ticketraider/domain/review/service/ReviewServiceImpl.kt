@@ -20,8 +20,8 @@ class ReviewServiceImpl(
     private val eventRepository: EventRepository,
 ) : ReviewService{
 
-    override fun createReview(request: CreateReviewRequest) {
-        val member = memberRepository.findByIdOrNull(request.memberId)
+    override fun createReview(memberId: Long, request: CreateReviewRequest) {
+        val member = memberRepository.findByIdOrNull(memberId)
             ?:throw NotFoundException()
 
         val event = eventRepository.findByIdOrNull(request.eventId)

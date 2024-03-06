@@ -12,5 +12,5 @@ interface LikeService {
     fun chkLike(memberId: Long, eventId : Long)
 
     fun updateLike()
-    fun deleteLike(memberId: Long, eventId : Long)
+//    fun deleteLike(memberId: Long, eventId : Long)
 }
