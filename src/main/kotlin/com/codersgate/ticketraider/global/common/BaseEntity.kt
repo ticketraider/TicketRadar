@@ -15,14 +15,14 @@ import java.time.LocalDateTime
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener::class)
 abstract class BaseEntity {
-    @JsonSerialize(using = LocalDateTimeSerializer::class)
-    @JsonDeserialize(using = LocalDateTimeDeserializer::class)
+//    @JsonSerialize(using = LocalDateTimeSerializer::class)
+//    @JsonDeserialize(using = LocalDateTimeDeserializer::class)
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
     val createdAt: LocalDateTime? = null
 
-    @JsonSerialize(using = LocalDateTimeSerializer::class)
-    @JsonDeserialize(using = LocalDateTimeDeserializer::class)
+//    @JsonSerialize(using = LocalDateTimeSerializer::class)
+//    @JsonDeserialize(using = LocalDateTimeDeserializer::class)
     @UpdateTimestamp
     @Column(nullable = false)
     val updatedAt: LocalDateTime? = null

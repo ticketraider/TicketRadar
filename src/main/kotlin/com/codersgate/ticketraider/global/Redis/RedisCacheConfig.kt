@@ -45,7 +45,7 @@ class RedisCacheConfig {
                     RedisSerializationContext.SerializationPair.fromSerializer(StringRedisSerializer()))
                 .serializeValuesWith( // 값을 직렬화 - GenericJackson2JsonRedisSerializer 사용
                     RedisSerializationContext.SerializationPair.fromSerializer(
-                        GenericJackson2JsonRedisSerializer()
+                        GenericJackson2JsonRedisSerializer(objectMapper)
                     ))
                 .entryTtl(Duration.ofSeconds(30L)) // 캐시 만료시간  3분으로 설정
 
@@ -53,7 +53,7 @@ class RedisCacheConfig {
         val ticketsCacheConfig = RedisCacheConfiguration.defaultCacheConfig()
             .entryTtl(Duration.ofMinutes(5))
             .serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(StringRedisSerializer()))
-            .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(GenericJackson2JsonRedisSerializer()))
+            .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(GenericJackson2JsonRedisSerializer(objectMapper)))
 
 
         return RedisCacheManager // RedisCacheManager를 생성하기 위한 빌더 패턴을 사용

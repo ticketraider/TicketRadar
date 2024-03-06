@@ -31,16 +31,10 @@ class TicketServiceImpl(
         val logger = LoggerFactory.getLogger(TicketServiceImpl::class.java)
     }
 
-//    @Cacheable(cacheNames = ["tickets"],
-//        key="#createTicketRequest.eventId + '_' " +
-//                "+ #createTicketRequest.date + '_' " +
-//                "+ #createTicketRequest.grade + '_' " +
-//                "+ #createTicketRequest.seatNo"
-//    )
     override fun createTicket(createTicketRequest: CreateTicketRequest) {
 
         chkTicketCache(createTicketRequest.eventId, createTicketRequest.date, createTicketRequest.grade, createTicketRequest.seatNo)
-//            ?: let {
+
         val event = eventRepository.findByIdOrNull(createTicketRequest.eventId)
             ?: throw ModelNotFoundException("event", createTicketRequest.eventId)
         val member = memberRepository.findByIdOrNull(createTicketRequest.memberId)
@@ -61,28 +55,20 @@ class TicketServiceImpl(
                 place = event.place.toString()
             )
         ).also{
-            val cache = cacheManager.getCache("tickets")
-            val key = "$createTicketRequest.eventId" +
-                    "_${createTicketRequest.date}_$createTicketRequest.grade" +
-                    "_$createTicketRequest.seatNo"
-            cache?.put(key, it)
+            putTicketCache(
+                createTicketRequest.eventId,
+                createTicketRequest.date,
+                createTicketRequest.grade,
+                createTicketRequest.seatNo,
+                TicketResponse.from(it))
         }
     }
 
-
-//    @Cacheable(cacheNames = ["tickets"],
-//        key="#createTicketRequest.eventId + '_' " +
-//                "+ #createTicketRequest.date + '_' " +
-//                "+ #createTicketRequest.grade + '_' " +
-//                "+ #createTicketRequest.seatNo"
-//    )
     override fun chkTicketCache(eventId: Long, date: LocalDate, grade: TicketGrade, seatNo: Int): Ticket? {
         logger.info("캐시의 티켓 확인")
         val cache = cacheManager.getCache("tickets")
-        val key = "$eventId" +
-                "_${date}_$grade" +
-                "_$seatNo"
-        var ticket = cache?.get(key) as? Ticket
+        val key = "tickets::$eventId" + "_$date" +"_$grade" + "_$seatNo"
+        val ticket = cache?.get(key) // Response 상태
 
         if (ticket != null) {
             logger.info("Cache hit for ticket: $key")
@@ -90,17 +76,22 @@ class TicketServiceImpl(
             throw IllegalAccessException("이미 예매된 티켓입니다. ( in cache ) ")
         } else {
             logger.info("Cache miss for ticket: $key")
+            logger.info("Ticket in Cache : $ticket")
             logger.info("레포지토리의 티켓 확인")
-            ticket = ticketRepository.chkTicket(eventId, date, grade, seatNo)
-            if ( ticket != null ) {
-                cache?.put(key, ticket)
-
-//                addTicketInCache(ticket, eventId, date, grade, seatNo)    // 예매된 티켓인데 캐시 저장 안되어있을 경우 캐시에 다시 등록
+            val ticketResponse = ticketRepository.chkTicket(eventId, date, grade, seatNo)?.let{TicketResponse.from(it)}
+            if ( ticketResponse != null ) {
+                putTicketCache(eventId, date, grade, seatNo, ticketResponse)    // 예매된 티켓인데 캐시 저장 안되어있을 경우 캐시에 다시 등록
                 throw IllegalAccessException("이미 예매된 티켓입니다. ( in repository ) ")
             }
             else
                 return null // 캐시에 해당 키에 대한 값이 없으면 null을 반환하도록 함
         }
+    }
+    fun putTicketCache(eventId: Long, date: LocalDate, grade: TicketGrade, seatNo: Int, ticketResponse: TicketResponse)
+    {
+        val cache = cacheManager.getCache("tickets")
+        val key = "$eventId" + "_$date" +"_$grade" + "_$seatNo"
+        cache?.put(key, ticketResponse)
     }
 
     override fun getTicketById(ticketId: Long): TicketResponse {
