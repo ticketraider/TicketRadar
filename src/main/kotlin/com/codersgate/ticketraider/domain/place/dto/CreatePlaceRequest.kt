@@ -5,4 +5,5 @@ data class CreatePlaceRequest(
     val seatR: Int,
     val seatS: Int,
     val seatA: Int,
+    val address: String,
 )
