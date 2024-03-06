@@ -8,7 +8,7 @@ import org.springframework.data.domain.Pageable
 
 interface TicketService {
 
-    fun createTicket(createTicketRequest: CreateTicketRequest)
+    fun createTicket(userPrincipal: UserPrincipal, createTicketRequest: CreateTicketRequest)
 
     fun getTicketById(ticketId: Long): TicketResponse
 

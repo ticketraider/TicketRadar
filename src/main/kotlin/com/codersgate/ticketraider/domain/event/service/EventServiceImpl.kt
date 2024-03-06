@@ -51,7 +51,7 @@ class EventServiceImpl(
         val place = placeRepository.findPlaceByName(eventRequest.place)
             ?: throw ModelNotFoundException("place", 0)
 
-        check(eventRequest.startDate != event.startDate || eventRequest.endDate != event.endDate) {
+        if (eventRequest.startDate != event.startDate || eventRequest.endDate != event.endDate) {
             availableSeatRepository.findAllByEventId(event.id!!).map { availableSeatRepository.delete(it!!) }
             val date = eventRequest.startDate
             val duration = eventRequest.endDate.compareTo(eventRequest.startDate)
@@ -75,9 +75,11 @@ class EventServiceImpl(
     }
 
     override fun getPaginatedEventList(pageable: Pageable, status: String?, categoryId: Long?): Page<EventResponse>? {
-
-        val category = categoryRepository.findByIdOrNull(categoryId)
-            ?: throw ModelNotFoundException("Category", categoryId)
+        var id = categoryId
+        if(categoryId == null) {
+            id = 0
+        }
+        val category = categoryRepository.findByIdOrNull(id)
 
         val eventList = eventRepository.findByPageable(pageable, category)
         return eventList.map { EventResponse.from(it) }

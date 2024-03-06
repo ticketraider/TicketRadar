@@ -13,11 +13,11 @@ import org.hibernate.annotations.SQLRestriction
 @Table(name = "likes")
 class Like (
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     val member: Member,
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "event_id")
     val event : Event,
 

@@ -1,5 +1,7 @@
 package com.codersgate.ticketraider.domain.place.service
 
+import com.codersgate.ticketraider.domain.event.repository.EventRepository
+import com.codersgate.ticketraider.domain.event.repository.seat.AvailableSeatRepository
 import com.codersgate.ticketraider.domain.place.dto.CreatePlaceRequest
 import com.codersgate.ticketraider.domain.place.dto.PlaceResponse
 import com.codersgate.ticketraider.domain.place.dto.UpdatePlaceRequest
@@ -11,7 +13,9 @@ import org.springframework.stereotype.Service
 
 @Service
 class PlaceServiceImpl(
-    private val placeRepository: PlaceRepository
+    private val placeRepository: PlaceRepository,
+    private val availableSeatRepository: AvailableSeatRepository,
+    private val eventRepository: EventRepository
 ) : PlaceService {
 
     override fun createPlace(request: CreatePlaceRequest) {

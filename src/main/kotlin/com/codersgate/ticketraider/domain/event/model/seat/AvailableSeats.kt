@@ -1,6 +1,7 @@
 package com.codersgate.ticketraider.domain.event.model.seat
 
 import com.codersgate.ticketraider.domain.event.model.Event
+import com.codersgate.ticketraider.domain.ticket.entity.TicketGrade
 import com.codersgate.ticketraider.global.common.BaseEntity
 import jakarta.persistence.*
 import org.hibernate.annotations.SQLDelete
@@ -12,7 +13,7 @@ import java.time.LocalDate
 @SQLRestriction("is_deleted = false")
 @Table(name = "available_seats")
 class AvailableSeat(
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "event_id")
     val event: Event? = null,
 
@@ -33,11 +34,34 @@ class AvailableSeat(
     var seatA: Int,
 
     @Column(name = "total_seat")
-    var totalSeat: Int = seatR + seatS + seatA
+    var totalSeat: Int
 
 
 ) : BaseEntity() {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null
+    fun isFull(): Boolean {
+        return (seatR <= 0 && seatS <= 0 && seatA <= 0)
+    }
+    fun isClosed(): Boolean {
+        return bookable == Bookable.CLOSED
+    }
+    fun close() {
+        bookable = Bookable.CLOSED
+    }
+    fun decreaseSeat(grade: TicketGrade, count: Int) {
+        when(grade){
+            TicketGrade.R -> seatR -= count
+            TicketGrade.S -> seatS -= count
+            TicketGrade.A -> seatA -= count
+        }
+    }
+    fun increaseSeat(grade: TicketGrade, count: Int) {
+        when(grade){
+            TicketGrade.R -> seatR += count
+            TicketGrade.S -> seatS += count
+            TicketGrade.A -> seatA += count
+        }
+    }
 }
