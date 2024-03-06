@@ -90,7 +90,8 @@ data class EventRequest(
             date = localDate,//여기도 알맞은 날짜 넣도록하기
             seatR = place.seatR,
             seatS = place.seatS,
-            seatA = place.seatA
+            seatA = place.seatA,
+            totalSeat = place.totalSeat
         )
         return availableSeat
     }

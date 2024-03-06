@@ -56,7 +56,7 @@ class LikeServiceImpl(
         eventRepository.save(event)
     }
 
-    override fun updateLike() {
+    override fun updateLikeCount() {
         // 이벤트 id 리스트를 Like 에서 가져와서
         likeRepository.getEventIdList().map{e_id ->
             // 각 id 마다 해당하는 like 가 몇개인지 확인하고   // 각 이벤트 객체의 count 를 저장
@@ -69,18 +69,17 @@ class LikeServiceImpl(
         }
     }
 
-    override fun deleteLike(memberId: Long, eventId: Long) {
-        val member = memberRepository.findByIdOrNull(memberId)
-            ?:throw NotFoundException()
-
-        val event = eventRepository.findByIdOrNull(eventId)
-            ?:throw NotFoundException()
-
-        likeRepository.findLikeByMemberIdAndEventId(memberId, eventId)
-            ?.let{
-                it.isDeleted = true
-                likeRepository.save(it)
-            }
-            ?: throw NotFoundException()
-    }
+//    override fun deleteLike(memberId: Long, eventId: Long) {
+//        val member = memberRepository.findByIdOrNull(memberId)
+//            ?:throw NotFoundException()
+//
+//        val event = eventRepository.findByIdOrNull(eventId)
+//            ?:throw NotFoundException()
+//
+//        likeRepository.findLikeByMemberIdAndEventId(memberId, eventId)
+//            ?.let{
+//                likeRepository.delete(it)  //직접 isDeleted를 true로 바꿔주는게 아닌 Delete 쿼리를 날리면 됨
+//            }
+//            ?: throw NotFoundException()
+//    }
 }

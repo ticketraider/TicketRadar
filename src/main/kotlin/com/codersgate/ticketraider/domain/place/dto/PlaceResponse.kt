@@ -19,8 +19,5 @@ data class PlaceResponse(
                 totalSeat = (place.seatR + place.seatS + place.seatA)
             )
         }
-        fun toEvent(place:Place): String {
-            return place.name
-        }
     }
 }

@@ -5,6 +5,7 @@ import com.codersgate.ticketraider.domain.review.dto.ReviewResponse
 import com.codersgate.ticketraider.domain.review.dto.UpdateReviewRequest
 import com.codersgate.ticketraider.domain.review.repository.ReviewRepository
 import com.codersgate.ticketraider.domain.review.service.ReviewService
+import com.codersgate.ticketraider.global.infra.security.jwt.UserPrincipal
 import io.swagger.v3.oas.annotations.Operation
 import jakarta.validation.Valid
 import org.apache.catalina.User
@@ -14,6 +15,7 @@ import org.springframework.data.web.PageableDefault
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
+import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.security.core.parameters.P
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.*
@@ -29,10 +31,11 @@ class ReviewController(
     @Transactional
     @PostMapping("/create")
     fun createReview(
+        @AuthenticationPrincipal userPrincipal: UserPrincipal,
         @Valid @RequestBody request: CreateReviewRequest
     ) : ResponseEntity<Unit>
     {
-        reviewService.createReview(request)
+        reviewService.createReview(userPrincipal.id, request)
         return ResponseEntity.status(HttpStatus.OK).build()
     }
 
@@ -41,11 +44,11 @@ class ReviewController(
     @GetMapping("/v2")
     fun getReviewList_V2(
         @PageableDefault(size = 5, sort = ["id"]) pageable: Pageable,
-        @RequestParam(required = false) memberId: Long?,
+        @AuthenticationPrincipal userPrincipal: UserPrincipal?,
         @RequestParam(required = false) eventId: Long?,
     ) : ResponseEntity<Page<ReviewResponse>>
     {
-        return ResponseEntity.status(HttpStatus.OK).body(reviewService.getReviewList_V2(pageable, memberId, eventId))
+        return ResponseEntity.status(HttpStatus.OK).body(reviewService.getReviewList_V2(pageable, userPrincipal?.id, eventId))
     }
 
 
@@ -68,12 +71,12 @@ class ReviewController(
     }
 
     @Operation(summary = "멤버 ID 별 조회")
-    @GetMapping("/members/{memberId}")
+    @GetMapping("/members")
     fun getReviewListByUser(
         @PageableDefault(size = 5, sort = ["id"]) pageable: Pageable,
-        @PathVariable memberId : Long
+        @AuthenticationPrincipal userPrincipal: UserPrincipal
     ): ResponseEntity<Page<ReviewResponse>> {
-        return ResponseEntity.status(HttpStatus.OK).body(reviewService.getReviewListByUser(pageable, memberId))
+        return ResponseEntity.status(HttpStatus.OK).body(reviewService.getReviewListByUser(pageable, userPrincipal.id))
     }
 
 

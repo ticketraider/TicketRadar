@@ -47,7 +47,7 @@ class Ticket(
 
     @Enumerated(EnumType.STRING)
     @Column(name = "ticket_status", nullable = false)
-    var ticketStatus: TicketStatus,
+    var ticketStatus: TicketStatus= TicketStatus.UNPAID,
 
     @Column(name = "price", nullable = false)
     val price: Int,
