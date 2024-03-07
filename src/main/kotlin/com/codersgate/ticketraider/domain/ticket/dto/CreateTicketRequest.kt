@@ -12,5 +12,4 @@ data class CreateTicketRequest(
     val eventId: Long,
 ) {
     val seatList = mutableListOf<SeatInfo>()
-
 }

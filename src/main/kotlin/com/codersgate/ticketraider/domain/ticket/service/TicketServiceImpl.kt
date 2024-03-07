@@ -3,6 +3,7 @@ package com.codersgate.ticketraider.domain.ticket.service
 import com.codersgate.ticketraider.domain.event.repository.EventRepository
 import com.codersgate.ticketraider.domain.member.repository.MemberRepository
 import com.codersgate.ticketraider.domain.ticket.dto.CreateTicketRequest
+import com.codersgate.ticketraider.domain.ticket.dto.SeatInfo
 import com.codersgate.ticketraider.domain.ticket.dto.TicketResponse
 import com.codersgate.ticketraider.domain.ticket.entity.Ticket
 import com.codersgate.ticketraider.domain.ticket.entity.TicketGrade
@@ -46,6 +47,7 @@ class TicketServiceImpl(
             lock.tryLock(10, 1, TimeUnit.SECONDS)
         }
 
+
         val event = eventRepository.findByIdOrNull(request.eventId)
             ?: throw ModelNotFoundException("event", request.eventId)
         val member = memberRepository.findByIdOrNull(userPrincipal.id)
@@ -54,9 +56,25 @@ class TicketServiceImpl(
 
         // 티켓 생성
         for (i in 0 until count) {
+
             // 캐시 , 레포지토리 체크
             if( ! chkTicketCache(request.eventId, request.date, request.seatList[i].ticketGrade, request.seatList[i].seatNumber) )
                 continue
+
+            // 예약 날짜 체크
+            if( request.date < event.startDate || request.date > event.endDate )
+                throw IllegalArgumentException("The requested date (${request.date}) is outside the valid range (${event.startDate} ~ ${event.endDate}) for the event id ${event.id}")
+
+            // 좌석 번호 체크
+            val seatLimit = when(request.seatList[i].ticketGrade ) {
+                TicketGrade.R -> event.place.seatR
+                TicketGrade.S -> event.place.seatS
+                TicketGrade.A -> event.place.seatA
+            }
+            if(request.seatList[i].seatNumber in 1..<seatLimit)
+                throw IllegalArgumentException("Invalid SeatNumber")
+
+
 
             ticketRepository.save(
                 Ticket(
