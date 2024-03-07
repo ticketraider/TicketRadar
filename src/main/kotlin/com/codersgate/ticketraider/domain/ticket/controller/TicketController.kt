@@ -2,6 +2,7 @@ package com.codersgate.ticketraider.domain.ticket.controller
 
 import com.codersgate.ticketraider.domain.ticket.dto.CreateTicketRequest
 import com.codersgate.ticketraider.domain.ticket.dto.TicketResponse
+import com.codersgate.ticketraider.domain.ticket.entity.TicketStatus
 import com.codersgate.ticketraider.domain.ticket.service.TicketService
 import com.codersgate.ticketraider.global.infra.security.jwt.UserPrincipal
 import io.swagger.v3.oas.annotations.Operation
@@ -53,16 +54,17 @@ class TicketController(
             .body(ticketService.getTicketListByUserId(user, pageable))
     }
 
-    // 티켓 수정 : 과정 정리 필요
-//    @Operation(summary = "티켓 수정")
-//    @PutMapping
-//    fun updateTicket(
-//        @Valid @RequestBody request: CreateTicketRequest
-//    ): ResponseEntity<Unit> {
-//        return ResponseEntity
-//            .status(HttpStatus.CREATED)
-//            .body(ticketService.updateTicket(request))
-//    }
+
+    @Operation(summary = "티켓 상태 변경")
+    @PutMapping
+    fun updateTicket(
+        @RequestParam ticketId: Long,
+        @RequestParam ticketStatus: TicketStatus
+    ): ResponseEntity<Unit> {
+        return ResponseEntity
+            .status(HttpStatus.CREATED)
+            .body(ticketService.updateTicket(ticketId, ticketStatus))
+    }
     @Operation(summary = "티켓 삭제")
     @DeleteMapping("/delete/{ticketId}")
     fun deleteTicket(
@@ -73,6 +75,7 @@ class TicketController(
             .status(HttpStatus.OK)
             .body(ticketService.deleteTicket(ticketId, user))
     }
+
 
 
 }

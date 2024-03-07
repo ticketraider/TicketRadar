@@ -2,6 +2,7 @@ package com.codersgate.ticketraider.domain.ticket.dto
 
 import com.codersgate.ticketraider.domain.ticket.entity.Ticket
 import com.codersgate.ticketraider.domain.ticket.entity.TicketGrade
+import com.codersgate.ticketraider.domain.ticket.entity.TicketStatus
 import java.time.LocalDate
 
 data class TicketResponse(
@@ -11,6 +12,7 @@ data class TicketResponse(
     val grade: TicketGrade,
     val date: LocalDate,
     val place: String,
+    val ticketStatus: TicketStatus,
     val eventName: String,
     val memberNickname: String,
 ) {
@@ -23,9 +25,10 @@ data class TicketResponse(
                 price = ticket.price,
                 grade = ticket.grade,
                 date = ticket.date,
+                place = ticket.place,
+                ticketStatus = ticket.ticketStatus,
                 eventName = ticket.event.title,
                 memberNickname = ticket.member.nickname,
-                place = ticket.place
             )
         }
     }
