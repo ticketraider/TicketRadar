@@ -63,13 +63,14 @@ class RedisConfig {
 
         return template
     }
+
+    // JSON 데이터와 Java 객체 간의 변환을 수행하는데 사용
     @Bean
     fun objectMapper(): ObjectMapper {
         val mapper = ObjectMapper()
         mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS) // timestamp 형식 안따르도록 설정
         mapper.registerModules(JavaTimeModule(), Jdk8Module()) // LocalDateTime 매핑을 위해 모듈 활성화
-        mapper.registerModules()
-        mapper.registerModule(ParameterNamesModule());
+        mapper.registerModule(ParameterNamesModule()); //생성자의 매개변수 이름을 사용하여 JSON 속성과 매핑
         return mapper
     }
 

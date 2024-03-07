@@ -22,7 +22,6 @@ class EventRepositoryImpl : QueryDslSupport(), CustomEventRepository {
     private val event = QEvent.event
     private val price = QPrice.price
     override fun findByPageable(pageable: Pageable, categoryId: Long?, status: String?): Page<Event> {
-
         val totalCount = queryFactory.select(event.count()).from(event).fetchOne() ?: 0L
 
         val builder = BooleanBuilder()
