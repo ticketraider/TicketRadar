@@ -58,18 +58,10 @@ class CategoryController(
     @Operation(summary = "카테고리 목록 조회")
     @GetMapping
     fun getCategoryList(
-        @PageableDefault(
-            size = 15,
-            sort = ["id"]
-        ) pageable: Pageable,
-        @RequestParam(
-            value = "status",
-            required = false
-        ) status: String?
-    ): ResponseEntity<Page<CategoryResponse>> {
+    ): ResponseEntity<List<CategoryResponse>> {
         return ResponseEntity
             .status(HttpStatus.OK)
-            .body(categoryService.getPaginatedCategoryList(pageable, status))
+            .body(categoryService.getCategoryList())
     }
 
     @Operation(summary = "카테고리 조회")
