@@ -6,6 +6,7 @@ import com.codersgate.ticketraider.domain.ticket.dto.CreateTicketRequest
 import com.codersgate.ticketraider.domain.ticket.dto.TicketResponse
 import com.codersgate.ticketraider.domain.ticket.entity.Ticket
 import com.codersgate.ticketraider.domain.ticket.entity.TicketGrade
+import com.codersgate.ticketraider.domain.ticket.entity.TicketStatus
 import com.codersgate.ticketraider.domain.ticket.repository.TicketRepository
 import com.codersgate.ticketraider.global.error.exception.InvalidCredentialException
 import com.codersgate.ticketraider.global.error.exception.ModelNotFoundException
@@ -128,6 +129,17 @@ class TicketServiceImpl(
             ?: throw ModelNotFoundException("Ticket", ticketId)
         return TicketResponse.from(ticket)
     }
+    override fun getTicketListByUserId(user: UserPrincipal, pageable: Pageable): Page<TicketResponse> {
+        return ticketRepository.getListByUserId(pageable, user.id).map { TicketResponse.from(it) }
+    }
+    override fun updateTicket(ticketId: Long, ticketStatus: TicketStatus) {
+        val ticket = ticketRepository.findByIdOrNull(ticketId)
+            ?: throw ModelNotFoundException("Ticket", ticketId)
+
+        ticket.switchTicketStatus(ticketStatus)
+
+        ticketRepository.save(ticket)
+    }
 
     override fun deleteTicket(ticketId: Long, user: UserPrincipal) {
         val ticket = ticketRepository.findByIdOrNull(ticketId)
@@ -140,9 +152,7 @@ class TicketServiceImpl(
 
 
 
-    override fun getTicketListByUserId(user: UserPrincipal, pageable: Pageable): Page<TicketResponse> {
-        return ticketRepository.getListByUserId(pageable, user.id).map { TicketResponse.from(it) }
-    }
+
 }
 private fun generateKey(eventId: Long, date: LocalDate, grade: TicketGrade, seatNo: Int): String {
     val key = "ID : ${eventId}, $date : ${grade}-${seatNo}"
