@@ -18,5 +18,6 @@ interface TicketService {
     fun getTicketById(ticketId: Long): TicketResponse
     fun getTicketListByUserId(user: UserPrincipal , pageable: Pageable): Page<TicketResponse>
     fun updateTicket(ticketId: Long, ticketStatus: TicketStatus)
+    fun chkExpiredTickets()
     fun deleteTicket(ticketId: Long, user: UserPrincipal)
 }

@@ -13,6 +13,7 @@ import com.codersgate.ticketraider.domain.ticket.repository.TicketRepository
 import com.codersgate.ticketraider.global.error.exception.InvalidCredentialException
 import com.codersgate.ticketraider.global.error.exception.ModelNotFoundException
 import com.codersgate.ticketraider.global.infra.security.jwt.UserPrincipal
+import org.hibernate.Hibernate
 import org.slf4j.LoggerFactory
 import org.springframework.cache.CacheManager
 import org.redisson.api.RLock
@@ -55,6 +56,9 @@ class TicketServiceImpl(
         val member = memberRepository.findByIdOrNull(userPrincipal.id)
             ?: throw ModelNotFoundException("member", userPrincipal.id)
 
+        // 컬렉션을 명시적으로 초기화 ( LAZY 모드 )
+        Hibernate.initialize(event.availableSeats)
+
         // 좌석 예약 가능 상태 확인
         val availableSeat = event.availableSeats.find {
             it.date == request.date && it.bookable == Bookable.OPEN
@@ -83,7 +87,7 @@ class TicketServiceImpl(
                 TicketGrade.S -> event.availableSeats[0].maxSeatS
                 TicketGrade.A -> event.availableSeats[0].maxSeatA
             }
-            if (request.seatList[i].seatNumber in 1..<seatLimit)
+            if (request.seatList[i].seatNumber !in 1..<seatLimit)
                 throw IllegalArgumentException("Invalid SeatNumber")
 
             // 티켓 생성
@@ -184,6 +188,14 @@ class TicketServiceImpl(
         ticket.switchTicketStatus(ticketStatus)
 
         ticketRepository.save(ticket)
+    }
+
+    override fun chkExpiredTickets(){
+        ticketRepository.findAll().map{
+            if(it.date < LocalDate.now())
+                it.ticketStatus = TicketStatus.EXPIRED
+            ticketRepository.save(it)
+        }
     }
 
     override fun deleteTicket(ticketId: Long, user: UserPrincipal) {

@@ -12,7 +12,9 @@ import org.springframework.data.domain.Pageable
 import org.springframework.data.web.PageableDefault
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.security.core.annotation.AuthenticationPrincipal
+import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.*
 
 @RestController
@@ -21,6 +23,7 @@ class TicketController(
     val ticketService: TicketService
 ) {
     @Operation(summary = "티켓 생성")
+    @Transactional
     @PostMapping
     fun createTicket(
         @AuthenticationPrincipal userPrincipal: UserPrincipal,
@@ -65,6 +68,18 @@ class TicketController(
             .status(HttpStatus.CREATED)
             .body(ticketService.updateTicket(ticketId, ticketStatus))
     }
+
+    @Scheduled(cron = "0 0 12 * * MON-FRI") // 매주 월요일부터 금요일까지 매일 정오(12시)에 메서드가 실행
+    @PatchMapping("/chkExpired")
+    @Operation(summary = "만료 티켓 확인")
+    fun chkExpiredTicket() : ResponseEntity<Unit>
+    {
+        ticketService.chkExpiredTickets()
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .build()
+    }
+
     @Operation(summary = "티켓 삭제")
     @DeleteMapping("/delete/{ticketId}")
     fun deleteTicket(
