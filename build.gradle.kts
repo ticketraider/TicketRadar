@@ -45,6 +45,8 @@ val kotestVersion = "5.5.5" // kotest
 val mockkVersion = "1.13.8" // mockk
 
 dependencies {
+    implementation("org.springframework.boot:spring-boot-starter-oauth2-client")  //  spring security oauth2
+
     implementation("org.springframework.boot:spring-boot-starter-aop")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0")
