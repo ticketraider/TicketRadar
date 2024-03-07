@@ -1,12 +1,15 @@
 package com.codersgate.ticketraider.global.infra.security
 
 
+import com.codersgate.ticketraider.domain.oauth.service.OAuth2LoginSuccessHandler
+import com.codersgate.ticketraider.domain.oauth.service.OAuth2UserService
 import com.codersgate.ticketraider.global.infra.security.jwt.JwtAuthenticationFilter
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
+import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.web.AuthenticationEntryPoint
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.access.AccessDeniedHandler
@@ -18,7 +21,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 class SecurityConfig(
     private val jwtAuthenticationFilter: JwtAuthenticationFilter,
     private val authenticationEntryPoint: AuthenticationEntryPoint,
-    private val accessDeniedHandler: AccessDeniedHandler
+    private val accessDeniedHandler: AccessDeniedHandler,
+    val oAuth2UserService: OAuth2UserService,
+    val oAuth2LoginSuccessHandler: OAuth2LoginSuccessHandler
 ) {
 
     @Bean
@@ -27,14 +32,27 @@ class SecurityConfig(
             .httpBasic { it.disable() }
             .formLogin { it.disable() }
             .csrf { it.disable() }
-            .authorizeHttpRequests {
+            .cors { it.disable() }
+            .headers { it.frameOptions { options -> options.sameOrigin() }}
+            .sessionManagement {
+                it.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            }.authorizeHttpRequests {
                 it.requestMatchers(
                     "/members/login",
                     "/members/signUp",
                     "/swagger-ui/**",
-                    "/v3/api-docs/**"
+                    "/v3/api-docs/**",
+                    "/oauth2/**"
                 ).permitAll()
                     .anyRequest().authenticated()
+            }.oauth2Login { oauthConfig ->
+                oauthConfig.authorizationEndpoint {
+                    it.baseUri("/oauth2/login")  //oauth2/login/kakao
+                }.redirectionEndpoint {
+                    it.baseUri("/oauth2/callback/*") // /oauth2/callback/kakao
+                }.userInfoEndpoint {
+                    it.userService(oAuth2UserService)
+                }.successHandler(oAuth2LoginSuccessHandler)
             }
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter::class.java)
             .exceptionHandling {
