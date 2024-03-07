@@ -1,6 +1,7 @@
 package com.codersgate.ticketraider.domain.event.service
 
 import com.codersgate.ticketraider.domain.category.repository.CategoryRepository
+import com.codersgate.ticketraider.domain.event.controller.Status
 import com.codersgate.ticketraider.domain.event.dto.EventRequest
 import com.codersgate.ticketraider.domain.event.dto.EventResponse
 import com.codersgate.ticketraider.domain.event.repository.EventRepository
@@ -75,15 +76,9 @@ class EventServiceImpl(
         eventRepository.delete(event)
     }
 
-    override fun getPaginatedEventList(pageable: Pageable, status: String?, categoryId: Long?): Page<EventResponse>? {
-//        var id = categoryId?:0L
-////        if(categoryId == null) {
-////            id = 0
-////        }
-//        val category = categoryRepository.findByIdOrNull(id)
+    override fun getPaginatedEventList(pageable: Pageable, status : String?, categoryId: Long?): Page<EventResponse>? {
 
-
-        val eventList = eventRepository.findByPageable(pageable, status)
+        val eventList = eventRepository.findByPageable(pageable, categoryId, status)
         return eventList.map { EventResponse.from(it) }
     }
 

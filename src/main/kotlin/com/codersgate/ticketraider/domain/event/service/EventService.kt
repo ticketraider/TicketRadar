@@ -1,5 +1,6 @@
 package com.codersgate.ticketraider.domain.event.service
 
+import com.codersgate.ticketraider.domain.event.controller.Status
 import com.codersgate.ticketraider.domain.event.dto.EventRequest
 import com.codersgate.ticketraider.domain.event.dto.EventResponse
 import org.springframework.data.domain.Page

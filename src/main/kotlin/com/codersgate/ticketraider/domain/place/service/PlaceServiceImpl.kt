@@ -40,6 +40,17 @@ class PlaceServiceImpl(
         place.seatA = request.seatA
         place.address = request.address
         place.totalSeat = (request.seatR + request.seatS + request.seatA)
+        placeRepository.save(place)
+        val seatList = availableSeatRepository.findByPlaceId(placeId)
+        seatList.map {
+            it!!.maxSeatR = place.seatR
+            it.maxSeatS = place.seatS
+            it.maxSeatA = place.seatA
+            it.totalSeat = place.totalSeat
+        }
+        seatList.map {
+            availableSeatRepository.save(it!!)
+        }
     }
 
     override fun deletePlace(placeId: Long) {
