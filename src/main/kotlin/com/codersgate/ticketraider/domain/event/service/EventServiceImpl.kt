@@ -1,6 +1,7 @@
 package com.codersgate.ticketraider.domain.event.service
 
 import com.codersgate.ticketraider.domain.category.repository.CategoryRepository
+import com.codersgate.ticketraider.domain.event.controller.Status
 import com.codersgate.ticketraider.domain.event.dto.EventRequest
 import com.codersgate.ticketraider.domain.event.dto.EventResponse
 import com.codersgate.ticketraider.domain.event.repository.EventRepository
@@ -8,6 +9,7 @@ import com.codersgate.ticketraider.domain.event.repository.price.PriceRepository
 import com.codersgate.ticketraider.domain.event.repository.seat.AvailableSeatRepository
 import com.codersgate.ticketraider.domain.place.repository.PlaceRepository
 import com.codersgate.ticketraider.global.error.exception.ModelNotFoundException
+import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException
 import org.springframework.data.domain.Page
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
@@ -51,7 +53,7 @@ class EventServiceImpl(
         val place = placeRepository.findPlaceByName(eventRequest.place)
             ?: throw ModelNotFoundException("place", 0)
 
-        check(eventRequest.startDate != event.startDate || eventRequest.endDate != event.endDate) {
+        if (eventRequest.startDate != event.startDate || eventRequest.endDate != event.endDate) {
             availableSeatRepository.findAllByEventId(event.id!!).map { availableSeatRepository.delete(it!!) }
             val date = eventRequest.startDate
             val duration = eventRequest.endDate.compareTo(eventRequest.startDate)
@@ -74,12 +76,9 @@ class EventServiceImpl(
         eventRepository.delete(event)
     }
 
-    override fun getPaginatedEventList(pageable: Pageable, status: String?, categoryId: Long?): Page<EventResponse>? {
+    override fun getPaginatedEventList(pageable: Pageable, status : String?, categoryId: Long?): Page<EventResponse>? {
 
-        val category = categoryRepository.findByIdOrNull(categoryId)
-            ?: throw ModelNotFoundException("Category", categoryId)
-
-        val eventList = eventRepository.findByPageable(pageable, category)
+        val eventList = eventRepository.findByPageable(pageable, categoryId, status)
         return eventList.map { EventResponse.from(it) }
     }
 

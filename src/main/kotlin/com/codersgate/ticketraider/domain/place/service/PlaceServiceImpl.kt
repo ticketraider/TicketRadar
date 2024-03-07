@@ -1,5 +1,7 @@
 package com.codersgate.ticketraider.domain.place.service
 
+import com.codersgate.ticketraider.domain.event.repository.EventRepository
+import com.codersgate.ticketraider.domain.event.repository.seat.AvailableSeatRepository
 import com.codersgate.ticketraider.domain.place.dto.CreatePlaceRequest
 import com.codersgate.ticketraider.domain.place.dto.PlaceResponse
 import com.codersgate.ticketraider.domain.place.dto.UpdatePlaceRequest
@@ -11,7 +13,9 @@ import org.springframework.stereotype.Service
 
 @Service
 class PlaceServiceImpl(
-    private val placeRepository: PlaceRepository
+    private val placeRepository: PlaceRepository,
+    private val availableSeatRepository: AvailableSeatRepository,
+    private val eventRepository: EventRepository
 ) : PlaceService {
 
     override fun createPlace(request: CreatePlaceRequest) {
@@ -20,6 +24,7 @@ class PlaceServiceImpl(
             seatR = request.seatR,
             seatS = request.seatS,
             seatA = request.seatA,
+            address = request.address,
             totalSeat = (request.seatR + request.seatS + request.seatA)
         )
         placeRepository.save(place)
@@ -33,7 +38,19 @@ class PlaceServiceImpl(
         place.seatR = request.seatR
         place.seatS = request.seatS
         place.seatA = request.seatA
+        place.address = request.address
         place.totalSeat = (request.seatR + request.seatS + request.seatA)
+        placeRepository.save(place)
+        val seatList = availableSeatRepository.findByPlaceId(placeId)
+        seatList.map {
+            it!!.maxSeatR = place.seatR
+            it.maxSeatS = place.seatS
+            it.maxSeatA = place.seatA
+            it.totalSeat = place.totalSeat
+        }
+        seatList.map {
+            availableSeatRepository.save(it!!)
+        }
     }
 
     override fun deletePlace(placeId: Long) {

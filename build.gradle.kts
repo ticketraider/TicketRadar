@@ -65,7 +65,7 @@ dependencies {
     runtimeOnly("io.jsonwebtoken:jjwt-impl:0.12.3")//시큐리티
     runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.12.3")//시큐리티
     runtimeOnly("org.postgresql:postgresql")
-//    runtimeOnly ("com.h2database:h2")
+    runtimeOnly("com.h2database:h2")
 
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
     testImplementation("org.springframework.boot:spring-boot-starter-test") //기본 테스트 의존성
@@ -77,7 +77,12 @@ dependencies {
     testImplementation("org.postgresql:postgresql")//테스트용 데이터소스URL
 
     implementation("org.springframework.boot:spring-boot-starter-data-redis") //Lettuce
+    implementation("org.springframework.boot:spring-boot-starter-cache") // 레디스 캐시
     implementation("org.redisson:redisson-spring-boot-starter:3.21.1") //Redisson
+
+    implementation ("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
+    implementation ("com.fasterxml.jackson.core:jackson-databind")
+
 
 }
 

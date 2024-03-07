@@ -88,9 +88,11 @@ data class EventRequest(
         val availableSeat = AvailableSeat(
             event = event,
             date = localDate,//여기도 알맞은 날짜 넣도록하기
-            seatR = place.seatR,
-            seatS = place.seatS,
-            seatA = place.seatA
+            maxSeatR = place.seatR,
+            maxSeatS = place.seatS,
+            maxSeatA = place.seatA,
+            totalSeat = place.totalSeat,
+            place = place
         )
         return availableSeat
     }

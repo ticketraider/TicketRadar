@@ -1,6 +1,8 @@
 package com.codersgate.ticketraider.domain.event.model.seat
 
 import com.codersgate.ticketraider.domain.event.model.Event
+import com.codersgate.ticketraider.domain.place.model.Place
+import com.codersgate.ticketraider.domain.ticket.entity.TicketGrade
 import com.codersgate.ticketraider.global.common.BaseEntity
 import jakarta.persistence.*
 import org.hibernate.annotations.SQLDelete
@@ -12,7 +14,7 @@ import java.time.LocalDate
 @SQLRestriction("is_deleted = false")
 @Table(name = "available_seats")
 class AvailableSeat(
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "event_id")
     val event: Event? = null,
 
@@ -24,20 +26,55 @@ class AvailableSeat(
     var bookable: Bookable = Bookable.OPEN,
 
     @Column(name = "seat_r")
-    var seatR: Int,
+    var seatR: Int = 0,
+
+    @Column(name = "max_seat_r")
+    var maxSeatR: Int,
 
     @Column(name = "seat_s")
-    var seatS: Int,
+    var seatS: Int = 0,
+
+    @Column(name = "max_seat_s")
+    var maxSeatS: Int,
 
     @Column(name = "seat_a")
-    var seatA: Int,
+    var seatA: Int = 0,
+
+    @Column(name = "max_seat_a")
+    var maxSeatA: Int,
 
     @Column(name = "total_seat")
-    var totalSeat: Int = seatR + seatS + seatA
+    var totalSeat: Int,
 
+    @ManyToOne()
+    @JoinColumn(name = "place_id")
+    val place: Place,
 
 ) : BaseEntity() {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null
+    fun isFull(): Boolean {
+        return (seatR >= maxSeatR && seatS >= maxSeatS && seatA >= maxSeatA)
+    }
+    fun isClosed(): Boolean {
+        return bookable == Bookable.CLOSED
+    }
+    fun close() {
+        bookable = Bookable.CLOSED
+    }
+    fun decreaseSeat(grade: TicketGrade, count: Int) {
+        when(grade){
+            TicketGrade.R -> seatR -= count
+            TicketGrade.S -> seatS -= count
+            TicketGrade.A -> seatA -= count
+        }
+    }
+    fun increaseSeat(grade: TicketGrade, count: Int) {
+        when(grade){
+            TicketGrade.R -> seatR += count
+            TicketGrade.S -> seatS += count
+            TicketGrade.A -> seatA += count
+        }
+    }
 }

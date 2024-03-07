@@ -6,5 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository
 interface AvailableSeatRepository : JpaRepository<AvailableSeat, Long> {
     fun findAllByEventId(eventId: Long): List<AvailableSeat?>
 
+    fun findByPlaceId(placeId:Long): List<AvailableSeat?>
+
     fun deleteByEventId(eventId: Long)
 }

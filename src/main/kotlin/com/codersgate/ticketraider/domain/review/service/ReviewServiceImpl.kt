@@ -20,8 +20,8 @@ class ReviewServiceImpl(
     private val eventRepository: EventRepository,
 ) : ReviewService{
 
-    override fun createReview(request: CreateReviewRequest) {
-        val member = memberRepository.findByIdOrNull(request.memberId)
+    override fun createReview(memberId: Long, request: CreateReviewRequest) {
+        val member = memberRepository.findByIdOrNull(memberId)
             ?:throw NotFoundException()
 
         val event = eventRepository.findByIdOrNull(request.eventId)
@@ -38,9 +38,9 @@ class ReviewServiceImpl(
         )
     }
 
-    override fun getReviewList_V2(pageable: Pageable, userId : Long?, eventId : Long?) : Page<ReviewResponse>
+    override fun getReviewList_V2(pageable: Pageable, memberId : Long?, eventId : Long?) : Page<ReviewResponse>
     {
-        return reviewRepository.getReviewList_V2(pageable, userId, eventId).map{ ReviewResponse.from(it) }
+        return reviewRepository.getReviewList_V2(pageable, memberId, eventId).map{ ReviewResponse.from(it) }
     }
 
     override fun getReviewList(pageable : Pageable): Page<ReviewResponse> {
@@ -51,8 +51,8 @@ class ReviewServiceImpl(
         return reviewRepository.getReviewListByEventId(pageable, eventId).map{ ReviewResponse.from(it) }
     }
 
-    override fun getReviewListByUser(pageable : Pageable, userId: Long): Page<ReviewResponse> {
-        return reviewRepository.getReviewListByUserId(pageable, userId).map{ ReviewResponse.from(it) }
+    override fun getReviewListByUser(pageable : Pageable, memberId: Long): Page<ReviewResponse> {
+        return reviewRepository.getReviewListByUserId(pageable, memberId).map{ ReviewResponse.from(it) }
     }
 
     override fun getReview(reviewId: Long): ReviewResponse {

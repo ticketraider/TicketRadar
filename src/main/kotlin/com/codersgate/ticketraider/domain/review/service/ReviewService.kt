@@ -12,11 +12,11 @@ import org.springframework.stereotype.Service
 
 interface ReviewService {
 
-    fun createReview(request: CreateReviewRequest)
+    fun createReview(memberId: Long, request: CreateReviewRequest)
     fun getReviewList(pageable : Pageable) : Page<ReviewResponse>
-    fun getReviewList_V2(pageable: Pageable,userId : Long?,eventId : Long?) : Page<ReviewResponse>
+    fun getReviewList_V2(pageable: Pageable,memberId : Long?,eventId : Long?) : Page<ReviewResponse>
     fun getReviewListByEvent(pageable : Pageable, eventId : Long) : Page<ReviewResponse>
-    fun getReviewListByUser(pageable : Pageable, userId: Long) : Page<ReviewResponse>
+    fun getReviewListByUser(pageable : Pageable, memberId: Long) : Page<ReviewResponse>
     fun getReview(reviewId : Long) : ReviewResponse
     fun updateReview(reviewId: Long, request : UpdateReviewRequest)
     fun deleteReview(reviewId: Long)
