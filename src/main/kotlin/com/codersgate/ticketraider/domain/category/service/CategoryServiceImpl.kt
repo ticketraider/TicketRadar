@@ -21,12 +21,18 @@ class CategoryServiceImpl(
         val category = Category(
             title = request.title
         )
+        check(!categoryRepository.existsByTitle(request.title)) {
+            "이미 존재하는 Title 입니다."
+        }
         categoryRepository.save(category)
     }
 
     override fun updateCategory(categoryId: Long, request: UpdateCategoryRequest) {
         val category = categoryRepository.findByIdOrNull(categoryId)
             ?: throw ModelNotFoundException("Category", categoryId)
+        check(!categoryRepository.existsByTitle(request.title)) {
+            "이미 존재하는 Title 입니다."
+        }
         category.title = request.title
     }
 

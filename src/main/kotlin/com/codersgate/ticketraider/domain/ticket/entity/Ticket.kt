@@ -53,7 +53,7 @@ class Ticket(
     val price: Int,
 
     @Column(name = "place", nullable = false)
-    val place: String
+    var place: String
 
 ): BaseEntity() {
     @Id

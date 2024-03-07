@@ -29,7 +29,16 @@ class EventServiceImpl(
             ?: throw ModelNotFoundException("category", eventRequest.categoryId)
         val place = placeRepository.findPlaceByName(eventRequest.place)
             ?: throw ModelNotFoundException("place", 0)//예외 추가 필요함
+
+        //시작일과 끝나는 일 비교후 false 시 예외처리
+        check(eventRequest.startDate < eventRequest.endDate) {
+            "끝나는날짜는 시작날짜보다 빠를수 없습니다."
+        }
+
         val (price, event) = eventRequest.toPriceAndEvent(category, place)
+        check(!eventRepository.existsByPlaceAndStartDateAndEndDate(place, eventRequest.startDate, eventRequest.endDate)){
+            "이미 입력한 장소의 해당 날짜에 존재하는 Event가 있습니다."
+        }
         event.price = price
         eventRepository.save(event)
         priceRepository.save(price)
@@ -52,6 +61,14 @@ class EventServiceImpl(
             ?: throw ModelNotFoundException("category", eventRequest.categoryId)
         val place = placeRepository.findPlaceByName(eventRequest.place)
             ?: throw ModelNotFoundException("place", 0)
+
+        //시작일과 끝나는 일 비교후 false 시 예외처리
+        check(eventRequest.startDate < eventRequest.endDate) {
+            "끝나는날짜는 시작날짜보다 빠를수 없습니다."
+        }
+        check(!eventRepository.existsByPlaceAndStartDateAndEndDate(place, eventRequest.startDate, eventRequest.endDate)){
+            "이미 입력한 장소의 해당 날짜에 존재하는 Event가 있습니다."
+        }
 
         if (eventRequest.startDate != event.startDate || eventRequest.endDate != event.endDate) {
             availableSeatRepository.findAllByEventId(event.id!!).map { availableSeatRepository.delete(it!!) }

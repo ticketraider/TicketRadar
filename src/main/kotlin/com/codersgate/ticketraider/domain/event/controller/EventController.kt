@@ -5,6 +5,7 @@ import com.codersgate.ticketraider.domain.event.dto.EventRequest
 import com.codersgate.ticketraider.domain.event.dto.EventResponse
 import com.codersgate.ticketraider.domain.event.service.EventService
 import io.swagger.v3.oas.annotations.Operation
+import jakarta.validation.Valid
 import org.springdoc.core.converters.models.PageableAsQueryParam
 import org.springframework.data.domain.Page
 
@@ -23,7 +24,7 @@ class EventController(
     @Operation(summary = " 이벤트 생성")
     @PostMapping
     fun createEvent(
-        @RequestBody eventRequest: EventRequest
+        @Valid @RequestBody eventRequest: EventRequest
     ): ResponseEntity<Unit> {
         return ResponseEntity
         .status(HttpStatus.CREATED)
@@ -34,7 +35,7 @@ class EventController(
     @PutMapping("/{eventId}")
 fun updateEvent(
         @PathVariable eventId: Long,
-        @RequestBody eventRequest: EventRequest,
+        @Valid @RequestBody eventRequest: EventRequest,
     ): ResponseEntity<Unit> {
     return ResponseEntity
         .status(HttpStatus.OK)
