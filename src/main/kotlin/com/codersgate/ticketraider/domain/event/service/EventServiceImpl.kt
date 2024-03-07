@@ -83,7 +83,7 @@ class EventServiceImpl(
 //        val category = categoryRepository.findByIdOrNull(id)
 
 
-        val eventList = eventRepository.findByPageable(pageable)
+        val eventList = eventRepository.findByPageable(pageable, status)
         return eventList.map { EventResponse.from(it) }
     }
 

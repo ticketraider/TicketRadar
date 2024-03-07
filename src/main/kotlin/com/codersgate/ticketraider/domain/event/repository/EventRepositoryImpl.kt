@@ -18,34 +18,45 @@ import org.springframework.data.domain.Pageable
 class EventRepositoryImpl : QueryDslSupport(), CustomEventRepository {
 
     private val event = QEvent.event
-    override fun findByPageable(pageable: Pageable): Page<Event> {
+    override fun findByPageable(pageable: Pageable, sortDir:String?): Page<Event> {
 
         val totalCount = queryFactory.select(event.count()).from(event).fetchOne() ?: 0L
 
         val builder = BooleanBuilder()
 
-//        if(categoryId != null){
-//            builder.and(event.category.id.eq(categoryId))
-//        }
+        val query = queryFactory
+            .selectFrom(event)
+            .offset(pageable.offset)
+            .limit(pageable.pageSize.toLong())
 
         val contents = queryFactory.selectFrom(event)
             .offset(pageable.offset)
             .limit(pageable.pageSize.toLong())
             .where(builder)
-//            .orderBy(*getOrderSpecifier(pageable, event))
+            .orderBy(*getOrderSpecifier(pageable, event, sortDir))
             .fetch()
 
         return PageImpl(contents, pageable, totalCount)
     }
 
-    private fun getOrderSpecifier(pageable: Pageable, path: EntityPathBase<*>): Array<OrderSpecifier<*>> {
+    private fun getOrderSpecifier(pageable: Pageable, path: EntityPathBase<*>, sortDir : String?): Array<OrderSpecifier<*>> {
+        val sortField = setOf("id", "title", "created_at", "average_rating", "likecount")
+
         val pathBuilder = PathBuilder(path.type, path.metadata)
 
         return pageable.sort.toList().map { order ->
-            OrderSpecifier(
-                if (order.isAscending) Order.ASC else Order.DESC,
-                pathBuilder.get(order.property) as Expression<Comparable<*>>
-            )
+
+            if(order.property in sortField){
+                OrderSpecifier(
+                    if (sortDir == "ASC")
+                        Order.ASC
+                    else
+                        Order.DESC, pathBuilder.get(order.property) as Expression<Comparable<*>>
+                )
+            }
+            else {
+                OrderSpecifier(Order.DESC, pathBuilder.get("id") as Expression<Comparable<*>>)
+            }
         }.toTypedArray()
     }
 
