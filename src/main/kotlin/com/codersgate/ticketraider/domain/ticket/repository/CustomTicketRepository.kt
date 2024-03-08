@@ -8,6 +8,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 
 interface CustomTicketRepository {
+    fun findAllByPlaceId(placeId: Long): List<Ticket?>
 
     fun getListByUserId(pageable: Pageable, userId: Long): Page<Ticket>
 

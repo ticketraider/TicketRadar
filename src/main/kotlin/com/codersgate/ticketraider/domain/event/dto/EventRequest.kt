@@ -92,6 +92,7 @@ data class EventRequest(
             seatAPrice = seatAPrice,
             event = event
         )
+        event.price = price
         return Pair(price, event)
     }
 
