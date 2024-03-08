@@ -1,14 +1,13 @@
 package com.codersgate.ticketraider.domain.place.service
 
-import com.codersgate.ticketraider.domain.place.dto.CreatePlaceRequest
+import com.codersgate.ticketraider.domain.place.dto.PlaceRequest
 import com.codersgate.ticketraider.domain.place.dto.PlaceResponse
-import com.codersgate.ticketraider.domain.place.dto.UpdatePlaceRequest
 
 interface PlaceService {
 
-    fun createPlace(request: CreatePlaceRequest)
+    fun createPlace(request: PlaceRequest)
 
-    fun updatePlace(placeId: Long, request: UpdatePlaceRequest)
+    fun updatePlace(placeId: Long, request: PlaceRequest)
 
     fun deletePlace(placeId: Long)
 

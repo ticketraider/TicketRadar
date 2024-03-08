@@ -66,11 +66,11 @@ class EventServiceImpl(
         check(eventRequest.startDate < eventRequest.endDate) {
             "끝나는날짜는 시작날짜보다 빠를수 없습니다."
         }
-        check(!eventRepository.existsByPlaceAndStartDateAndEndDate(place, eventRequest.startDate, eventRequest.endDate)){
-            "이미 입력한 장소의 해당 날짜에 존재하는 Event가 있습니다."
-        }
 
         if (eventRequest.startDate != event.startDate || eventRequest.endDate != event.endDate) {
+            check(!eventRepository.existsByPlaceAndStartDateAndEndDate(place, eventRequest.startDate, eventRequest.endDate)){
+                "이미 입력한 장소의 해당 날짜에 존재하는 Event가 있습니다."
+            }
             availableSeatRepository.findAllByEventId(event.id!!).map { availableSeatRepository.delete(it!!) }
             val date = eventRequest.startDate
             val duration = eventRequest.endDate.compareTo(eventRequest.startDate)
@@ -78,7 +78,7 @@ class EventServiceImpl(
                 val seat = eventRequest.toAvailableSeat(event, place, date.plusDays(i.toLong()))
                 availableSeatRepository.save(seat)
             }
-        }
+        } //이 방식대로하면 기존것을 삭제하고 새로 만드는 형식임
 
         val (newPrice, newEvent) = eventRequest.toPriceAndEvent(category, place)
         event.price = newPrice

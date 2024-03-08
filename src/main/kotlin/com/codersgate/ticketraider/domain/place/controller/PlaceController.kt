@@ -1,8 +1,7 @@
 package com.codersgate.ticketraider.domain.place.controller
 
-import com.codersgate.ticketraider.domain.place.dto.CreatePlaceRequest
+import com.codersgate.ticketraider.domain.place.dto.PlaceRequest
 import com.codersgate.ticketraider.domain.place.dto.PlaceResponse
-import com.codersgate.ticketraider.domain.place.dto.UpdatePlaceRequest
 import com.codersgate.ticketraider.domain.place.service.PlaceService
 import io.swagger.v3.oas.annotations.Operation
 import jakarta.validation.Valid
@@ -21,7 +20,7 @@ class PlaceController(
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN')")
     fun createPlace(
-        @Valid @RequestBody request: CreatePlaceRequest
+        @Valid @RequestBody request: PlaceRequest
     ): ResponseEntity<Unit> {
         return ResponseEntity
             .status(HttpStatus.CREATED)
@@ -33,7 +32,7 @@ class PlaceController(
     @PreAuthorize("hasAnyRole('ADMIN')")
     fun updatePlace(
         @PathVariable placeId: Long,
-        @Valid @RequestBody request: UpdatePlaceRequest
+        @Valid @RequestBody request: PlaceRequest
     ): ResponseEntity<Unit> {
         return ResponseEntity
             .status(HttpStatus.OK)
