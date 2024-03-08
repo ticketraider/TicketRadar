@@ -7,6 +7,7 @@ import com.codersgate.ticketraider.domain.place.dto.PlaceResponse
 import com.codersgate.ticketraider.domain.place.dto.UpdatePlaceRequest
 import com.codersgate.ticketraider.domain.place.model.Place
 import com.codersgate.ticketraider.domain.place.repository.PlaceRepository
+import com.codersgate.ticketraider.domain.ticket.repository.TicketRepository
 import com.codersgate.ticketraider.global.error.exception.ModelNotFoundException
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
@@ -15,7 +16,8 @@ import org.springframework.stereotype.Service
 class PlaceServiceImpl(
     private val placeRepository: PlaceRepository,
     private val availableSeatRepository: AvailableSeatRepository,
-    private val eventRepository: EventRepository
+    private val eventRepository: EventRepository,
+    private val ticketRepository: TicketRepository
 ) : PlaceService {
 
     override fun createPlace(request: CreatePlaceRequest) {
@@ -47,9 +49,15 @@ class PlaceServiceImpl(
             it.maxSeatS = place.seatS
             it.maxSeatA = place.seatA
             it.totalSeat = place.totalSeat
+            availableSeatRepository.save(it)
         }
-        seatList.map {
-            availableSeatRepository.save(it!!)
+        val eventList = eventRepository.findAllByPlaceId(placeId)
+        val ticketList = eventList.map { ticketRepository.findAllByEventId(it!!.id!!) }
+        ticketList.map {
+            it.map {
+                it!!.place = place.name
+                ticketRepository.save(it)
+            }
         }
     }
 

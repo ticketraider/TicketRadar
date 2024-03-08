@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
 import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.validation.constraints.Pattern
+import jakarta.validation.constraints.Size
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -19,8 +20,12 @@ data class EventRequest(
 
     val posterImage: String,
 
+    @field: Size(min = 1, max = 100, message = "Title must be between 1 and 100 characters")
+    @JsonProperty("title")
     val title: String,
 
+    @field: Size(min = 1, max = 1000, message = "EventInfo must be between 1 and 1000 characters")
+    @JsonProperty("eventInfo")
     val eventInfo: String,
 
     @field: Pattern(
@@ -41,10 +46,16 @@ data class EventRequest(
 
     val place: String,
 
+    @field: Size(min = 1, message = "Price cannot be less than 1")
+    @JsonProperty("seatRPrice")
     val seatRPrice: Int,
 
+    @field: Size(min = 1, message = "Price cannot be less than 1")
+    @JsonProperty("seatSPrice")
     val seatSPrice: Int,
 
+    @field: Size(min = 1, message = "Price cannot be less than 1")
+    @JsonProperty("seatAPrice")
     val seatAPrice: Int,
 
     ) {
