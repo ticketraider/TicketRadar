@@ -22,8 +22,8 @@ class SecurityConfig(
     private val jwtAuthenticationFilter: JwtAuthenticationFilter,
     private val authenticationEntryPoint: AuthenticationEntryPoint,
     private val accessDeniedHandler: AccessDeniedHandler,
-    val oAuth2UserService: OAuth2UserService,
-    val oAuth2LoginSuccessHandler: OAuth2LoginSuccessHandler
+    private val oAuth2UserService: OAuth2UserService,
+    private val oAuth2LoginSuccessHandler: OAuth2LoginSuccessHandler
 ) {
 
     @Bean
@@ -45,7 +45,8 @@ class SecurityConfig(
                     "/oauth2/**"
                 ).permitAll()
                     .anyRequest().authenticated()
-            }.oauth2Login { oauthConfig ->
+            }.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter::class.java)
+            .oauth2Login { oauthConfig ->
                 oauthConfig.authorizationEndpoint {
                     it.baseUri("/oauth2/login")  //oauth2/login/kakao
                 }.redirectionEndpoint {
@@ -54,7 +55,6 @@ class SecurityConfig(
                     it.userService(oAuth2UserService)
                 }.successHandler(oAuth2LoginSuccessHandler)
             }
-            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter::class.java)
             .exceptionHandling {
 //                it.authenticationEntryPoint(authenticationEntryPoint)
 //                it.accessDeniedHandler(accessDeniedHandler)
