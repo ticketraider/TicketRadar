@@ -21,6 +21,30 @@ class TicketRepositoryImpl : QueryDslSupport(), CustomTicketRepository {
         return contents
     }
 
+    override fun getAllTicketList(pageable: Pageable, memberId: Long?, eventId: Long?): Page<Ticket> {
+        val whereClause = BooleanBuilder()
+
+        memberId?.let{whereClause.and(ticket.member.id.eq(memberId))}
+        eventId?.let{whereClause.and(ticket.event.id.eq(eventId))}
+
+        val totalCounts = queryFactory
+            .select(ticket.count())
+            .from(ticket)
+            .where(whereClause)
+            .fetchOne()
+            ?:0L
+
+        val contents = queryFactory.selectFrom(ticket)
+            .where(whereClause)
+            .orderBy(ticket.createdAt.desc())
+            .offset(pageable.offset)
+            .limit(pageable.pageSize.toLong())
+            .fetch()
+
+
+        return PageImpl(contents, pageable, totalCounts)
+    }
+
     override fun getListByUserId(pageable: Pageable, userId: Long): Page<Ticket> {
 
         val whereClause = BooleanBuilder()

@@ -6,4 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository
 
 interface PlaceRepository : JpaRepository<Place, Long> {
     fun findPlaceByName(name: String): Place?
+    fun findAllById(id : Long) : List<Place>
 }

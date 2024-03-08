@@ -1,5 +1,6 @@
 package com.codersgate.ticketraider.domain.ticket.controller
 
+import com.codersgate.ticketraider.domain.review.dto.ReviewResponse
 import com.codersgate.ticketraider.domain.ticket.dto.CreateTicketRequest
 import com.codersgate.ticketraider.domain.ticket.dto.TicketResponse
 import com.codersgate.ticketraider.domain.ticket.entity.TicketStatus
@@ -24,7 +25,7 @@ class TicketController(
 ) {
     @Operation(summary = "티켓 생성")
     @Transactional
-    @PostMapping
+    @PostMapping("/create")
     fun createTicket(
         @AuthenticationPrincipal userPrincipal: UserPrincipal,
         @Valid @RequestBody request: CreateTicketRequest
@@ -34,6 +35,7 @@ class TicketController(
             .body(ticketService.createTicket(userPrincipal, request))
     }
 
+    // 조건별 티켓 조회
     @Operation(summary = "티켓 단건 조회")
     @GetMapping("/{ticketId}")
     fun getTicketById(
@@ -44,22 +46,33 @@ class TicketController(
             .body(ticketService.getTicketById(ticketId))
     }
 
+
+    @Operation(summary = "통합 조회(전체/유저ID/이벤트ID")
+    @GetMapping("/allTicketList")
+    fun getAllTicketList(
+        @PageableDefault(size = 5, sort = ["id"]) pageable: Pageable,
+        @RequestParam(required = false) memberId: Long?,
+        @RequestParam(required = false) eventId: Long?,
+    ) : ResponseEntity<Page<TicketResponse>>
+    {
+        return ResponseEntity.status(HttpStatus.OK).body(ticketService.getAllTicketList(pageable, memberId, eventId))
+    }
+
     @Operation(summary = "멤버 티켓리스트 조회")
-    @GetMapping("/getList")
+    @GetMapping("/getTicketListByUserId")
     fun getTicketListByUserId(
         @PageableDefault(
             size = 15, sort = ["id"]
         ) pageable: Pageable,
-        @AuthenticationPrincipal user: UserPrincipal
+        @AuthenticationPrincipal userPrincipal: UserPrincipal
     ): ResponseEntity<Page<TicketResponse>> {
         return ResponseEntity
             .status(HttpStatus.OK)
-            .body(ticketService.getTicketListByUserId(user, pageable))
+            .body(ticketService.getTicketListByUserId(userPrincipal, pageable))
     }
 
-
     @Operation(summary = "티켓 상태 변경")
-    @PutMapping
+    @PutMapping("/update")
     fun updateTicket(
         @RequestParam ticketId: Long,
         @RequestParam ticketStatus: TicketStatus
@@ -80,15 +93,41 @@ class TicketController(
             .build()
     }
 
+    @PatchMapping("/makePayment")
+    @Operation(summary = "티켓 결제하기")
+    fun makePayment(
+        @AuthenticationPrincipal userPrincipal: UserPrincipal,
+        @RequestParam ticketIdList : MutableList<Long>,
+    ) : ResponseEntity<List<TicketResponse>>
+    {
+
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(ticketService.makePayment(userPrincipal, ticketIdList))
+    }
+
+    // 멤버용
+    @Operation(summary = "티켓 취소")
+    @DeleteMapping("/cancel/{ticketId}")
+    fun cancelTicket(
+        @PathVariable ticketId: Long,
+        @AuthenticationPrincipal userPrincipal: UserPrincipal
+    ): ResponseEntity<Unit> {
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(ticketService.cancelTicket(ticketId, userPrincipal))
+    }
+
+    // 관리자용
     @Operation(summary = "티켓 삭제")
     @DeleteMapping("/delete/{ticketId}")
     fun deleteTicket(
         @PathVariable ticketId: Long,
-        @AuthenticationPrincipal user: UserPrincipal
+        @AuthenticationPrincipal userPrincipal: UserPrincipal
     ): ResponseEntity<Unit> {
         return ResponseEntity
             .status(HttpStatus.OK)
-            .body(ticketService.deleteTicket(ticketId, user))
+            .body(ticketService.deleteTicket(ticketId, userPrincipal))
     }
 
 
