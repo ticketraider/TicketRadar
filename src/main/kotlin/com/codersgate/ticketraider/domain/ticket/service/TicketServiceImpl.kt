@@ -3,6 +3,7 @@ package com.codersgate.ticketraider.domain.ticket.service
 import com.codersgate.ticketraider.domain.event.model.seat.Bookable
 import com.codersgate.ticketraider.domain.event.repository.EventRepository
 import com.codersgate.ticketraider.domain.member.repository.MemberRepository
+import com.codersgate.ticketraider.domain.review.dto.ReviewResponse
 import com.codersgate.ticketraider.domain.ticket.dto.CreateTicketRequest
 import com.codersgate.ticketraider.domain.ticket.dto.SeatInfo
 import com.codersgate.ticketraider.domain.ticket.dto.TicketResponse
@@ -168,6 +169,10 @@ class TicketServiceImpl(
         logger.info("Cache : $cache")
         val key = "$eventId" + "_$date" + "_$grade" + "_$seatNo"
         cache?.put(key, ticketResponse)
+    }
+
+    override fun getAllTicketList(pageable: Pageable, memberId: Long?, eventId: Long?) : Page<TicketResponse>{
+        return ticketRepository.getAllTicketList(pageable, memberId, eventId).map{ TicketResponse.from(it) }
     }
 
     override fun getTicketById(ticketId: Long): TicketResponse {
