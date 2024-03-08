@@ -11,6 +11,7 @@ import org.springframework.data.domain.Pageable
 import org.springframework.data.web.PageableDefault
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
 
@@ -50,6 +51,7 @@ class LikeController(
     }
 
     @Operation(summary = "좋아요 최신화")
+    @Scheduled(cron = "0 0 12 * * MON-FRI") // 매주 월요일부터 금요일까지 매일 정오(12시)에 메서드가 실행
     @PatchMapping("/update")
     fun updateLikeCount() : ResponseEntity<Unit>
     {
