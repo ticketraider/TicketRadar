@@ -12,6 +12,14 @@ import java.time.LocalDate
 
 class TicketRepositoryImpl : QueryDslSupport(), CustomTicketRepository {
     private val ticket = QTicket.ticket
+    override fun findAllByPlaceId(placeId: Long): List<Ticket?> {
+        val contents = queryFactory.select(ticket)
+            .from(ticket)
+            .where(ticket.event.place.id.eq(placeId))
+            .orderBy(ticket.date.desc())
+            .fetch()
+        return contents
+    }
 
     override fun getAllTicketList(pageable: Pageable, memberId: Long?, eventId: Long?): Page<Ticket> {
         val whereClause = BooleanBuilder()

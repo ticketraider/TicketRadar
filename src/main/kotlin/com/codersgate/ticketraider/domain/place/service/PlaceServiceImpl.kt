@@ -3,11 +3,10 @@ package com.codersgate.ticketraider.domain.place.service
 import com.codersgate.ticketraider.domain.event.dto.EventResponse
 import com.codersgate.ticketraider.domain.event.repository.EventRepository
 import com.codersgate.ticketraider.domain.event.repository.seat.AvailableSeatRepository
-import com.codersgate.ticketraider.domain.place.dto.CreatePlaceRequest
+import com.codersgate.ticketraider.domain.place.dto.PlaceRequest
 import com.codersgate.ticketraider.domain.place.dto.PlaceResponse
-import com.codersgate.ticketraider.domain.place.dto.UpdatePlaceRequest
-import com.codersgate.ticketraider.domain.place.model.Place
 import com.codersgate.ticketraider.domain.place.repository.PlaceRepository
+import com.codersgate.ticketraider.domain.ticket.repository.TicketRepository
 import com.codersgate.ticketraider.global.error.exception.ModelNotFoundException
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
@@ -16,41 +15,31 @@ import org.springframework.stereotype.Service
 class PlaceServiceImpl(
     private val placeRepository: PlaceRepository,
     private val availableSeatRepository: AvailableSeatRepository,
-    private val eventRepository: EventRepository
+    private val ticketRepository: TicketRepository
 ) : PlaceService {
 
-    override fun createPlace(request: CreatePlaceRequest) {
-        val place = Place(
-            name = request.name,
-            seatR = request.seatR,
-            seatS = request.seatS,
-            seatA = request.seatA,
-            address = request.address,
-            totalSeat = (request.seatR + request.seatS + request.seatA)
-        )
+    override fun createPlace(request: PlaceRequest) {
+        val place = request.toPlace()
         placeRepository.save(place)
 
     }
 
-    override fun updatePlace(placeId: Long, request: UpdatePlaceRequest) {
+    override fun updatePlace(placeId: Long, request: PlaceRequest) {
         val place = placeRepository.findByIdOrNull(placeId)
             ?: throw ModelNotFoundException("place", placeId)
-        place.name = request.name
-        place.seatR = request.seatR
-        place.seatS = request.seatS
-        place.seatA = request.seatA
-        place.address = request.address
-        place.totalSeat = (request.seatR + request.seatS + request.seatA)
+        place.let { request.toPlace() }
         placeRepository.save(place)
+
         val seatList = availableSeatRepository.findByPlaceId(placeId)
         seatList.map {
-            it!!.maxSeatR = place.seatR
-            it.maxSeatS = place.seatS
-            it.maxSeatA = place.seatA
-            it.totalSeat = place.totalSeat
+            request.updateSeatByPlace(it!!, place)
+            availableSeatRepository.save(it)
         }
-        seatList.map {
-            availableSeatRepository.save(it!!)
+
+        val ticketList = ticketRepository.findAllByPlaceId(placeId)
+        ticketList.map {
+            it!!.place = place.name
+            ticketRepository.save(it)
         }
     }
 
