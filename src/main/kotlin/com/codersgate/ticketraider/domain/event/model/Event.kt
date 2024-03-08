@@ -24,6 +24,9 @@ class Event(
     @Column(name = "like_count")
     var likeCount: Int = 0,
 
+    @Column(name = "review_count")
+    var reviewCount:Int = 0,
+
     @Column(name = "average_rating")
     var averageRating: Float = 0F,
 

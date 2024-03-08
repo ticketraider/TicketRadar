@@ -3,10 +3,12 @@ package com.codersgate.ticketraider.domain.event.controller
 
 import com.codersgate.ticketraider.domain.event.dto.EventRequest
 import com.codersgate.ticketraider.domain.event.dto.EventResponse
+import com.codersgate.ticketraider.domain.event.model.Event
 import com.codersgate.ticketraider.domain.event.service.EventService
 import io.swagger.v3.oas.annotations.Operation
 import jakarta.validation.Valid
 import org.springdoc.core.converters.models.PageableAsQueryParam
+import org.apache.coyote.Response
 import org.springframework.data.domain.Page
 
 import org.springframework.http.HttpStatus
@@ -71,6 +73,18 @@ fun updateEvent(
         return ResponseEntity
             .status(HttpStatus.OK)
             .body(eventService.getEvent(eventId))
+    }
+
+    @Operation(summary = "리뷰나 좋아요 많은 순 이벤트 조회")
+    @GetMapping("/like&review")
+    fun getPaginatedLikeList(
+        @PageableDefault(size = 15, sort = ["id"]) pageable : Pageable,
+        @RequestParam(value = "like", required = false) likeCount: Int?,
+        @RequestParam(value = "review") reviewCount : Int?,
+    ): ResponseEntity<Page<EventResponse?>> {
+            return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(eventService.getPaginatedcountlist(pageable))
     }
 }
 
