@@ -1,5 +1,5 @@
 package com.codersgate.ticketraider.domain.ticket.entity
 
 enum class TicketStatus {
-    UNPAID, PAID
+    UNPAID, PAID, EXPIRED
 }

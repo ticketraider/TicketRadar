@@ -60,9 +60,7 @@ class Ticket(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null
 
-    fun toggleTicketStatus() {
-        ticketStatus = if (ticketStatus == TicketStatus.UNPAID) {
-            TicketStatus.PAID
-        } else TicketStatus.UNPAID
+    fun switchTicketStatus(status : TicketStatus) {
+        ticketStatus = status
     }
 }

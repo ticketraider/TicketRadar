@@ -7,6 +7,7 @@ import com.codersgate.ticketraider.domain.review.dto.ReviewResponse
 import com.codersgate.ticketraider.domain.review.dto.UpdateReviewRequest
 import com.codersgate.ticketraider.domain.review.model.Review
 import com.codersgate.ticketraider.domain.review.repository.ReviewRepository
+import com.codersgate.ticketraider.domain.ticket.entity.TicketStatus
 import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -21,11 +22,14 @@ class ReviewServiceImpl(
 ) : ReviewService{
 
     override fun createReview(memberId: Long, request: CreateReviewRequest) {
+
         val member = memberRepository.findByIdOrNull(memberId)
             ?:throw NotFoundException()
 
-        val event = eventRepository.findByIdOrNull(request.eventId)
-            ?:throw NotFoundException()
+        // 티켓 내역 확인
+        val ticket =  member.tickets.find{
+            it.event.id == request.eventId && it.ticketStatus == TicketStatus.EXPIRED
+        }?: throw IllegalStateException("Expired ticket not found for event id: ${request.eventId}")
 
         reviewRepository.save(
             Review(
@@ -33,7 +37,7 @@ class ReviewServiceImpl(
             request.content,
             request.rating,
                 member,
-                event,
+                ticket.event,
             )
         )
     }

@@ -1,16 +1,14 @@
 package com.codersgate.ticketraider.domain.ticket.dto
 
-import com.codersgate.ticketraider.domain.ticket.entity.TicketGrade
+import jakarta.validation.constraints.FutureOrPresent
 import jakarta.validation.constraints.NotNull
 import java.time.LocalDate
-import java.time.LocalDateTime
 
 data class CreateTicketRequest(
-    @field:NotNull // 어떻게 validation?
+    @field : FutureOrPresent(message = "지난 일자는 예매가 불가능합니다!")
     val date: LocalDate,
     @field:NotNull
     val eventId: Long,
 ) {
     val seatList = mutableListOf<SeatInfo>()
-
 }
