@@ -46,13 +46,12 @@ data class OAuth2UserInfo(
         }
         private fun ofNaver(provider: String, userRequest: OAuth2UserRequest, originUser: OAuth2User): OAuth2UserInfo {
             val profile = originUser.attributes["response"] as Map<*, *>
-            val userNameAttributeName =
-                userRequest.clientRegistration.providerDetails.userInfoEndpoint.userNameAttributeName
+//            val userNameAttributeName = userRequest.clientRegistration.providerDetails.userInfoEndpoint.userNameAttributeName
             val nickname = profile["nickname"] ?: ""
             val email = profile["email"] ?: ""
 
             return OAuth2UserInfo(
-                id = (originUser.attributes[userNameAttributeName] as Long).toString(),
+                id = profile["id"].toString(),
                 provider = provider.uppercase(),
                 nickname = nickname as String,
                 email = email as String
