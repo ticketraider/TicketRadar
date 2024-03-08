@@ -1,5 +1,6 @@
 package com.codersgate.ticketraider.domain.place.service
 
+import com.codersgate.ticketraider.domain.event.dto.EventResponse
 import com.codersgate.ticketraider.domain.place.dto.CreatePlaceRequest
 import com.codersgate.ticketraider.domain.place.dto.PlaceResponse
 import com.codersgate.ticketraider.domain.place.dto.UpdatePlaceRequest
@@ -15,4 +16,6 @@ interface PlaceService {
     fun getPlaceList(): List<PlaceResponse>
 
     fun getPlace(placeId: Long): PlaceResponse
+
+    fun getEventList(placeId: Long) : List<EventResponse>?
 }

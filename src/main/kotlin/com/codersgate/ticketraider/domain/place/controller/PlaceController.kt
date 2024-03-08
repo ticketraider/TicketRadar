@@ -1,5 +1,6 @@
 package com.codersgate.ticketraider.domain.place.controller
 
+import com.codersgate.ticketraider.domain.event.dto.EventResponse
 import com.codersgate.ticketraider.domain.place.dto.CreatePlaceRequest
 import com.codersgate.ticketraider.domain.place.dto.PlaceResponse
 import com.codersgate.ticketraider.domain.place.dto.UpdatePlaceRequest
@@ -70,4 +71,17 @@ class PlaceController(
             .status(HttpStatus.OK)
             .body(placeService.getPlace(placeId))
     }
+
+    @Operation(summary = "장소별 이벤트 조회")
+    @GetMapping("/{placeId}")
+    @PreAuthorize("hasAnyRole('ADMIN')")
+    fun getEventList(
+        @PathVariable placeId: Long
+    ): ResponseEntity<List<EventResponse>>? {
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(placeService.getEventList(placeId))
+    }
+
+
 }
