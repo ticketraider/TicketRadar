@@ -176,8 +176,8 @@ class TicketServiceImpl(
         return TicketResponse.from(ticket)
     }
 
-    override fun getTicketListByUserId(user: UserPrincipal, pageable: Pageable): Page<TicketResponse> {
-        return ticketRepository.getListByUserId(pageable, user.id).map { TicketResponse.from(it) }
+    override fun getTicketListByUserId(userPrincipal: UserPrincipal, pageable: Pageable): Page<TicketResponse> {
+        return ticketRepository.getListByUserId(pageable, userPrincipal.id).map { TicketResponse.from(it) }
     }
 
     override fun updateTicket(ticketId: Long, ticketStatus: TicketStatus) {
@@ -197,16 +197,42 @@ class TicketServiceImpl(
         }
     }
 
-    override fun deleteTicket(ticketId: Long, user: UserPrincipal) {
+    override fun makePayment(userPrincipal: UserPrincipal, ticketIdList : MutableList<Long>) : MutableList<TicketResponse> {
+
+        val paidTicketList : MutableList<TicketResponse> = mutableListOf()
+
+        ticketRepository.findAllByMemberId(userPrincipal.id).map{
+            if(it.id in ticketIdList && it.ticketStatus == TicketStatus.UNPAID){
+
+                // TODO() 결제로직
+
+                it.ticketStatus = TicketStatus.PAID
+                ticketRepository.save(it)
+                paidTicketList.add(TicketResponse.from(it))
+            }
+        }
+
+        return paidTicketList
+    }
+
+    override fun cancelTicket(ticketId: Long, userPrincipal: UserPrincipal) {
+        ticketRepository.findByIdOrNull(ticketId)
+            ?.let{
+            if(it.member.id == userPrincipal.id) {
+                it.isDeleted = true
+                ticketRepository.save(it)
+            }
+        }
+    }
+
+    override fun deleteTicket(ticketId: Long, userPrincipal: UserPrincipal) {
         val ticket = ticketRepository.findByIdOrNull(ticketId)
             ?: throw ModelNotFoundException("Ticket", ticketId)
-        if (ticket.member.id!! != user.id) {
+        if (ticket.member.id!! != userPrincipal.id) {
             throw InvalidCredentialException("")
         }
         ticketRepository.delete(ticket)
     }
-
-
 }
 
 private fun generateKey(eventId: Long, date: LocalDate, grade: TicketGrade, seatNo: Int): String {

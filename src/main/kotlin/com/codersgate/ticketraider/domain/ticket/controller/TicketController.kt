@@ -50,13 +50,12 @@ class TicketController(
         @PageableDefault(
             size = 15, sort = ["id"]
         ) pageable: Pageable,
-        @AuthenticationPrincipal user: UserPrincipal
+        @AuthenticationPrincipal userPrincipal: UserPrincipal
     ): ResponseEntity<Page<TicketResponse>> {
         return ResponseEntity
             .status(HttpStatus.OK)
-            .body(ticketService.getTicketListByUserId(user, pageable))
+            .body(ticketService.getTicketListByUserId(userPrincipal, pageable))
     }
-
 
     @Operation(summary = "티켓 상태 변경")
     @PutMapping
@@ -80,15 +79,41 @@ class TicketController(
             .build()
     }
 
+    @PatchMapping("/makePayment")
+    @Operation(summary = "티켓 결제하기")
+    fun makePayment(
+        @AuthenticationPrincipal userPrincipal: UserPrincipal,
+        @RequestParam ticketIdList : MutableList<Long>,
+    ) : ResponseEntity<List<TicketResponse>>
+    {
+
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(ticketService.makePayment(userPrincipal, ticketIdList))
+    }
+
+    // 멤버용
+    @Operation(summary = "티켓 취소")
+    @DeleteMapping("/cancel/{ticketId}")
+    fun cancelTicket(
+        @PathVariable ticketId: Long,
+        @AuthenticationPrincipal userPrincipal: UserPrincipal
+    ): ResponseEntity<Unit> {
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(ticketService.cancelTicket(ticketId, userPrincipal))
+    }
+
+    // 관리자용
     @Operation(summary = "티켓 삭제")
     @DeleteMapping("/delete/{ticketId}")
     fun deleteTicket(
         @PathVariable ticketId: Long,
-        @AuthenticationPrincipal user: UserPrincipal
+        @AuthenticationPrincipal userPrincipal: UserPrincipal
     ): ResponseEntity<Unit> {
         return ResponseEntity
             .status(HttpStatus.OK)
-            .body(ticketService.deleteTicket(ticketId, user))
+            .body(ticketService.deleteTicket(ticketId, userPrincipal))
     }
 
 
