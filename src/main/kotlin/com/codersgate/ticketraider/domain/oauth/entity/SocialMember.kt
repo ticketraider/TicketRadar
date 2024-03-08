@@ -32,9 +32,17 @@ class SocialMember(
                 nickname = nickname
             )
         }
+        fun ofGoogle(id: String, nickname: String, email: String): SocialMember {
+            return SocialMember(
+                provider = OAuth2Provider.GOOGLE,
+                providerId = id,
+                email = email,
+                nickname = nickname
+            )
+        }
     }
 }
 
 enum class OAuth2Provider {
-    KAKAO, NAVER
+    KAKAO, NAVER, GOOGLE
 }

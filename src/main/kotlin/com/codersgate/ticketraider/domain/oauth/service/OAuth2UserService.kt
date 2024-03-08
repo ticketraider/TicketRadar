@@ -13,7 +13,7 @@ class OAuth2UserService(
 
     override fun loadUser(userRequest: OAuth2UserRequest): OAuth2User {
         val originUser = super.loadUser(userRequest)
-        val provider = userRequest.clientRegistration.clientName // "KAKAO"
+        val provider = userRequest.clientRegistration.clientName
         return OAuth2UserInfo.of(provider, userRequest, originUser)
             .also { socialMemberService.registerIfAbsent(it) }
     }
