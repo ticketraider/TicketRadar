@@ -1,7 +1,6 @@
 package com.codersgate.ticketraider.domain.place.service
 
 import com.codersgate.ticketraider.domain.event.dto.EventResponse
-import com.codersgate.ticketraider.domain.event.repository.EventRepository
 import com.codersgate.ticketraider.domain.event.repository.seat.AvailableSeatRepository
 import com.codersgate.ticketraider.domain.place.dto.PlaceRequest
 import com.codersgate.ticketraider.domain.place.dto.PlaceResponse

@@ -1,7 +1,6 @@
 package com.codersgate.ticketraider.domain.place.controller
 
 import com.codersgate.ticketraider.domain.event.dto.EventResponse
-import com.codersgate.ticketraider.domain.place.dto.CreatePlaceRequest
 import com.codersgate.ticketraider.domain.place.dto.PlaceRequest
 import com.codersgate.ticketraider.domain.place.dto.PlaceResponse
 import com.codersgate.ticketraider.domain.place.service.PlaceService
@@ -73,7 +72,7 @@ class PlaceController(
     }
 
     @Operation(summary = "장소별 이벤트 조회")
-    @GetMapping("/{placeId}")
+    @GetMapping("/getEventList/{placeId}")
     @PreAuthorize("hasAnyRole('ADMIN')")
     fun getEventList(
         @PathVariable placeId: Long

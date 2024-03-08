@@ -3,6 +3,7 @@ package com.codersgate.ticketraider.domain.event.service
 import com.codersgate.ticketraider.domain.category.repository.CategoryRepository
 import com.codersgate.ticketraider.domain.event.dto.EventRequest
 import com.codersgate.ticketraider.domain.event.dto.EventResponse
+import com.codersgate.ticketraider.domain.event.model.Event
 import com.codersgate.ticketraider.domain.event.repository.EventRepository
 import com.codersgate.ticketraider.domain.event.repository.price.PriceRepository
 import com.codersgate.ticketraider.domain.event.repository.seat.AvailableSeatRepository
@@ -55,7 +56,7 @@ class EventServiceImpl(
         }
     }
 
-
+    @Transactional
     override fun updateEvent(eventId: Long, eventRequest: EventRequest) {
         val event = eventRepository.findByIdOrNull(eventId)
             ?: throw ModelNotFoundException("Event", eventId)
@@ -65,28 +66,46 @@ class EventServiceImpl(
             ?: throw ModelNotFoundException("category", eventRequest.categoryId)
         val place = placeRepository.findPlaceByName(eventRequest.place)
             ?: throw ModelNotFoundException("place", 0)
-
+        val orgStartDate = event.startDate
+        val orgEndDate = event.endDate
         //시작일과 끝나는 일 비교후 false 시 예외처리
         check(eventRequest.startDate < eventRequest.endDate) {
             "끝나는날짜는 시작날짜보다 빠를수 없습니다."
         }
+        event.let {
+            it.posterImage = eventRequest.posterImage
+            it.title = eventRequest.title
+            it.eventInfo = eventRequest.eventInfo
+            it.startDate = eventRequest.startDate
+            it.endDate = eventRequest.endDate
+            it.place = place
+            it.category = category
+        }
+        eventRepository.save(event)
+        price.let {
+            it.seatRPrice = eventRequest.seatRPrice
+            it.seatSPrice = eventRequest.seatSPrice
+            it.seatAPrice = eventRequest.seatAPrice
+            it.event = event
+        }
+        event.price = price
+        priceRepository.save(price)
 
-        if (eventRequest.startDate != event.startDate || eventRequest.endDate != event.endDate) {
-            check(
-                !eventRepository.existsByPlaceAndStartDateAndEndDate(
-                    place,
-                    eventRequest.startDate,
-                    eventRequest.endDate
-                )
-            ) {
-                "이미 입력한 장소의 해당 날짜에 존재하는 Event가 있습니다."
-            }
-            val (newPrice, newEvent) = eventRequest.toPriceAndEvent(category, place)
-            price.let { newPrice }
-            event.let { newEvent }
-            val date = eventRequest.startDate
-            val duration = eventRequest.endDate.compareTo(eventRequest.startDate)
+        println("$orgStartDate, ${event.startDate}, $orgEndDate, ${event.endDate}")
+
+//        val (newPrice, newEvent) = eventRequest.toPriceAndEvent(category, place)
+        //날짜 변동이 생겼는지 확인
+        if (orgStartDate != event.startDate || orgEndDate != event.endDate) {
+            val date = event.startDate
+            val duration = event.endDate.compareTo(event.startDate)
             for (i in 0..duration) {
+                val seat = availableSeatRepository.findByPlaceIdAndDate(place.id!!, date.plusDays(i.toLong()))
+                check(seat!!.event!!.id == event.id) {
+                    "다른 이벤트가 존재함"
+                }
+            }
+            for (i in 0..duration) {
+                val seatList = availableSeatRepository.findAllByEventId(eventId)
                 val seat = availableSeatRepository.findByEventIdAndDate(eventId, date.plusDays(i.toLong()))
                 if (seat == null) {
                     val newSeat = eventRequest.toAvailableSeat(event, place, date.plusDays(i.toLong()))
@@ -94,6 +113,7 @@ class EventServiceImpl(
                 }
             }
         }
+
 
 
     }

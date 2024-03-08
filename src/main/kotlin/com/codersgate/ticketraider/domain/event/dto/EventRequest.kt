@@ -46,16 +46,16 @@ data class EventRequest(
 
     val place: String,
 
-    @field: Size(min = 1, message = "Price cannot be less than 1")
-    @JsonProperty("seatRPrice")
+//    @field: Size(min = 1, message = "Price cannot be less than 1")
+//    @JsonProperty("seatRPrice")
     val seatRPrice: Int,
 
-    @field: Size(min = 1, message = "Price cannot be less than 1")
-    @JsonProperty("seatSPrice")
+//    @field: Size(min = 1, message = "Price cannot be less than 1")
+//    @JsonProperty("seatSPrice")
     val seatSPrice: Int,
 
-    @field: Size(min = 1, message = "Price cannot be less than 1")
-    @JsonProperty("seatAPrice")
+//    @field: Size(min = 1, message = "Price cannot be less than 1")
+//    @JsonProperty("seatAPrice")
     val seatAPrice: Int,
 
     ) {

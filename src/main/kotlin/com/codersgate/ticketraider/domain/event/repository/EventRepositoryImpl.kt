@@ -56,7 +56,7 @@ class EventRepositoryImpl : QueryDslSupport(), CustomEventRepository {
         }.toTypedArray()
     }
 
-    override fun findByPageableAndcount(pageable: Pageable): Page<Event?> {
+    override fun findByPageableAndCount(pageable: Pageable): Page<Event?> {
         val builder = BooleanBuilder()
         val totalCount = queryFactory.select(event.count()).from(event).where(builder).fetchOne() ?: 0L
         val query = queryFactory.selectFrom(event)

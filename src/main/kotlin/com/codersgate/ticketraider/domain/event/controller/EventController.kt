@@ -75,17 +75,17 @@ fun updateEvent(
             .body(eventService.getEvent(eventId))
     }
 
-    @Operation(summary = "리뷰나 좋아요 많은 순 이벤트 조회")
-    @GetMapping("/like&review")
-    fun getPaginatedLikeList(
-        @PageableDefault(size = 15, sort = ["id"]) pageable : Pageable,
-        @RequestParam(value = "like", required = false) likeCount: Int?,
-        @RequestParam(value = "review") reviewCount : Int?,
-    ): ResponseEntity<Page<EventResponse?>> {
-            return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(eventService.getPaginatedcountlist(pageable))
-    }
+//    @Operation(summary = "리뷰나 좋아요 많은 순 이벤트 조회")
+//    @GetMapping("/like&review")
+//    fun getPaginatedLikeList(
+//        @PageableDefault(size = 15, sort = ["id"]) pageable : Pageable,
+//        @RequestParam(value = "like", required = false) likeCount: Int?,
+//        @RequestParam(value = "review") reviewCount : Int?,
+//    ): ResponseEntity<Page<EventResponse?>> {
+//            return ResponseEntity
+//                .status(HttpStatus.OK)
+//                .body(eventService.getPaginatedCountList(pageable))
+//    }
 }
 
 
