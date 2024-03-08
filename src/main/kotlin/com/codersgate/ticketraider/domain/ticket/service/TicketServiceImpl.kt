@@ -59,11 +59,14 @@ class TicketServiceImpl(
         // 컬렉션을 명시적으로 초기화 ( LAZY 모드 )
         Hibernate.initialize(event.availableSeats)
 
+        // 예약 날짜 체크
+        if (request.date < event.startDate || request.date > event.endDate || request.date < LocalDate.now() )
+            throw IllegalArgumentException("예매일(${request.date})이 올바르지 않습니다.")
+
         // 좌석 예약 가능 상태 확인
         val availableSeat = event.availableSeats.find {
             it.date == request.date && it.bookable == Bookable.OPEN
         } ?: throw IllegalArgumentException("예매일(${request.date}) 의 예약이 불가능한 상태 입니다.")
-
 
         // 티켓 생성
         for (i in 0 until count) {
@@ -74,12 +77,7 @@ class TicketServiceImpl(
                     request.seatList[i].ticketGrade,
                     request.seatList[i].seatNumber
                 )
-            )
-                continue
-
-            // 예약 날짜 체크
-            if (request.date < event.startDate || request.date > event.endDate)
-                throw IllegalArgumentException("The requested date (${request.date}) is outside the valid range (${event.startDate} ~ ${event.endDate}) for the event id ${event.id}")
+            ) continue
 
             // 좌석 번호 체크
             val seatLimit = when (request.seatList[i].ticketGrade) {
@@ -115,7 +113,6 @@ class TicketServiceImpl(
                     TicketResponse.from(it)
                 )
 
-
                 // 락 해제
                 lockList[i].unlock()
 
@@ -123,6 +120,8 @@ class TicketServiceImpl(
                 availableSeat.increaseSeat(request.seatList[i].ticketGrade, 1)
                 if (availableSeat.isFull())
                     availableSeat.close()
+
+                eventRepository.save(event)
             }//also
         }//for
     }
