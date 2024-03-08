@@ -16,6 +16,7 @@ class SocialMemberService(
             socialMemberRepository.save( when (provider) {
                 OAuth2Provider.KAKAO -> SocialMember.ofKakao(userInfo.id, userInfo.nickname, userInfo.email)
                 OAuth2Provider.NAVER -> SocialMember.ofNaver(userInfo.id, userInfo.nickname, userInfo.email)
+                OAuth2Provider.GOOGLE -> SocialMember.ofGoogle(userInfo.id, userInfo.nickname, userInfo.email)
             })
         } else {
             socialMemberRepository.findByProviderAndProviderId(provider, userInfo.id)
