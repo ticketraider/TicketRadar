@@ -30,7 +30,7 @@ class EventServiceImpl(
             ?: throw ModelNotFoundException("place", 0)//예외 추가 필요함
 
         //시작일과 끝나는 일 비교후 false 시 예외처리
-        check(eventRequest.startDate < eventRequest.endDate) {
+        check( eventRequest.startDate >= eventRequest.endDate) {
             "끝나는날짜는 시작날짜보다 빠를수 없습니다."
         }
 
@@ -91,21 +91,25 @@ class EventServiceImpl(
         event.price = price
         priceRepository.save(price)
 
-        println("$orgStartDate, ${event.startDate}, $orgEndDate, ${event.endDate}")
-
-//        val (newPrice, newEvent) = eventRequest.toPriceAndEvent(category, place)
         //날짜 변동이 생겼는지 확인
         if (orgStartDate != event.startDate || orgEndDate != event.endDate) {
             val date = event.startDate
             val duration = event.endDate.compareTo(event.startDate)
             for (i in 0..duration) {
                 val seat = availableSeatRepository.findByPlaceIdAndDate(place.id!!, date.plusDays(i.toLong()))
-                check(seat!!.event!!.id == event.id) {
-                    "다른 이벤트가 존재함"
+                if (seat != null) {
+                    check(seat.event!!.id == event.id) {
+                        "다른 이벤트가 존재함"
+                    }
+                }
+            }
+            val seatList = availableSeatRepository.findAllByEventId(eventId)
+            seatList.map{
+                if(it!!.date.isBefore(event.startDate) || it.date.isAfter(event.endDate)){
+                    it.isDeleted = true
                 }
             }
             for (i in 0..duration) {
-                val seatList = availableSeatRepository.findAllByEventId(eventId)
                 val seat = availableSeatRepository.findByEventIdAndDate(eventId, date.plusDays(i.toLong()))
                 if (seat == null) {
                     val newSeat = eventRequest.toAvailableSeat(event, place, date.plusDays(i.toLong()))
@@ -113,9 +117,6 @@ class EventServiceImpl(
                 }
             }
         }
-
-
-
     }
 
     @Transactional
