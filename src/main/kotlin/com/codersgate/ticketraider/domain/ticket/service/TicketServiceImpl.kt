@@ -39,6 +39,7 @@ class TicketServiceImpl(
     }
 
     override fun createTicket(userPrincipal: UserPrincipal, request: CreateTicketRequest) {
+        var startTime = System.currentTimeMillis()
 
         // 락 생성
         val lockList = mutableListOf<RLock>()
@@ -51,11 +52,20 @@ class TicketServiceImpl(
             lock.tryLock(10, 1, TimeUnit.SECONDS)
         }
 
+        var nowTime = System.currentTimeMillis()
+        var elapsedTime = nowTime - startTime
+        logger.info("생성 ~ 락 획득: $elapsedTime 밀리초") // 생성 ~ 락 획득: 1 밀리초 / 33 밀리초 / 31 밀리초 /  2 밀리초 / 40 밀리초 / 3 밀리초
+        startTime = System.currentTimeMillis()
 
         val event = eventRepository.findByIdOrNull(request.eventId)
             ?: throw ModelNotFoundException("event", request.eventId)
         val member = memberRepository.findByIdOrNull(userPrincipal.id)
             ?: throw ModelNotFoundException("member", userPrincipal.id)
+
+        nowTime = System.currentTimeMillis()
+        elapsedTime = nowTime - startTime
+        logger.info("락 획득 ~ 이벤트, 멤버 가져오기: $elapsedTime 밀리초") // 락 획득 ~ 이벤트, 멤버 가져오기: 72 밀리초 , 334 밀리초 / 407 밀리초 / 591 밀리초 / 336 밀리초 / 71 밀리초
+        startTime = System.currentTimeMillis()
 
         // 컬렉션을 명시적으로 초기화 ( LAZY 모드 )
         Hibernate.initialize(event.availableSeats)
@@ -64,10 +74,20 @@ class TicketServiceImpl(
         if (request.date < event.startDate || request.date > event.endDate || request.date < LocalDate.now() )
             throw IllegalArgumentException("예매일(${request.date})이 올바르지 않습니다.")
 
+        nowTime = System.currentTimeMillis()
+        elapsedTime = nowTime - startTime
+        logger.info("객체호출 ~ 예약 날짜 확인: $elapsedTime 밀리초") // 객체호출 ~ 예약 날짜 확인: 11 밀리초 / 11 밀리초 / 11 밀리초 / 8 밀리초 / 8 밀리초
+        startTime = System.currentTimeMillis()
+
         // 좌석 예약 가능 상태 확인
         val availableSeat = event.availableSeats.find {
             it.date == request.date && it.bookable == Bookable.OPEN
         } ?: throw IllegalArgumentException("예매일(${request.date}) 의 예약이 불가능한 상태 입니다.")
+
+        nowTime = System.currentTimeMillis()
+        elapsedTime = nowTime - startTime
+        logger.info("날짜 확인 ~ 예악 가능 상태 확인: $elapsedTime 밀리초") // 날짜 확인 ~ 예악 가능 상태 확인: 1 밀리초 / 1 밀리초 / 0 밀리초 / 0 밀리초 / 2 밀리초
+        startTime = System.currentTimeMillis()
 
         // 티켓 생성
         for (i in 0 until count) {
@@ -80,6 +100,11 @@ class TicketServiceImpl(
                 )
             ) continue
 
+            nowTime = System.currentTimeMillis()
+            elapsedTime = nowTime - startTime
+            logger.info("~ 캐시 확인[$i] : $elapsedTime 밀리초") // ~ 캐시 확인[0] : 161 밀리초
+            startTime = System.currentTimeMillis()
+
             // 좌석 번호 체크
             val seatLimit = when (request.seatList[i].ticketGrade) {
                 TicketGrade.R -> event.availableSeats[0].maxSeatR
@@ -88,6 +113,11 @@ class TicketServiceImpl(
             }
             if (request.seatList[i].seatNumber !in 1..<seatLimit)
                 throw IllegalArgumentException("Invalid SeatNumber")
+
+            nowTime = System.currentTimeMillis()
+            elapsedTime = nowTime - startTime
+            logger.info("유효 좌석 번호 확인: $elapsedTime 밀리초") // 유효 좌석 번호 확인: 1 밀리초
+            startTime = System.currentTimeMillis()
 
             // 티켓 생성
             ticketRepository.save(
@@ -104,7 +134,13 @@ class TicketServiceImpl(
                     },
                     place = event.place.name
                 )
+
             ).also {
+                nowTime = System.currentTimeMillis()
+                elapsedTime = nowTime - startTime
+                logger.info("티켓 생성 [$i] : $elapsedTime 밀리초") // 티켓 생성 [0] : 144 밀리초
+                startTime = System.currentTimeMillis()
+
                 // 캐시에 추가
                 putTicketCache(
                     request.eventId,
@@ -114,6 +150,11 @@ class TicketServiceImpl(
                     TicketResponse.from(it)
                 )
 
+                nowTime = System.currentTimeMillis()
+                elapsedTime = nowTime - startTime
+                logger.info("캐시에 추가 : $elapsedTime 밀리초") // 캐시에 추가 : 12 밀리초
+                startTime = System.currentTimeMillis()
+
                 // 락 해제
                 lockList[i].unlock()
 
@@ -122,35 +163,56 @@ class TicketServiceImpl(
                 if (availableSeat.isFull())
                     availableSeat.close()
 
+
                 eventRepository.save(event)
+
+                nowTime = System.currentTimeMillis()
+                elapsedTime = nowTime - startTime
+                logger.info("~ 데이터베이스에 저장 : $elapsedTime 밀리초") // ~ 데이터베이스에 저장 : 13 밀리초
+                startTime = System.currentTimeMillis()
             }//also
         }//for
+
     }
 
-    override fun chkTicketCache(eventId: Long, date: LocalDate, grade: TicketGrade, seatNo: Int): Boolean {
+    fun chkTicketCache(eventId: Long, date: LocalDate, grade: TicketGrade, seatNo: Int): Boolean {
+        var startTime = System.currentTimeMillis()
+
         logger.info("캐시의 티켓 확인 시작")
         val cache = cacheManager.getCache("tickets")
         logger.info("Cache : $cache")
         val key = "$eventId" + "_$date" + "_$grade" + "_$seatNo"
         val ticket = cache?.get(key) // Response 상태
 
+        logger.info("캐시 키 생성 : ${System.currentTimeMillis() - startTime} 밀리초") // 11 밀리초 / 2 밀리초 / 10 밀리초 / 0 밀리초
+        startTime = System.currentTimeMillis()
+
         // 캐시에 일치하는 키 있을 때
         if (ticket != null) {
             logger.info("Cache hit for ticket: $key")
             logger.info("Ticket in Cache : $ticket")
             logger.info("이미 예매된 티켓입니다. ( in cache ) ")
+
+            logger.info("캐시 존재 확인 : ${System.currentTimeMillis() - startTime} 밀리초") // 0 밀리초 / 0 밀리초
+            startTime = System.currentTimeMillis()
             return false
         }
         // 캐시에 일치하는 키 없을 때
         else {
+            logger.info("캐시 부재 확인 : ${System.currentTimeMillis() - startTime} 밀리초") // 0 밀리초 / 0 밀리초
+            startTime = System.currentTimeMillis()
             logger.info("Cache miss for ticket: $key")
             logger.info("레포지토리의 티켓 확인 시작")
 
             val ticketResponse =
                 ticketRepository.chkTicket(eventId, date, grade, seatNo)?.let { TicketResponse.from(it) }
 
+            logger.info("데이터 가져오기 : ${System.currentTimeMillis() - startTime} 밀리초") // 1148 밀리초 / 942 밀리초
+            startTime = System.currentTimeMillis()
+
             if (ticketResponse != null) {
                 putTicketCache(eventId, date, grade, seatNo, ticketResponse)    // 예매된 티켓인데 캐시 저장 안되어있을 경우 캐시에 다시 등록
+                logger.info("캐시 부재. 재등록 : ${System.currentTimeMillis() - startTime} 밀리초") // 12 밀리초 / 10 밀리초
                 logger.info("이미 예매된 티켓입니다. ( in repository ) ")
                 return false
             } else
