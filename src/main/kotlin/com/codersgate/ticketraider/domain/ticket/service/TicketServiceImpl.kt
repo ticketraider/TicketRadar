@@ -25,6 +25,7 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 import java.util.concurrent.TimeUnit
+import kotlin.math.log
 
 @Service
 class TicketServiceImpl(
@@ -39,71 +40,65 @@ class TicketServiceImpl(
     }
 
     override fun createTicket(userPrincipal: UserPrincipal, request: CreateTicketRequest) {
-        var startTime = System.currentTimeMillis()
+
+        val lockList = mutableListOf<RLock>()
 
         // 락 생성
-        val lockList = mutableListOf<RLock>()
-        val count = request.seatList.size
-
-        request.seatList.map {
-            val lock = redissonClient.getLock(generateKey(request.eventId, request.date, it.ticketGrade, it.seatNumber))
+        for (i in 0 until request.seatList.size) {
+            val key = generateKey(
+                request.eventId,
+                request.date,
+                request.seatList[i].ticketGrade,
+                request.seatList[i].seatNumber
+            )
+            val lock = redissonClient.getLock(key)
             lockList.add(lock)
-            //획득시도 시간, 락 점유 시간
-            lock.tryLock(10, 1, TimeUnit.SECONDS)
+
+            lock.tryLock(10, 1, TimeUnit.SECONDS) //획득시도 시간, 락 점유 시간
         }
 
-        var nowTime = System.currentTimeMillis()
-        var elapsedTime = nowTime - startTime
-        logger.info("생성 ~ 락 획득: $elapsedTime 밀리초") // 생성 ~ 락 획득: 1 밀리초 / 33 밀리초 / 31 밀리초 /  2 밀리초 / 40 밀리초 / 3 밀리초
-        startTime = System.currentTimeMillis()
+        // 캐시에 존재하는지 확인
+        for (i in 0 until request.seatList.size) {
+            if (chkTicketCache(
+                    request.eventId,
+                    request.date,
+                    request.seatList[i].ticketGrade,
+                    request.seatList[i].seatNumber
+                )
+                ) {
+                logger.info("${request.seatList[i].seatNumber} 번 좌석은 이미 예약되어 있습니다.")
+                request.seatList.removeAt(i)
+                lockList[i].unlock()
+            }
+        }
 
         val event = eventRepository.findByIdOrNull(request.eventId)
             ?: throw ModelNotFoundException("event", request.eventId)
-        val member = memberRepository.findByIdOrNull(userPrincipal.id)
-            ?: throw ModelNotFoundException("member", userPrincipal.id)
 
-        nowTime = System.currentTimeMillis()
-        elapsedTime = nowTime - startTime
-        logger.info("락 획득 ~ 이벤트, 멤버 가져오기: $elapsedTime 밀리초") // 락 획득 ~ 이벤트, 멤버 가져오기: 72 밀리초 , 334 밀리초 / 407 밀리초 / 591 밀리초 / 336 밀리초 / 71 밀리초
-        startTime = System.currentTimeMillis()
 
-        // 컬렉션을 명시적으로 초기화 ( LAZY 모드 )
-        Hibernate.initialize(event.availableSeats)
+        Hibernate.initialize(event.availableSeats)   // 컬렉션을 명시적으로 초기화 ( LAZY 모드 )
 
         // 예약 날짜 체크
-        if (request.date < event.startDate || request.date > event.endDate || request.date < LocalDate.now() )
+        if (request.date < event.startDate || request.date > event.endDate || request.date < LocalDate.now())
             throw IllegalArgumentException("예매일(${request.date})이 올바르지 않습니다.")
-
-        nowTime = System.currentTimeMillis()
-        elapsedTime = nowTime - startTime
-        logger.info("객체호출 ~ 예약 날짜 확인: $elapsedTime 밀리초") // 객체호출 ~ 예약 날짜 확인: 11 밀리초 / 11 밀리초 / 11 밀리초 / 8 밀리초 / 8 밀리초
-        startTime = System.currentTimeMillis()
 
         // 좌석 예약 가능 상태 확인
         val availableSeat = event.availableSeats.find {
             it.date == request.date && it.bookable == Bookable.OPEN
         } ?: throw IllegalArgumentException("예매일(${request.date}) 의 예약이 불가능한 상태 입니다.")
 
-        nowTime = System.currentTimeMillis()
-        elapsedTime = nowTime - startTime
-        logger.info("날짜 확인 ~ 예악 가능 상태 확인: $elapsedTime 밀리초") // 날짜 확인 ~ 예악 가능 상태 확인: 1 밀리초 / 1 밀리초 / 0 밀리초 / 0 밀리초 / 2 밀리초
-        startTime = System.currentTimeMillis()
 
-        // 티켓 생성
-        for (i in 0 until count) {
-            // 캐시 , 레포지토리 체크
-            if (!chkTicketCache(
-                    request.eventId,
-                    request.date,
-                    request.seatList[i].ticketGrade,
-                    request.seatList[i].seatNumber
-                )
-            ) continue
-
-            nowTime = System.currentTimeMillis()
-            elapsedTime = nowTime - startTime
-            logger.info("~ 캐시 확인[$i] : $elapsedTime 밀리초") // ~ 캐시 확인[0] : 161 밀리초
-            startTime = System.currentTimeMillis()
+        for (i in 0 until request.seatList.size) {
+            // 데이터베이스 체크
+            if( chkTicketRepository(
+                request.eventId,
+                request.date,
+                request.seatList[i].ticketGrade,
+                request.seatList[i].seatNumber
+            )){
+                request.seatList.removeAt(i)
+                continue
+            }
 
             // 좌석 번호 체크
             val seatLimit = when (request.seatList[i].ticketGrade) {
@@ -111,13 +106,13 @@ class TicketServiceImpl(
                 TicketGrade.S -> event.availableSeats[0].maxSeatS
                 TicketGrade.A -> event.availableSeats[0].maxSeatA
             }
-            if (request.seatList[i].seatNumber !in 1..<seatLimit)
-                throw IllegalArgumentException("Invalid SeatNumber")
+            if (request.seatList[i].seatNumber !in 1..<seatLimit){
+                request.seatList.removeAt(i)
+                continue
+            }
 
-            nowTime = System.currentTimeMillis()
-            elapsedTime = nowTime - startTime
-            logger.info("유효 좌석 번호 확인: $elapsedTime 밀리초") // 유효 좌석 번호 확인: 1 밀리초
-            startTime = System.currentTimeMillis()
+            val member = memberRepository.findByIdOrNull(userPrincipal.id)
+                ?: throw ModelNotFoundException("member", userPrincipal.id)
 
             // 티켓 생성
             ticketRepository.save(
@@ -136,10 +131,6 @@ class TicketServiceImpl(
                 )
 
             ).also {
-                nowTime = System.currentTimeMillis()
-                elapsedTime = nowTime - startTime
-                logger.info("티켓 생성 [$i] : $elapsedTime 밀리초") // 티켓 생성 [0] : 144 밀리초
-                startTime = System.currentTimeMillis()
 
                 // 캐시에 추가
                 putTicketCache(
@@ -149,11 +140,6 @@ class TicketServiceImpl(
                     request.seatList[i].seatNumber,
                     TicketResponse.from(it)
                 )
-
-                nowTime = System.currentTimeMillis()
-                elapsedTime = nowTime - startTime
-                logger.info("캐시에 추가 : $elapsedTime 밀리초") // 캐시에 추가 : 12 밀리초
-                startTime = System.currentTimeMillis()
 
                 // 락 해제
                 lockList[i].unlock()
@@ -165,60 +151,45 @@ class TicketServiceImpl(
 
 
                 eventRepository.save(event)
-
-                nowTime = System.currentTimeMillis()
-                elapsedTime = nowTime - startTime
-                logger.info("~ 데이터베이스에 저장 : $elapsedTime 밀리초") // ~ 데이터베이스에 저장 : 13 밀리초
-                startTime = System.currentTimeMillis()
             }//also
         }//for
-
     }
 
     fun chkTicketCache(eventId: Long, date: LocalDate, grade: TicketGrade, seatNo: Int): Boolean {
-        var startTime = System.currentTimeMillis()
-
         logger.info("캐시의 티켓 확인 시작")
         val cache = cacheManager.getCache("tickets")
         logger.info("Cache : $cache")
         val key = "$eventId" + "_$date" + "_$grade" + "_$seatNo"
-        val ticket = cache?.get(key) // Response 상태
+        val ticket = cache?.get(key) // ticket : TicketResponse 상태
 
-        logger.info("캐시 키 생성 : ${System.currentTimeMillis() - startTime} 밀리초") // 11 밀리초 / 2 밀리초 / 10 밀리초 / 0 밀리초
-        startTime = System.currentTimeMillis()
-
-        // 캐시에 일치하는 키 있을 때
-        if (ticket != null) {
+        if (ticket != null) {    // 캐시에 일치하는 키 있을 때
             logger.info("Cache hit for ticket: $key")
             logger.info("Ticket in Cache : $ticket")
             logger.info("이미 예매된 티켓입니다. ( in cache ) ")
-
-            logger.info("캐시 존재 확인 : ${System.currentTimeMillis() - startTime} 밀리초") // 0 밀리초 / 0 밀리초
-            startTime = System.currentTimeMillis()
+            return true
+        } else {   // 캐시에 일치하는 키 없을 때
+            logger.info("Cache miss for ticket: $key")
             return false
         }
-        // 캐시에 일치하는 키 없을 때
-        else {
-            logger.info("캐시 부재 확인 : ${System.currentTimeMillis() - startTime} 밀리초") // 0 밀리초 / 0 밀리초
-            startTime = System.currentTimeMillis()
-            logger.info("Cache miss for ticket: $key")
-            logger.info("레포지토리의 티켓 확인 시작")
-
-            val ticketResponse =
-                ticketRepository.chkTicket(eventId, date, grade, seatNo)?.let { TicketResponse.from(it) }
-
-            logger.info("데이터 가져오기 : ${System.currentTimeMillis() - startTime} 밀리초") // 1148 밀리초 / 942 밀리초
-            startTime = System.currentTimeMillis()
-
-            if (ticketResponse != null) {
-                putTicketCache(eventId, date, grade, seatNo, ticketResponse)    // 예매된 티켓인데 캐시 저장 안되어있을 경우 캐시에 다시 등록
-                logger.info("캐시 부재. 재등록 : ${System.currentTimeMillis() - startTime} 밀리초") // 12 밀리초 / 10 밀리초
-                logger.info("이미 예매된 티켓입니다. ( in repository ) ")
-                return false
-            } else
-                return true // 캐시에 해당 키에 대한 값이 없으면 null을 반환하도록 함
-        }
     }
+
+    fun chkTicketRepository(eventId: Long, date: LocalDate, grade: TicketGrade, seatNo: Int): Boolean {
+        logger.info("레포지토리의 티켓 확인 시작")
+        ticketRepository.chkTicket(eventId, date, grade, seatNo)
+            ?.let {
+                putTicketCache(
+                    eventId,
+                    date,
+                    grade,
+                    seatNo,
+                    TicketResponse.from(it)
+                )    // 예매된 티켓인데 캐시 저장 안되어있을 경우 캐시에 다시 등록
+                logger.info("이미 레포지토리에 존재하는 티켓입니다.")
+                return true
+            }
+            ?: return false
+    }
+
 
     fun putTicketCache(
         eventId: Long,
@@ -228,13 +199,13 @@ class TicketServiceImpl(
         ticketResponse: TicketResponse
     ) {
         val cache = cacheManager.getCache("tickets")
-        logger.info("Cache : $cache")
         val key = "$eventId" + "_$date" + "_$grade" + "_$seatNo"
         cache?.put(key, ticketResponse)
+        logger.info("Put Cache : $cache::$key")
     }
 
-    override fun getAllTicketList(pageable: Pageable, memberId: Long?, eventId: Long?) : Page<TicketResponse>{
-        return ticketRepository.getAllTicketList(pageable, memberId, eventId).map{ TicketResponse.from(it) }
+    override fun getAllTicketList(pageable: Pageable, memberId: Long?, eventId: Long?): Page<TicketResponse> {
+        return ticketRepository.getAllTicketList(pageable, memberId, eventId).map { TicketResponse.from(it) }
     }
 
     override fun getTicketById(ticketId: Long): TicketResponse {
@@ -256,20 +227,23 @@ class TicketServiceImpl(
         ticketRepository.save(ticket)
     }
 
-    override fun chkExpiredTickets(){
-        ticketRepository.findAll().map{
-            if(it.date < LocalDate.now())
+    override fun chkExpiredTickets() {
+        ticketRepository.findAll().map {
+            if (it.date < LocalDate.now())
                 it.ticketStatus = TicketStatus.EXPIRED
             ticketRepository.save(it)
         }
     }
 
-    override fun makePayment(userPrincipal: UserPrincipal, ticketIdList : MutableList<Long>) : MutableList<TicketResponse> {
+    override fun makePayment(
+        userPrincipal: UserPrincipal,
+        ticketIdList: MutableList<Long>
+    ): MutableList<TicketResponse> {
 
-        val paidTicketList : MutableList<TicketResponse> = mutableListOf()
+        val paidTicketList: MutableList<TicketResponse> = mutableListOf()
 
-        ticketRepository.findAllByMemberId(userPrincipal.id).map{
-            if(it.id in ticketIdList && it.ticketStatus == TicketStatus.UNPAID){
+        ticketRepository.findAllByMemberId(userPrincipal.id).map {
+            if (it.id in ticketIdList && it.ticketStatus == TicketStatus.UNPAID) {
 
                 // TODO() 결제로직
 
@@ -284,12 +258,12 @@ class TicketServiceImpl(
 
     override fun cancelTicket(ticketId: Long, userPrincipal: UserPrincipal) {
         ticketRepository.findByIdOrNull(ticketId)
-            ?.let{
-            if(it.member.id == userPrincipal.id) {
-                it.isDeleted = true
-                ticketRepository.save(it)
+            ?.let {
+                if (it.member.id == userPrincipal.id) {
+                    it.isDeleted = true
+                    ticketRepository.save(it)
+                }
             }
-        }
     }
 
     override fun deleteTicket(ticketId: Long, userPrincipal: UserPrincipal) {
