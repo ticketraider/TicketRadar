@@ -46,16 +46,10 @@ data class EventRequest(
 
     val place: String,
 
-//    @field: Size(min = 1, message = "Price cannot be less than 1")
-//    @JsonProperty("seatRPrice")
     val seatRPrice: Int,
 
-//    @field: Size(min = 1, message = "Price cannot be less than 1")
-//    @JsonProperty("seatSPrice")
     val seatSPrice: Int,
 
-//    @field: Size(min = 1, message = "Price cannot be less than 1")
-//    @JsonProperty("seatAPrice")
     val seatAPrice: Int,
 
     ) {
@@ -96,15 +90,15 @@ data class EventRequest(
         return Pair(price, event)
     }
 
-    fun toAvailableSeat(event: Event, place: Place, localDate: LocalDate): AvailableSeat {
+    fun toAvailableSeat(event: Event, localDate: LocalDate): AvailableSeat {
         val availableSeat = AvailableSeat(
             event = event,
             date = localDate,//여기도 알맞은 날짜 넣도록하기
-            maxSeatR = place.seatR,
-            maxSeatS = place.seatS,
-            maxSeatA = place.seatA,
-            totalSeat = place.totalSeat,
-            place = place
+            maxSeatR = event.place.seatR,
+            maxSeatS = event.place.seatS,
+            maxSeatA = event.place.seatA,
+            totalSeat = event.place.totalSeat,
+            place = event.place
         )
         return availableSeat
     }
