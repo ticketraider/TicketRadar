@@ -116,4 +116,7 @@ class EventServiceImpl(
             ?: throw ModelNotFoundException("Event", eventId)
         return EventResponse.from(event)
     }
+    override fun getPaginatedCountList(pageable: Pageable): Page<EventResponse?> {
+        return eventRepository.findByPageableAndcount(pageable).map {EventResponse.from(it!!)}
+    }
 }

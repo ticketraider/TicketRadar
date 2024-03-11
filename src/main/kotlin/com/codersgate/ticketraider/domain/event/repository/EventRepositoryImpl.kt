@@ -66,8 +66,13 @@ class EventRepositoryImpl : QueryDslSupport(), CustomEventRepository {
 
         if (pageable.sort.isSorted) {
             when (pageable.sort.first()?.property) {
-                "likecount" -> query.orderBy(event.likeCount.asc())
-                "reviewcount" -> query.orderBy(event.reviewCount.asc())
+                "likecount" -> query.orderBy(event.likeCount.desc())
+                "reviewcount" -> query.orderBy(event.reviewCount.desc())
+                "title" -> query.orderBy(event.title.asc())
+                "created_at" -> query.orderBy(event.createdAt.desc())
+                "average_rating" -> query.orderBy(event.averageRating.desc())
+                "place" -> query.orderBy(event.place.name.asc())
+
                 else -> query.orderBy(event.createdAt.asc())
             }
         } else {

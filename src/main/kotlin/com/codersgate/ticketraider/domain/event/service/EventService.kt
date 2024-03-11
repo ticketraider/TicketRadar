@@ -20,5 +20,5 @@ interface EventService {
 
     fun getEvent(eventId: Long): EventResponse
 
-
+    fun getPaginatedCountList(pageable: Pageable): Page<EventResponse?>
 }

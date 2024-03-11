@@ -84,7 +84,7 @@ fun updateEvent(
     ): ResponseEntity<Page<EventResponse?>> {
             return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(eventService.getPaginatedcountlist(pageable))
+                .body(eventService.getPaginatedCountList(pageable))
     }
 }
 
