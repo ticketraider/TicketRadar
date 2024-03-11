@@ -7,6 +7,7 @@ import com.codersgate.ticketraider.domain.event.model.Event
 import com.codersgate.ticketraider.domain.event.repository.EventRepository
 import com.codersgate.ticketraider.domain.event.repository.price.PriceRepository
 import com.codersgate.ticketraider.domain.event.repository.seat.AvailableSeatRepository
+import com.codersgate.ticketraider.domain.place.model.Place
 import com.codersgate.ticketraider.domain.place.repository.PlaceRepository
 import com.codersgate.ticketraider.global.error.exception.ModelNotFoundException
 import org.springframework.data.domain.Page
@@ -23,6 +24,7 @@ class EventServiceImpl(
     private val availableSeatRepository: AvailableSeatRepository,
     private val placeRepository: PlaceRepository
 ) : EventService {
+    @Transactional
     override fun createEvent(eventRequest: EventRequest) {
         val category = categoryRepository.findByIdOrNull(eventRequest.categoryId)
             ?: throw ModelNotFoundException("category", eventRequest.categoryId)
@@ -35,25 +37,11 @@ class EventServiceImpl(
         }
 
         val (price, event) = eventRequest.toPriceAndEvent(category, place)
-        check(
-            !eventRepository.existsByPlaceAndStartDateAndEndDate(
-                place,
-                eventRequest.startDate,
-                eventRequest.endDate
-            )
-        ) {
-            "이미 입력한 장소의 해당 날짜에 존재하는 Event가 있습니다."
-        }
         event.price = price
         eventRepository.save(event)
         priceRepository.save(price)
 
-        val date = eventRequest.startDate
-        val duration = eventRequest.endDate.compareTo(eventRequest.startDate)
-        for (i in 0..duration) {
-            val seat = eventRequest.toAvailableSeat(event, place, date.plusDays(i.toLong()))
-            availableSeatRepository.save(seat)
-        }
+        checkSeatForUpdateAndCreate(event, eventRequest, availableSeatRepository)
     }
 
     @Transactional
@@ -93,29 +81,7 @@ class EventServiceImpl(
 
         //날짜 변동이 생겼는지 확인
         if (orgStartDate != event.startDate || orgEndDate != event.endDate) {
-            val date = event.startDate
-            val duration = event.endDate.compareTo(event.startDate)
-            for (i in 0..duration) {
-                val seat = availableSeatRepository.findByPlaceIdAndDate(place.id!!, date.plusDays(i.toLong()))
-                if (seat != null) {
-                    check(seat.event!!.id == event.id) {
-                        "다른 이벤트가 존재함"
-                    }
-                }
-            }
-            val seatList = availableSeatRepository.findAllByEventId(eventId)
-            seatList.map{
-                if(it!!.date.isBefore(event.startDate) || it.date.isAfter(event.endDate)){
-                    it.isDeleted = true
-                }
-            }
-            for (i in 0..duration) {
-                val seat = availableSeatRepository.findByEventIdAndDate(eventId, date.plusDays(i.toLong()))
-                if (seat == null) {
-                    val newSeat = eventRequest.toAvailableSeat(event, place, date.plusDays(i.toLong()))
-                    availableSeatRepository.save(newSeat)
-                }
-            }
+            checkSeatForUpdateAndCreate(event, eventRequest, availableSeatRepository)
         }
     }
 
@@ -136,5 +102,33 @@ class EventServiceImpl(
         val event = eventRepository.findByIdOrNull(eventId)
             ?: throw ModelNotFoundException("Event", eventId)
         return EventResponse.from(event)
+    }
+}
+private fun checkSeatForUpdateAndCreate(event: Event, request: EventRequest, seatRepository: AvailableSeatRepository) {
+    val date = event.startDate
+    val duration = event.endDate.compareTo(event.startDate)
+    //다른 이벤트가 존재하는지 체크
+    for (i in 0..duration) {
+        val seat = seatRepository.findByPlaceIdAndDate(event.place.id!!, date.plusDays(i.toLong()))
+        if (seat != null) {
+            check(seat.event!!.id == event.id) {
+                "해당 날짜에 이미 다른 이벤트가 존재합니다."
+            }
+        }
+    }
+    //해당 이벤트id로 모든 Seat를 불러옴 > 정해둔 기간 외에 날짜는 삭제처리
+    val seatList = seatRepository.findAllByEventId(event.id!!)
+    seatList.map{
+        if(it!!.date.isBefore(event.startDate) || it.date.isAfter(event.endDate)){
+            it.isDeleted = true
+        }
+    }
+    //없는 seat는 생성함
+    for (i in 0..duration) {
+        val seat = seatRepository.findByEventIdAndDate(event.id!!, date.plusDays(i.toLong()))
+        if (seat == null) {
+            val newSeat = request.toAvailableSeat(event, date.plusDays(i.toLong()))
+            seatRepository.save(newSeat)
+        }
     }
 }

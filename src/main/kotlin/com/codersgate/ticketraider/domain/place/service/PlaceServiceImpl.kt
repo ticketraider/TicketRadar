@@ -33,20 +33,15 @@ class PlaceServiceImpl(
             it.seatR = request.seatR
             it.seatS = request.seatS
             it.seatA = request.seatA
-            it.totalSeat = request.seatR+request.seatS+request.seatA
+            it.totalSeat = request.seatR + request.seatS + request.seatA
             it.address = request.address
         }
         placeRepository.save(place)
 
         val seatList = availableSeatRepository.findByPlaceId(placeId)
         seatList.map {
-            it.let {
-                it!!.maxSeatR = place.seatR
-                it.maxSeatS = place.seatS
-                it.maxSeatA = place.seatA
-                it.totalSeat = place.totalSeat
-            }
-            availableSeatRepository.save(it!!)
+            request.updateSeatByPlace(it!!, place)
+            availableSeatRepository.save(it)
         }
 
         val ticketList = ticketRepository.findAllByPlaceId(placeId)
