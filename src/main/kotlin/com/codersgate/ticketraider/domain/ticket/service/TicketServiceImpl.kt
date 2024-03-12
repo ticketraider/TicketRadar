@@ -54,27 +54,26 @@ class TicketServiceImpl(
             val lock = redissonClient.getLock(key)
             lockList.add(lock)
 
-            lock.tryLock(10, 1, TimeUnit.SECONDS) //획득시도 시간, 락 점유 시간
+            lock.tryLock(10, 10, TimeUnit.SECONDS) //획득시도 시간, 락 점유 시간
         }
 
         // 캐시에 존재하는지 확인
-        for (i in 0 until request.seatList.size) {
-            if (chkTicketCache(
-                    request.eventId,
-                    request.date,
-                    request.seatList[i].ticketGrade,
-                    request.seatList[i].seatNumber
-                )
-                ) {
-                logger.info("${request.seatList[i].seatNumber} 번 좌석은 이미 예약되어 있습니다.")
-                request.seatList.removeAt(i)
-                lockList[i].unlock()
-            }
-        }
+//        for (i in 0 until request.seatList.size) {
+//            if (chkTicketCache(
+//                    request.eventId,
+//                    request.date,
+//                    request.seatList[i].ticketGrade,
+//                    request.seatList[i].seatNumber
+//                )
+//                ) {
+//                logger.info("${request.seatList[i].seatNumber} 번 좌석은 이미 예약되어 있습니다.")
+//                request.seatList.removeAt(i)
+//                lockList[i].unlock()
+//            }
+//        }
 
         val event = eventRepository.findByIdOrNull(request.eventId)
             ?: throw ModelNotFoundException("event", request.eventId)
-
 
         Hibernate.initialize(event.availableSeats)   // 컬렉션을 명시적으로 초기화 ( LAZY 모드 )
 
@@ -87,7 +86,10 @@ class TicketServiceImpl(
             it.date == request.date && it.bookable == Bookable.OPEN
         } ?: throw IllegalArgumentException("예매일(${request.date}) 의 예약이 불가능한 상태 입니다.")
 
+        val member = memberRepository.findByIdOrNull(userPrincipal.id)
+            ?: throw ModelNotFoundException("member", userPrincipal.id)
 
+        val deleteIndex = mutableSetOf<Int>()
         for (i in 0 until request.seatList.size) {
             // 데이터베이스 체크
             if( chkTicketRepository(
@@ -96,7 +98,8 @@ class TicketServiceImpl(
                 request.seatList[i].ticketGrade,
                 request.seatList[i].seatNumber
             )){
-                request.seatList.removeAt(i)
+                logger.info("${request.seatList[i].seatNumber} 번 좌석은 선택할 수 없습니다. ( 이미 예약된 좌석 in DB )")
+                deleteIndex.add(i)
                 continue
             }
 
@@ -107,12 +110,14 @@ class TicketServiceImpl(
                 TicketGrade.A -> event.availableSeats[0].maxSeatA
             }
             if (request.seatList[i].seatNumber !in 1..<seatLimit){
-                request.seatList.removeAt(i)
+                logger.info("${request.seatList[i].seatNumber} 번 좌석은 선택할 수 없습니다. (좌석 번호 초과)")
+                deleteIndex.add(i)
                 continue
             }
 
-            val member = memberRepository.findByIdOrNull(userPrincipal.id)
-                ?: throw ModelNotFoundException("member", userPrincipal.id)
+            deleteIndex.map{
+                request.seatList.removeAt(it)
+            }
 
             // 티켓 생성
             ticketRepository.save(
@@ -133,19 +138,19 @@ class TicketServiceImpl(
             ).also {
 
                 // 캐시에 추가
-                putTicketCache(
-                    request.eventId,
-                    request.date,
-                    request.seatList[i].ticketGrade,
-                    request.seatList[i].seatNumber,
-                    TicketResponse.from(it)
-                )
+//                putTicketCache(
+//                    request.eventId,
+//                    request.date,
+//                    request.seatList[i].ticketGrade,
+//                    request.seatList[i].seatNumber,
+//                    TicketResponse.from(it)
+//                )
 
                 // 락 해제
                 lockList[i].unlock()
 
                 // 좌석 예약 수
-                availableSeat.increaseSeat(request.seatList[i].ticketGrade, 1)
+                availableSeat.increaseSeat(request.seatList[i].ticketGrade)
                 if (availableSeat.isFull())
                     availableSeat.close()
 
@@ -159,7 +164,7 @@ class TicketServiceImpl(
         logger.info("캐시의 티켓 확인 시작")
         val cache = cacheManager.getCache("tickets")
         logger.info("Cache : $cache")
-        val key = "$eventId" + "_$date" + "_$grade" + "_$seatNo"
+        val key = "${eventId}_${date}_${grade}_${seatNo}"
         val ticket = cache?.get(key) // ticket : TicketResponse 상태
 
         if (ticket != null) {    // 캐시에 일치하는 키 있을 때
@@ -199,7 +204,7 @@ class TicketServiceImpl(
         ticketResponse: TicketResponse
     ) {
         val cache = cacheManager.getCache("tickets")
-        val key = "$eventId" + "_$date" + "_$grade" + "_$seatNo"
+        val key = "${eventId}_${date}_${grade}_${seatNo}"
         cache?.put(key, ticketResponse)
         logger.info("Put Cache : $cache::$key")
     }
@@ -218,7 +223,8 @@ class TicketServiceImpl(
         return ticketRepository.getListByUserId(pageable, userPrincipal.id).map { TicketResponse.from(it) }
     }
 
-    override fun updateTicket(ticketId: Long, ticketStatus: TicketStatus) {
+    // 없어도 될듯
+    override fun updateTicketStatus(ticketId: Long, ticketStatus: TicketStatus) {
         val ticket = ticketRepository.findByIdOrNull(ticketId)
             ?: throw ModelNotFoundException("Ticket", ticketId)
 
@@ -260,18 +266,19 @@ class TicketServiceImpl(
         ticketRepository.findByIdOrNull(ticketId)
             ?.let {
                 if (it.member.id == userPrincipal.id) {
-                    it.isDeleted = true
-                    ticketRepository.save(it)
+                    it.event.availableSeats.map{seat ->
+                        if(seat.date == it.date)
+                            seat.decreaseSeat(it.grade)
+                    }
                 }
+                else
+                    throw InvalidCredentialException("")
             }
     }
 
-    override fun deleteTicket(ticketId: Long, userPrincipal: UserPrincipal) {
+    override fun deleteTicket(ticketId: Long) {
         val ticket = ticketRepository.findByIdOrNull(ticketId)
             ?: throw ModelNotFoundException("Ticket", ticketId)
-        if (ticket.member.id!! != userPrincipal.id) {
-            throw InvalidCredentialException("")
-        }
         ticketRepository.delete(ticket)
     }
 }

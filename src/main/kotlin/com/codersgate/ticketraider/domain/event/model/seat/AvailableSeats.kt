@@ -63,18 +63,18 @@ class AvailableSeat(
     fun close() {
         bookable = Bookable.CLOSED
     }
-    fun decreaseSeat(grade: TicketGrade, count: Int) {
+    fun decreaseSeat(grade: TicketGrade) {
         when(grade){
-            TicketGrade.R -> seatR -= count
-            TicketGrade.S -> seatS -= count
-            TicketGrade.A -> seatA -= count
+            TicketGrade.R -> seatR --
+            TicketGrade.S -> seatS --
+            TicketGrade.A -> seatA --
         }
     }
-    fun increaseSeat(grade: TicketGrade, count: Int) {
+    fun increaseSeat(grade: TicketGrade) {
         when(grade){
-            TicketGrade.R -> seatR += count
-            TicketGrade.S -> seatS += count
-            TicketGrade.A -> seatA += count
+            TicketGrade.R -> seatR ++
+            TicketGrade.S -> seatS ++
+            TicketGrade.A -> seatA ++
         }
     }
 }
