@@ -41,6 +41,7 @@ class TicketServiceImpl(
 
     override fun createTicket(userPrincipal: UserPrincipal, request: CreateTicketRequest) {
 
+        val lockList = mutableListOf<RLock>()
         // 락 생성
         for (i in 0 until request.seatList.size) {
             val key = generateKey(
@@ -50,38 +51,31 @@ class TicketServiceImpl(
                 request.seatList[i].seatNumber
             )
             val lock = redissonClient.getLock(key)
-
             lock.tryLock(10, 10, TimeUnit.SECONDS) //획득시도 시간, 락 점유 시간
+            lockList.add(lock)
         }
 
-        // 캐시에 존재하는지 확인
-//        for (i in 0 until request.seatList.size) {
-//            if (chkTicketCache(
-//                    request.eventId,
-//                    request.date,
-//                    request.seatList[i].ticketGrade,
-//                    request.seatList[i].seatNumber
-//                )
-//                ) {
-//                logger.info("${request.seatList[i].seatNumber} 번 좌석은 이미 예약되어 있습니다.")
-//                request.seatList.removeAt(i)
-//                lockList[i].unlock()
-//            }
-//        }
-
         val event = eventRepository.findByIdOrNull(request.eventId)
-            ?: throw ModelNotFoundException("event", request.eventId)
+            ?:let{
+                lockList.map{ it.unlock() }
+                throw ModelNotFoundException("event", request.eventId)
+            }
 
         Hibernate.initialize(event.availableSeats)   // 컬렉션을 명시적으로 초기화 ( LAZY 모드 )
 
         // 예약 날짜 체크
-        if (request.date < event.startDate || request.date > event.endDate || request.date < LocalDate.now())
+        if (request.date < event.startDate || request.date > event.endDate || request.date < LocalDate.now()){
+            lockList.map{ it.unlock() }
             throw IllegalArgumentException("예매일(${request.date})이 올바르지 않습니다.")
+        }
 
         // 좌석 예약 가능 상태 확인
         val availableSeat = event.availableSeats.find {
             it.date == request.date && it.bookable == Bookable.OPEN
-        } ?: throw IllegalArgumentException("예매일(${request.date}) 의 예약이 불가능한 상태 입니다.")
+        } ?:let{
+            lockList.map{ it.unlock() }
+            throw IllegalArgumentException("예매일(${request.date}) 의 예약이 불가능한 상태 입니다.")
+        }
 
         // 예약 가능 좌석 선별
         val newSeatList = request.seatList.filter { seat ->
@@ -115,11 +109,16 @@ class TicketServiceImpl(
         if(newSeatList.size == 0)
         {
             logger.info("생성 가능한 좌석이 없습니다.")
+            lockList.map{ it.unlock() }
             return
         }
 
         val member = memberRepository.findByIdOrNull(userPrincipal.id)
-            ?: throw ModelNotFoundException("member", userPrincipal.id)
+            ?:let{
+                lockList.map{l -> l.unlock() }
+                throw ModelNotFoundException("member", userPrincipal.id)
+            }
+
 
         // 티켓 생성
         newSeatList.map{seat ->
@@ -140,15 +139,6 @@ class TicketServiceImpl(
                 )
             )
 
-            // 캐시에 추가
-//            putTicketCache(
-//                request.eventId,
-//                request.date,
-//                request.seatList[i].ticketGrade,
-//                request.seatList[i].seatNumber,
-//                TicketResponse.from(it)
-//            )
-
             // 락 해제
             val key = generateKey(request.eventId,request.date,seat.ticketGrade,seat.seatNumber )
             redissonClient.getLock(key).unlock()
@@ -160,6 +150,7 @@ class TicketServiceImpl(
 
         }//map
 
+        lockList?.map{ it.unlock() }
         eventRepository.save(event)
     }
 
