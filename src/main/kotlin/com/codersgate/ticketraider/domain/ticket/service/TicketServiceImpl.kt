@@ -41,8 +41,6 @@ class TicketServiceImpl(
 
     override fun createTicket(userPrincipal: UserPrincipal, request: CreateTicketRequest) {
 
-        val lockList = mutableListOf<RLock>()
-
         // 락 생성
         for (i in 0 until request.seatList.size) {
             val key = generateKey(
@@ -52,7 +50,6 @@ class TicketServiceImpl(
                 request.seatList[i].seatNumber
             )
             val lock = redissonClient.getLock(key)
-            lockList.add(lock)
 
             lock.tryLock(10, 10, TimeUnit.SECONDS) //획득시도 시간, 락 점유 시간
         }
@@ -86,78 +83,84 @@ class TicketServiceImpl(
             it.date == request.date && it.bookable == Bookable.OPEN
         } ?: throw IllegalArgumentException("예매일(${request.date}) 의 예약이 불가능한 상태 입니다.")
 
+        // 예약 가능 좌석 선별
+        val newSeatList = request.seatList.filter { seat ->
+            //DB 체크
+            val isReserved = chkTicketDB(
+                request.eventId,
+                request.date,
+                seat.ticketGrade,
+                seat.seatNumber
+            )
+
+            // 좌석 번호 체크
+            val seatLimit = when (seat.ticketGrade) {
+                TicketGrade.R -> availableSeat.maxSeatR
+                TicketGrade.S -> availableSeat.maxSeatS
+                TicketGrade.A -> availableSeat.maxSeatA
+            }
+
+            if (isReserved) {
+                logger.info("${seat.seatNumber} 번 좌석은 선택할 수 없습니다. ( 이미 예약된 좌석 in DB )")
+                false
+            }
+            else if ( seat.seatNumber !in 1..<seatLimit) {
+                logger.info("${seat.seatNumber} 번 좌석은 선택할 수 없습니다. (좌석 번호 범위 초과)")
+                false
+            }
+            else
+                true // 유효한 좌석만 true 반환하여 새로운 리스트로 만듦.
+        }.toMutableList()
+
+        if(newSeatList.size == 0)
+        {
+            logger.info("생성 가능한 좌석이 없습니다.")
+            return
+        }
+
         val member = memberRepository.findByIdOrNull(userPrincipal.id)
             ?: throw ModelNotFoundException("member", userPrincipal.id)
 
-        val deleteIndex = mutableSetOf<Int>()
-        for (i in 0 until request.seatList.size) {
-            // 데이터베이스 체크
-            if( chkTicketRepository(
-                request.eventId,
-                request.date,
-                request.seatList[i].ticketGrade,
-                request.seatList[i].seatNumber
-            )){
-                logger.info("${request.seatList[i].seatNumber} 번 좌석은 선택할 수 없습니다. ( 이미 예약된 좌석 in DB )")
-                deleteIndex.add(i)
-                continue
-            }
+        // 티켓 생성
+        newSeatList.map{seat ->
 
-            // 좌석 번호 체크
-            val seatLimit = when (request.seatList[i].ticketGrade) {
-                TicketGrade.R -> event.availableSeats[0].maxSeatR
-                TicketGrade.S -> event.availableSeats[0].maxSeatS
-                TicketGrade.A -> event.availableSeats[0].maxSeatA
-            }
-            if (request.seatList[i].seatNumber !in 1..<seatLimit){
-                logger.info("${request.seatList[i].seatNumber} 번 좌석은 선택할 수 없습니다. (좌석 번호 초과)")
-                deleteIndex.add(i)
-                continue
-            }
-
-            deleteIndex.map{
-                request.seatList.removeAt(it)
-            }
-
-            // 티켓 생성
             ticketRepository.save(
                 Ticket(
                     date = request.date,
-                    grade = request.seatList[i].ticketGrade,
-                    seatNo = request.seatList[i].seatNumber,
+                    grade = seat.ticketGrade,
+                    seatNo = seat.seatNumber,
                     event = event,
                     member = member,
-                    price = when (request.seatList[i].ticketGrade) {
+                    price = when (seat.ticketGrade) {
                         TicketGrade.R -> event.price!!.seatRPrice
                         TicketGrade.S -> event.price!!.seatSPrice
                         TicketGrade.A -> event.price!!.seatAPrice
                     },
                     place = event.place.name
                 )
+            )
 
-            ).also {
+            // 캐시에 추가
+//            putTicketCache(
+//                request.eventId,
+//                request.date,
+//                request.seatList[i].ticketGrade,
+//                request.seatList[i].seatNumber,
+//                TicketResponse.from(it)
+//            )
 
-                // 캐시에 추가
-//                putTicketCache(
-//                    request.eventId,
-//                    request.date,
-//                    request.seatList[i].ticketGrade,
-//                    request.seatList[i].seatNumber,
-//                    TicketResponse.from(it)
-//                )
+            // 락 해제
+            val key = generateKey(request.eventId,request.date,seat.ticketGrade,seat.seatNumber )
+            redissonClient.getLock(key).unlock()
 
-                // 락 해제
-                lockList[i].unlock()
+            // 좌석 예약 수 수정
+            availableSeat.increaseSeat(seat.ticketGrade)
+            if (availableSeat.isFull())
+                availableSeat.close()
 
-                // 좌석 예약 수
-                availableSeat.increaseSeat(request.seatList[i].ticketGrade)
-                if (availableSeat.isFull())
-                    availableSeat.close()
+        }//map
 
-
-                eventRepository.save(event)
-            }//also
-        }//for
+        eventRepository.save(event)
     }
 
     fun chkTicketCache(eventId: Long, date: LocalDate, grade: TicketGrade, seatNo: Int): Boolean {
@@ -178,8 +181,8 @@ class TicketServiceImpl(
         }
     }
 
-    fun chkTicketRepository(eventId: Long, date: LocalDate, grade: TicketGrade, seatNo: Int): Boolean {
-        logger.info("레포지토리의 티켓 확인 시작")
+    fun chkTicketDB(eventId: Long, date: LocalDate, grade: TicketGrade, seatNo: Int): Boolean {
+        logger.info("DB의 티켓 확인 시작")
         ticketRepository.chkTicket(eventId, date, grade, seatNo)
             ?.let {
                 putTicketCache(
@@ -189,12 +192,11 @@ class TicketServiceImpl(
                     seatNo,
                     TicketResponse.from(it)
                 )    // 예매된 티켓인데 캐시 저장 안되어있을 경우 캐시에 다시 등록
-                logger.info("이미 레포지토리에 존재하는 티켓입니다.")
+                logger.info("이미 DB에 존재하는 티켓입니다.")
                 return true
             }
             ?: return false
     }
-
 
     fun putTicketCache(
         eventId: Long,
