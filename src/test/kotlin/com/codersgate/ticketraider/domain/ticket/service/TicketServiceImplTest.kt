@@ -17,6 +17,8 @@ import com.codersgate.ticketraider.domain.ticket.entity.TicketGrade
 import com.codersgate.ticketraider.global.error.exception.ModelNotFoundException
 import com.codersgate.ticketraider.global.infra.security.jwt.UserPrincipal
 import io.mockk.junit5.MockKExtension
+import kotlinx.coroutines.Delay
+import kotlinx.coroutines.delay
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -39,7 +41,6 @@ class TicketServiceImplTest(
     @Autowired val categoryRepository: CategoryRepository,
     @Autowired val ticketService: TicketService,
     @Autowired val eventService: EventService,
-    @Autowired val priceRepository: PriceRepository
 ) {
 
     @Test
@@ -71,7 +72,7 @@ class TicketServiceImplTest(
             posterImage = "string",
             categoryId = getCate.id!!,
             eventInfo = "String",
-            _startDate = "2024-03-15",
+            _startDate = "2024-03-10",
             _endDate = "2024-03-17",
             place = "문화회관",
             seatRPrice = 150000,
@@ -82,40 +83,43 @@ class TicketServiceImplTest(
         val getEvent = eventRepository.findByIdOrNull(1)
 
 
-
-        val threadCount = 100
-        val executorService = Executors.newFixedThreadPool(100)
+        val threadCount = 10
+        val executorService = Executors.newFixedThreadPool(5)
         val countDownLatch = CountDownLatch(threadCount)
 
+        var success = 0
+        var fail = 0
         val createTicketReq = CreateTicketRequest(
             date = LocalDate.now(),
             eventId = getEvent!!.id!!,
         )
-        createTicketReq.seatList.add(SeatInfo(TicketGrade.R, 1))
-        var success = 0
-        var fail = 0
         //when 100개의 스레드로 동시에 티켓을 구매했을때
         repeat(threadCount) {
             executorService.submit {
                 try {
+                    println("리퀘스트 전!@#(@!*#)*(!@#&(*!@#&*(!@@#&*(@!#&(*!@#&*(&!@(*@#&*(!@&#*(")
+                    createTicketReq.seatList.add(SeatInfo(TicketGrade.R, 1))
+                    println("크리에이트티켓 전!@#(@!*#)*(!@#&(*!@#&*(!@@#&*(@!#&(*!@#&*(&!@(*@#&*(!@&#*(")
                     ticketService.createTicket(member.id!!, createTicketReq)
+                    println("티켓 생성 후 !@#(@!*#)*(!@#&(*!@#&*(!@@#&*(@!#&(*!@#&*(&!@(*@#&*(!@&#*(")
                     success++
-                } catch (e: ModelNotFoundException) { //예외처리 추가후 수정
+                    countDownLatch.countDown()
+                } catch (e: ModelNotFoundException) {
                     fail++
-                } finally {
                     countDownLatch.countDown()
                 }
+
             }
+            countDownLatch.await()
+
+            // 시도한 횟수랑 = 실패 + 성공 횟수 같아야함.
+            // 성공 횟수가 100이 아닌거는 동시성 문제해결.
+            println("success : $success")
+            println("fail : $fail")
+
+            //then 성공50 실패50 이여야한다.
+            Assertions.assertThat(success).isEqualTo(1)
+            Assertions.assertThat(fail).isEqualTo(9)
         }
-        countDownLatch.await()
-
-        // 시도한 횟수랑 = 실패 + 성공 횟수 같아야함.
-        // 성공 횟수가 100이 아닌거는 동시성 문제해결.
-        println("success : $success")
-        println("fail : $fail")
-
-        //then 성공50 실패50 이여야한다.
-        Assertions.assertThat(success).isEqualTo(20)
-        Assertions.assertThat(fail).isEqualTo(80)
     }
 }

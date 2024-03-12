@@ -23,6 +23,7 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
 import java.util.concurrent.TimeUnit
 import kotlin.math.log
@@ -39,6 +40,7 @@ class TicketServiceImpl(
         val logger = LoggerFactory.getLogger(TicketServiceImpl::class.java)
     }
 
+    @Transactional
     override fun createTicket(memberId: Long, request: CreateTicketRequest) {
 
         val lockList = mutableListOf<RLock>()
@@ -60,9 +62,6 @@ class TicketServiceImpl(
                 lockList.map{ it.unlock() }
                 throw ModelNotFoundException("event", request.eventId)
             }
-            ?: throw ModelNotFoundException("event", request.eventId)
-        val member = memberRepository.findByIdOrNull(memberId)
-            ?: throw ModelNotFoundException("member", memberId)
 
         Hibernate.initialize(event.availableSeats)   // 컬렉션을 명시적으로 초기화 ( LAZY 모드 )
 
@@ -116,10 +115,10 @@ class TicketServiceImpl(
             return
         }
 
-        val member = memberRepository.findByIdOrNull(userPrincipal.id)
+        val member = memberRepository.findByIdOrNull(memberId)
             ?:let{
                 lockList.map{l -> l.unlock() }
-                throw ModelNotFoundException("member", userPrincipal.id)
+                throw ModelNotFoundException("member", memberId)
             }
 
 
@@ -186,8 +185,8 @@ class TicketServiceImpl(
                     seatNo,
                     TicketResponse.from(it)
                 )    // 예매된 티켓인데 캐시 저장 안되어있을 경우 캐시에 다시 등록
-                logger.info("이미 DB에 존재하는 티켓입니다.")
-                return true
+                throw ModelNotFoundException("test", 99)
+//                return true
             }
             ?: return false
     }

@@ -32,7 +32,7 @@ class EventServiceImpl(
             ?: throw ModelNotFoundException("place", 0)//예외 추가 필요함
 
         //시작일과 끝나는 일 비교후 false 시 예외처리
-        check( eventRequest.startDate >= eventRequest.endDate) {
+        check( eventRequest.startDate <= eventRequest.endDate) {
             "끝나는날짜는 시작날짜보다 빠를수 없습니다."
         }
 
