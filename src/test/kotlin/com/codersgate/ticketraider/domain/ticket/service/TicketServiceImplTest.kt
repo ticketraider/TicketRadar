@@ -12,8 +12,10 @@ import com.codersgate.ticketraider.domain.member.repository.MemberRepository
 import com.codersgate.ticketraider.domain.place.model.Place
 import com.codersgate.ticketraider.domain.place.repository.PlaceRepository
 import com.codersgate.ticketraider.domain.ticket.dto.CreateTicketRequest
+import com.codersgate.ticketraider.domain.ticket.dto.SeatInfo
 import com.codersgate.ticketraider.domain.ticket.entity.TicketGrade
 import com.codersgate.ticketraider.global.error.exception.ModelNotFoundException
+import com.codersgate.ticketraider.global.infra.security.jwt.UserPrincipal
 import io.mockk.junit5.MockKExtension
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.DisplayName
@@ -43,12 +45,14 @@ class TicketServiceImplTest(
     @Test
     @DisplayName("티켓 테스트")
     fun `ticket test`() {
+
         val place = Place(
             name = "문화회관",
             totalSeat = 300,
             seatR = 50,
             seatS = 100,
-            seatA = 150
+            seatA = 150,
+            address = "서울시어쩌구"
         )
         placeRepository.save(place)
         val member = Member(
@@ -76,25 +80,25 @@ class TicketServiceImplTest(
         )
         eventService.createEvent(createEventReq)
         val getEvent = eventRepository.findByIdOrNull(1)
-        val threadCount = 10
 
-        val executorService = Executors.newFixedThreadPool(10)
+
+
+        val threadCount = 100
+        val executorService = Executors.newFixedThreadPool(100)
         val countDownLatch = CountDownLatch(threadCount)
+
         val createTicketReq = CreateTicketRequest(
             date = LocalDate.now(),
-            grade = TicketGrade.R,
-            seatNo = 15,
             eventId = getEvent!!.id!!,
-            memberId = member.id!!
         )
+        createTicketReq.seatList.add(SeatInfo(TicketGrade.R, 1))
         var success = 0
         var fail = 0
-
         //when 100개의 스레드로 동시에 티켓을 구매했을때
         repeat(threadCount) {
             executorService.submit {
                 try {
-                    ticketService.createTicket(createTicketReq)
+                    ticketService.createTicket(member.id!!, createTicketReq)
                     success++
                 } catch (e: ModelNotFoundException) { //예외처리 추가후 수정
                     fail++
@@ -111,7 +115,7 @@ class TicketServiceImplTest(
         println("fail : $fail")
 
         //then 성공50 실패50 이여야한다.
-        Assertions.assertThat(success).isEqualTo(1)
-        Assertions.assertThat(fail).isEqualTo(9)
+        Assertions.assertThat(success).isEqualTo(20)
+        Assertions.assertThat(fail).isEqualTo(80)
     }
 }

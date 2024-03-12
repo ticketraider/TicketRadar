@@ -38,7 +38,7 @@ class TicketServiceImpl(
         val logger = LoggerFactory.getLogger(TicketServiceImpl::class.java)
     }
 
-    override fun createTicket(userPrincipal: UserPrincipal, request: CreateTicketRequest) {
+    override fun createTicket(memberId: Long, request: CreateTicketRequest) {
 
         // 락 생성
         val lockList = mutableListOf<RLock>()
@@ -54,8 +54,8 @@ class TicketServiceImpl(
 
         val event = eventRepository.findByIdOrNull(request.eventId)
             ?: throw ModelNotFoundException("event", request.eventId)
-        val member = memberRepository.findByIdOrNull(userPrincipal.id)
-            ?: throw ModelNotFoundException("member", userPrincipal.id)
+        val member = memberRepository.findByIdOrNull(memberId)
+            ?: throw ModelNotFoundException("member", memberId)
 
         // 컬렉션을 명시적으로 초기화 ( LAZY 모드 )
         Hibernate.initialize(event.availableSeats)
