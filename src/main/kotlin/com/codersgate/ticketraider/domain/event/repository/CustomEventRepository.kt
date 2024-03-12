@@ -11,5 +11,4 @@ interface CustomEventRepository {
 
     fun findByPageableAndCount(pageable: Pageable): Page<Event?>
 
-//    fun getPaginatedCountList
 }
