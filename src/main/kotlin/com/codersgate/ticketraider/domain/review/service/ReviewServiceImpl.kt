@@ -28,7 +28,7 @@ class ReviewServiceImpl(
 
         // 티켓 내역 확인
         val ticket =  member.tickets.find{
-            it.event.id == request.eventId && it.ticketStatus != TicketStatus.UNPAID
+            it.event.id == request.eventId && it.ticketStatus == TicketStatus.EXPIRED
         }?: throw IllegalStateException("Expired ticket not found for event id: ${request.eventId}")
 
         reviewRepository.save(

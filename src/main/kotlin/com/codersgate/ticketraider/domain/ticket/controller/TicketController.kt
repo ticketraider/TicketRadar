@@ -79,7 +79,7 @@ class TicketController(
     ): ResponseEntity<Unit> {
         return ResponseEntity
             .status(HttpStatus.CREATED)
-            .body(ticketService.updateTicket(ticketId, ticketStatus))
+            .body(ticketService.updateTicketStatus(ticketId, ticketStatus))
     }
 
     @Scheduled(cron = "0 0 12 * * MON-FRI") // 매주 월요일부터 금요일까지 매일 정오(12시)에 메서드가 실행
@@ -123,11 +123,10 @@ class TicketController(
     @DeleteMapping("/delete/{ticketId}")
     fun deleteTicket(
         @PathVariable ticketId: Long,
-        @AuthenticationPrincipal userPrincipal: UserPrincipal
     ): ResponseEntity<Unit> {
         return ResponseEntity
             .status(HttpStatus.OK)
-            .body(ticketService.deleteTicket(ticketId, userPrincipal))
+            .body(ticketService.deleteTicket(ticketId))
     }
 
 
