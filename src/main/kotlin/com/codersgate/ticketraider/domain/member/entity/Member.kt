@@ -27,14 +27,14 @@ class Member(
     @Column(name = "role", nullable = false)
     val role: MemberRole,
 
-    @OneToMany(mappedBy = "member", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
     val tickets: List<Ticket> = emptyList(),
 
-    @OneToMany(mappedBy = "member", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
     val likes: List<Like> = emptyList(),
 
-    @OneToMany(mappedBy = "member", fetch = FetchType.EAGER)
-    val reviews: List<Review> = emptyList()
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
+    val reviews: List<Review> = emptyList(),
 
 ) : BaseEntity() {
     @Id
