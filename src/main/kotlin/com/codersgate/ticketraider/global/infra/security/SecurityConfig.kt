@@ -1,8 +1,8 @@
 package com.codersgate.ticketraider.global.infra.security
 
 
-import com.codersgate.ticketraider.domain.oauth.service.OAuth2LoginSuccessHandler
-import com.codersgate.ticketraider.domain.oauth.service.OAuth2UserService
+import com.codersgate.ticketraider.domain.member.service.OAuth2LoginSuccessHandler
+import com.codersgate.ticketraider.domain.member.service.OAuth2UserService
 import com.codersgate.ticketraider.global.infra.security.jwt.JwtAuthenticationFilter
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
