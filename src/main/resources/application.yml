@@ -93,6 +93,9 @@ logging:
             bind: trace
       springframework:
         security: debug
+
+server:
+  port: 8081
 ---
 spring:
   config:
