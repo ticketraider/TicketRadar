@@ -13,7 +13,7 @@ import java.time.LocalDate
 
 interface TicketService {
 
-    fun createTicket(userPrincipal: UserPrincipal, request: CreateTicketRequest)
+    fun createTicket(memberId: Long, request: CreateTicketRequest)
     //fun chkTicketCache(eventId:Long, date: LocalDate, grade:TicketGrade, seatNo:Int) : Boolean?
 
     fun getAllTicketList(pageable:Pageable, memberId:Long?, eventId:Long?) : Page<TicketResponse>

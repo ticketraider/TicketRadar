@@ -32,7 +32,7 @@ class TicketController(
     ): ResponseEntity<Unit> {
         return ResponseEntity
             .status(HttpStatus.CREATED)
-            .body(ticketService.createTicket(userPrincipal, request))
+            .body(ticketService.createTicket(userPrincipal.id, request))
     }
 
     // 조건별 티켓 조회

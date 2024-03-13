@@ -12,9 +12,15 @@ import com.codersgate.ticketraider.domain.member.repository.MemberRepository
 import com.codersgate.ticketraider.domain.place.model.Place
 import com.codersgate.ticketraider.domain.place.repository.PlaceRepository
 import com.codersgate.ticketraider.domain.ticket.dto.CreateTicketRequest
+import com.codersgate.ticketraider.domain.ticket.dto.SeatInfo
 import com.codersgate.ticketraider.domain.ticket.entity.TicketGrade
 import com.codersgate.ticketraider.global.error.exception.ModelNotFoundException
+import com.codersgate.ticketraider.global.error.exception.TicketReservationFailedException
+import com.codersgate.ticketraider.global.infra.redis.lock.RedissonLockService
+import com.codersgate.ticketraider.global.infra.security.jwt.UserPrincipal
 import io.mockk.junit5.MockKExtension
+import kotlinx.coroutines.Delay
+import kotlinx.coroutines.delay
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -37,18 +43,20 @@ class TicketServiceImplTest(
     @Autowired val categoryRepository: CategoryRepository,
     @Autowired val ticketService: TicketService,
     @Autowired val eventService: EventService,
-    @Autowired val priceRepository: PriceRepository
+    @Autowired val redissonLockService: RedissonLockService
 ) {
 
     @Test
     @DisplayName("티켓 테스트")
     fun `ticket test`() {
+
         val place = Place(
             name = "문화회관",
             totalSeat = 300,
             seatR = 50,
             seatS = 100,
-            seatA = 150
+            seatA = 150,
+            address = "서울시어쩌구"
         )
         placeRepository.save(place)
         val member = Member(
@@ -67,7 +75,7 @@ class TicketServiceImplTest(
             posterImage = "string",
             categoryId = getCate.id!!,
             eventInfo = "String",
-            _startDate = "2024-03-15",
+            _startDate = "2024-03-10",
             _endDate = "2024-03-17",
             place = "문화회관",
             seatRPrice = 150000,
@@ -76,29 +84,27 @@ class TicketServiceImplTest(
         )
         eventService.createEvent(createEventReq)
         val getEvent = eventRepository.findByIdOrNull(1)
-        val threadCount = 10
 
+
+        val threadCount = 50
         val executorService = Executors.newFixedThreadPool(10)
         val countDownLatch = CountDownLatch(threadCount)
+
+        var success = 0
+        var total = 0
         val createTicketReq = CreateTicketRequest(
             date = LocalDate.now(),
-            grade = TicketGrade.R,
-            seatNo = 15,
             eventId = getEvent!!.id!!,
-            memberId = member.id!!
         )
-        var success = 0
-        var fail = 0
-
-        //when 100개의 스레드로 동시에 티켓을 구매했을때
+        //when 10개의 스레드로 동시에 티켓을 구매했을때
         repeat(threadCount) {
             executorService.submit {
                 try {
-                    ticketService.createTicket(createTicketReq)
+                    createTicketReq.seatList.add(SeatInfo(TicketGrade.R, 1))
+                    ticketService.createTicket(member.id!!, createTicketReq)
                     success++
-                } catch (e: ModelNotFoundException) { //예외처리 추가후 수정
-                    fail++
-                } finally {
+                }  finally {
+                    total++
                     countDownLatch.countDown()
                 }
             }
@@ -106,12 +112,12 @@ class TicketServiceImplTest(
         countDownLatch.await()
 
         // 시도한 횟수랑 = 실패 + 성공 횟수 같아야함.
-        // 성공 횟수가 100이 아닌거는 동시성 문제해결.
+        // 성공 횟수가 10이 아닌거는 동시성 문제해결.
         println("success : $success")
-        println("fail : $fail")
+        println("total : $total")
 
-        //then 성공50 실패50 이여야한다.
+        //then 성공1 실패9 이여야한다.
         Assertions.assertThat(success).isEqualTo(1)
-        Assertions.assertThat(fail).isEqualTo(9)
+        Assertions.assertThat(total).isEqualTo(50)
     }
 }
