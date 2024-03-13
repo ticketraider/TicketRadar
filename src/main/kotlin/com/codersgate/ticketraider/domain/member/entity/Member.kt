@@ -46,3 +46,10 @@ class Member(
         this.nickname = nickname
     }
 }
+enum class MemberRole {
+    ADMIN, MEMBER
+}
+
+enum class Provider {
+    KAKAO, NAVER, GOOGLE, COMMON
+}
