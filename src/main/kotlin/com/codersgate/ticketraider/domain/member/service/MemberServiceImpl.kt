@@ -111,8 +111,9 @@ class MemberServiceImpl(
 
     @Transactional
     override fun unregister(user: UserPrincipal) {
-        val member = memberRepository.findByIdOrNull(user.id)
+        val member = memberRepository.findByEmail(user.email)
             ?: throw InvalidCredentialException("")
         memberRepository.delete(member)
+        providerMapRepository.deleteById(member.id!!)
     }
 }
