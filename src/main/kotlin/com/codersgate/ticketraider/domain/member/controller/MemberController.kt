@@ -57,12 +57,12 @@ class MemberController(
     @PreAuthorize("hasAnyRole('MEMBER', 'ADMIN')")
     @PutMapping("/update")
     fun updateProfile(
-        @Valid @RequestBody memberRequest: MemberRequest,
+        @Valid @RequestBody updateProfileRequest: UpdateProfileRequest,
         @AuthenticationPrincipal user: UserPrincipal
     ): ResponseEntity<Unit> {
         return ResponseEntity
             .status(HttpStatus.OK)
-            .body(memberService.updateProfile(memberRequest, user))
+            .body(memberService.updateProfile(updateProfileRequest, user))
     }
 
     @Operation(summary = "회원 탈퇴")

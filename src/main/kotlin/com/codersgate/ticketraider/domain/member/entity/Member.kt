@@ -41,8 +41,7 @@ class Member(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null
 
-    fun updateProfile(email: String, password: String, nickname: String) {
-        this.email = email
+    fun updateProfile(password: String, nickname: String) {
         this.password = password
         this.nickname = nickname
     }

@@ -61,11 +61,11 @@ class MemberServiceImpl(
     }
 
     @Transactional
-    override fun updateProfile(memberRequest: MemberRequest, user: UserPrincipal) {
+    override fun updateProfile(updateProfileRequest: UpdateProfileRequest, user: UserPrincipal) {
         val member = memberRepository.findByIdOrNull(user.id)
             ?: throw InvalidCredentialException("")
-        val changedPassword = passwordEncoder.encode(memberRequest.password)
-        member.updateProfile(memberRequest.email, changedPassword, memberRequest.nickname)
+        val changedPassword = passwordEncoder.encode(updateProfileRequest.password)
+        member.updateProfile(changedPassword, updateProfileRequest.nickname)
     }
 
     @Transactional

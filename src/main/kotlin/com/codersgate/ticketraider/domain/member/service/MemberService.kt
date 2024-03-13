@@ -14,7 +14,7 @@ interface MemberService {
 
     fun getProfile(memberId: Long): MemberResponse
 
-    fun updateProfile(memberRequest: MemberRequest, user: UserPrincipal)
+    fun updateProfile(updateProfileRequest: UpdateProfileRequest, user: UserPrincipal)
 
     fun unregister(user: UserPrincipal)
 }
