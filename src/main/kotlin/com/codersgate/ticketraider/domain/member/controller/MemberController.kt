@@ -1,9 +1,6 @@
 package com.codersgate.ticketraider.domain.member.controller
 
-import com.codersgate.ticketraider.domain.member.dto.LoginRequest
-import com.codersgate.ticketraider.domain.member.dto.LoginResponse
-import com.codersgate.ticketraider.domain.member.dto.MemberResponse
-import com.codersgate.ticketraider.domain.member.dto.MemberRequest
+import com.codersgate.ticketraider.domain.member.dto.*
 import com.codersgate.ticketraider.domain.member.entity.MemberRole
 import com.codersgate.ticketraider.domain.member.service.MemberService
 import com.codersgate.ticketraider.global.infra.security.jwt.UserPrincipal
@@ -26,7 +23,7 @@ class MemberController(
     @PostMapping("/signUp")
     fun signUp(
         @Valid @RequestBody memberRequest: MemberRequest,
-        @RequestParam role : MemberRole
+        @RequestParam role: MemberRole
     ): ResponseEntity<Unit> {
         return ResponseEntity
             .status(HttpStatus.OK)
@@ -46,7 +43,7 @@ class MemberController(
     @Operation(summary = "프로필 조회")
     @GetMapping("/members/{memberId}")
     fun getProfile(
-       @PathVariable memberId: Long
+        @PathVariable memberId: Long
     ): ResponseEntity<MemberResponse> {
         return ResponseEntity
             .status(HttpStatus.OK)
@@ -75,16 +72,5 @@ class MemberController(
             .status(HttpStatus.OK)
             .body(memberService.unregister(user))
     }
-
-    // 로그아웃 구현?
-//    @Operation(summary = "로그아웃")
-//    @PreAuthorize("hasAnyRole('MEMBER')")
-//    @DeleteMapping("/members/logout")
-//    fun logout(
-//        @AuthenticationPrincipal user: UserPrincipal
-//    ): ResponseEntity<Unit> {
-//        return ResponseEntity
-//            .status(HttpStatus.OK)
-//            .body(memberService.logout(user))
-//    }
 }
+

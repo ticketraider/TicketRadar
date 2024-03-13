@@ -1,4 +1,4 @@
-package com.codersgate.ticketraider.domain.oauth.dto
+package com.codersgate.ticketraider.domain.member.dto
 
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest
@@ -36,8 +36,6 @@ data class OAuth2UserInfo(
             val account = originUser.attributes["kakao_account"] as Map<*, *>
             val email = account["email"] ?: ""
 
-//            val accessToken = userRequest.accessToken.tokenValue
-
             return OAuth2UserInfo(
                 id = (originUser.attributes[userNameAttributeName] as Long).toString(),
                 provider = provider.uppercase(),
@@ -47,7 +45,6 @@ data class OAuth2UserInfo(
         }
         private fun ofNaver(provider: String, userRequest: OAuth2UserRequest, originUser: OAuth2User): OAuth2UserInfo {
             val profile = originUser.attributes["response"] as Map<*, *>
-//            val userNameAttributeName = userRequest.clientRegistration.providerDetails.userInfoEndpoint.userNameAttributeName
             val nickname = profile["nickname"] ?: ""
             val email = profile["email"] ?: ""
 
