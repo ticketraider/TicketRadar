@@ -7,7 +7,6 @@ import com.codersgate.ticketraider.domain.event.model.Event
 import com.codersgate.ticketraider.domain.event.repository.EventRepository
 import com.codersgate.ticketraider.domain.event.repository.price.PriceRepository
 import com.codersgate.ticketraider.domain.event.repository.seat.AvailableSeatRepository
-import com.codersgate.ticketraider.domain.place.model.Place
 import com.codersgate.ticketraider.domain.place.repository.PlaceRepository
 import com.codersgate.ticketraider.global.error.exception.ModelNotFoundException
 import org.springframework.data.domain.Page
@@ -32,7 +31,7 @@ class EventServiceImpl(
             ?: throw ModelNotFoundException("place", 0)//예외 추가 필요함
 
         //시작일과 끝나는 일 비교후 false 시 예외처리
-        check( eventRequest.startDate <= eventRequest.endDate) {
+        check(eventRequest.startDate <= eventRequest.endDate) {
             "끝나는날짜는 시작날짜보다 빠를수 없습니다."
         }
 
@@ -104,6 +103,7 @@ class EventServiceImpl(
         return EventResponse.from(event)
     }
 }
+
 private fun checkSeatForUpdateAndCreate(event: Event, request: EventRequest, seatRepository: AvailableSeatRepository) {
     val date = event.startDate
     val duration = event.endDate.compareTo(event.startDate)
@@ -118,8 +118,8 @@ private fun checkSeatForUpdateAndCreate(event: Event, request: EventRequest, sea
     }
     //해당 이벤트id로 모든 Seat를 불러옴 > 정해둔 기간 외에 날짜는 삭제처리
     val seatList = seatRepository.findAllByEventId(event.id!!)
-    seatList.map{
-        if(it!!.date.isBefore(event.startDate) || it.date.isAfter(event.endDate)){
+    seatList.map {
+        if (it!!.date.isBefore(event.startDate) || it.date.isAfter(event.endDate)) {
             it.isDeleted = true
         }
     }

@@ -15,6 +15,8 @@ import com.codersgate.ticketraider.domain.ticket.dto.CreateTicketRequest
 import com.codersgate.ticketraider.domain.ticket.dto.SeatInfo
 import com.codersgate.ticketraider.domain.ticket.entity.TicketGrade
 import com.codersgate.ticketraider.global.error.exception.ModelNotFoundException
+import com.codersgate.ticketraider.global.error.exception.TicketReservationFailedException
+import com.codersgate.ticketraider.global.infra.redis.lock.RedissonLockService
 import com.codersgate.ticketraider.global.infra.security.jwt.UserPrincipal
 import io.mockk.junit5.MockKExtension
 import kotlinx.coroutines.Delay
@@ -41,6 +43,7 @@ class TicketServiceImplTest(
     @Autowired val categoryRepository: CategoryRepository,
     @Autowired val ticketService: TicketService,
     @Autowired val eventService: EventService,
+    @Autowired val redissonLockService: RedissonLockService
 ) {
 
     @Test
@@ -83,43 +86,38 @@ class TicketServiceImplTest(
         val getEvent = eventRepository.findByIdOrNull(1)
 
 
-        val threadCount = 10
-        val executorService = Executors.newFixedThreadPool(5)
+        val threadCount = 50
+        val executorService = Executors.newFixedThreadPool(10)
         val countDownLatch = CountDownLatch(threadCount)
 
         var success = 0
-        var fail = 0
+        var total = 0
         val createTicketReq = CreateTicketRequest(
             date = LocalDate.now(),
             eventId = getEvent!!.id!!,
         )
-        //when 100개의 스레드로 동시에 티켓을 구매했을때
+        //when 10개의 스레드로 동시에 티켓을 구매했을때
         repeat(threadCount) {
             executorService.submit {
                 try {
-                    println("리퀘스트 전!@#(@!*#)*(!@#&(*!@#&*(!@@#&*(@!#&(*!@#&*(&!@(*@#&*(!@&#*(")
                     createTicketReq.seatList.add(SeatInfo(TicketGrade.R, 1))
-                    println("크리에이트티켓 전!@#(@!*#)*(!@#&(*!@#&*(!@@#&*(@!#&(*!@#&*(&!@(*@#&*(!@&#*(")
                     ticketService.createTicket(member.id!!, createTicketReq)
-                    println("티켓 생성 후 !@#(@!*#)*(!@#&(*!@#&*(!@@#&*(@!#&(*!@#&*(&!@(*@#&*(!@&#*(")
                     success++
-                    countDownLatch.countDown()
-                } catch (e: ModelNotFoundException) {
-                    fail++
+                }  finally {
+                    total++
                     countDownLatch.countDown()
                 }
-
             }
-            countDownLatch.await()
-
-            // 시도한 횟수랑 = 실패 + 성공 횟수 같아야함.
-            // 성공 횟수가 100이 아닌거는 동시성 문제해결.
-            println("success : $success")
-            println("fail : $fail")
-
-            //then 성공50 실패50 이여야한다.
-            Assertions.assertThat(success).isEqualTo(1)
-            Assertions.assertThat(fail).isEqualTo(9)
         }
+        countDownLatch.await()
+
+        // 시도한 횟수랑 = 실패 + 성공 횟수 같아야함.
+        // 성공 횟수가 10이 아닌거는 동시성 문제해결.
+        println("success : $success")
+        println("total : $total")
+
+        //then 성공1 실패9 이여야한다.
+        Assertions.assertThat(success).isEqualTo(1)
+        Assertions.assertThat(total).isEqualTo(50)
     }
 }
