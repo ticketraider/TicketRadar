@@ -129,5 +129,4 @@ class MemberServiceImpl(
             }
             ?: throw InvalidCredentialException("")
     }
-
 }
