@@ -11,7 +11,7 @@ interface MemberService {
     fun socialSignUpOrLogin(userInfo: OAuth2UserInfo): Any?
     fun socialSignUpAndRegister(id: String, nickname: String, email: String, provider: Provider): Member
     fun login(loginRequest: LoginRequest): LoginResponse
-
+    fun socialLogin(userInfo: OAuth2UserInfo): LoginResponse
     fun getProfile(memberId: Long): MemberResponse
 
     fun updateProfile(updateProfileRequest: UpdateProfileRequest, user: UserPrincipal)

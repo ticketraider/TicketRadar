@@ -72,5 +72,14 @@ class MemberController(
             .status(HttpStatus.OK)
             .body(memberService.unregister(user))
     }
+    @Operation(summary = "재가입")
+    @PutMapping("/rejoin")
+    fun rejoin(
+        @RequestBody loginRequest: LoginRequest
+    ): ResponseEntity<Unit> {
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(memberService.rejoin(loginRequest))
+    }
 }
 
