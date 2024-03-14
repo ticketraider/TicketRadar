@@ -67,6 +67,16 @@ class MemberServiceImpl(
             )
         )
     }
+    override fun socialLogin(userInfo: OAuth2UserInfo): LoginResponse {
+        val member = memberRepository.findByEmail(userInfo.email)
+            ?: throw InvalidCredentialException("")
+        return LoginResponse(jwtPlugin.generateAccessToken(
+                subject = member.id.toString(),
+                email = member.email,
+                role = member.role.name
+            )
+        )
+    }
 
     @Transactional
     override fun socialSignUpOrLogin(userInfo: OAuth2UserInfo): Any? {
