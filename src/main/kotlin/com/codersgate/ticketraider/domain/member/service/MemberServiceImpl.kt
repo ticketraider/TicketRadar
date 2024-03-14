@@ -114,20 +114,6 @@ class MemberServiceImpl(
         val member = memberRepository.findByEmail(user.email)
             ?: throw InvalidCredentialException("")
         memberRepository.delete(member)
-        providerMapRepository.deleteByMemberId(member.id!!)
+        providerMapRepository.deleteById(member.id!!)
     }
-
-    @Transactional
-    override fun rejoin(loginRequest: LoginRequest) {
-
-        memberRepository.restoreMemberByEmail(loginRequest.email)
-            ?.let {
-                check(passwordEncoder.matches(loginRequest.password, it.password))
-                it.isDeleted = false
-                providerMapRepository.restoreProviderMapByMemberId(it.id!!)
-                    ?.isDeleted = false
-            }
-            ?: throw InvalidCredentialException("")
-    }
-
 }

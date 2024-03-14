@@ -40,7 +40,6 @@ class SecurityConfig(
                 it.requestMatchers(
                     "/members/login",
                     "/members/signUp",
-                    "/members/rejoin",
                     "/swagger-ui/**",
                     "/v3/api-docs/**",
                     "/oauth2/**"

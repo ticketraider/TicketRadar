@@ -17,5 +17,4 @@ interface MemberService {
     fun updateProfile(updateProfileRequest: UpdateProfileRequest, user: UserPrincipal)
 
     fun unregister(user: UserPrincipal)
-    fun rejoin(loginRequest: LoginRequest)
 }
