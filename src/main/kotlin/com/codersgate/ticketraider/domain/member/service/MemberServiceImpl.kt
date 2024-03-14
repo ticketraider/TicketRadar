@@ -116,4 +116,18 @@ class MemberServiceImpl(
         memberRepository.delete(member)
         providerMapRepository.deleteByMemberId(member.id!!)
     }
+
+    @Transactional
+    override fun rejoin(loginRequest: LoginRequest) {
+
+        memberRepository.restoreMemberByEmail(loginRequest.email)
+            ?.let {
+                check(passwordEncoder.matches(loginRequest.password, it.password))
+                it.isDeleted = false
+                providerMapRepository.restoreProviderMapByMemberId(it.id!!)
+                    ?.isDeleted = false
+            }
+            ?: throw InvalidCredentialException("")
+    }
+
 }
