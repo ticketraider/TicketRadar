@@ -41,7 +41,7 @@ class MemberController(
     }
 
     @Operation(summary = "프로필 조회")
-    @GetMapping("/{memberId}")
+    @GetMapping("/members/{memberId}")
     fun getProfile(
         @PathVariable memberId: Long
     ): ResponseEntity<MemberResponse> {
@@ -64,23 +64,13 @@ class MemberController(
 
     @Operation(summary = "회원 탈퇴")
     @PreAuthorize("hasAnyRole('MEMBER', 'ADMIN')")
-    @DeleteMapping("/unregister")
+    @DeleteMapping("/members/unregister")
     fun unregister(
         @AuthenticationPrincipal user: UserPrincipal
     ): ResponseEntity<Unit> {
         return ResponseEntity
             .status(HttpStatus.OK)
             .body(memberService.unregister(user))
-    }
-
-    @Operation(summary = "재가입")
-    @PutMapping("/rejoin")
-    fun rejoin(
-        @RequestBody loginRequest: LoginRequest
-    ): ResponseEntity<Unit> {
-        return ResponseEntity
-            .status(HttpStatus.OK)
-            .body(memberService.rejoin(loginRequest))
     }
 }
 

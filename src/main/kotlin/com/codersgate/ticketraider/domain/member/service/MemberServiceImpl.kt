@@ -114,7 +114,7 @@ class MemberServiceImpl(
         val member = memberRepository.findByEmail(user.email)
             ?: throw InvalidCredentialException("")
         memberRepository.delete(member)
-        providerMapRepository.deleteByMemberId(member.id!!)
+        providerMapRepository.deleteById(member.id!!)
     }
 
     @Transactional
@@ -129,4 +129,5 @@ class MemberServiceImpl(
             }
             ?: throw InvalidCredentialException("")
     }
+
 }
