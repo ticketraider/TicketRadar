@@ -1,6 +1,6 @@
 package com.codersgate.ticketraider.domain.member.entity
 
-mport com.codersgate.ticketraider.domain.like.model.Like
+import com.codersgate.ticketraider.domain.like.model.Like
 import com.codersgate.ticketraider.domain.review.model.Review
 import com.codersgate.ticketraider.domain.ticket.entity.Ticket
 import com.codersgate.ticketraider.global.common.BaseEntity
