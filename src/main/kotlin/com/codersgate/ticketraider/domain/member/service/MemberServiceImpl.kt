@@ -114,6 +114,6 @@ class MemberServiceImpl(
         val member = memberRepository.findByEmail(user.email)
             ?: throw InvalidCredentialException("")
         memberRepository.delete(member)
-        providerMapRepository.deleteById(member.id!!)
+        providerMapRepository.deleteByMemberId(member.id!!)
     }
 }
