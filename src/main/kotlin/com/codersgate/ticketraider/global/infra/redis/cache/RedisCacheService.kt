@@ -7,9 +7,7 @@ import com.codersgate.ticketraider.global.error.exception.ModelNotFoundException
 import org.slf4j.LoggerFactory
 import org.springframework.cache.CacheManager
 import org.springframework.data.redis.core.RedisTemplate
-import org.springframework.data.redis.core.ZSetOperations
 import org.springframework.stereotype.Service
-import java.util.stream.Collectors
 
 
 @Service
@@ -29,28 +27,29 @@ class RedisCacheService (
     fun searchEvent(eventTitle: String): EventResponse {
 
         // 캐시에 있으면 바로 반환
-        val value : EventResponse? = chkCache(CacheTarget.EVENT,eventTitle)
-
-        if (value != null){
+        if (chkCache(CacheTarget.EVENT,eventTitle)){
             //캐싱 시간 초기화
             refreshCacheTtl(CacheTarget.EVENT, eventTitle)
-            return value
+            val value =  getCachedValue(CacheTarget.EVENT, eventTitle)
+                ?.let{
+                    return it
+                }
         }
 
         // 없으면 찾아서 반환
-        val event =  getEventByTitle(eventTitle)
+        val eventResponse =  getEventByTitle(eventTitle)
 
         // 캐시에 등록.
-        putCache(CacheTarget.EVENT, eventTitle, event)
+        putCache(CacheTarget.EVENT, eventTitle, eventResponse)
 
         // 인기도 증가
-        setScoreForKeyword(CacheTarget.EVENT,  eventTitle, event)
+//        setScoreForKeyword(CacheTarget.EVENT,  eventTitle, event)
 
 
 //        val membersWithScores = redisTemplate.opsForZSet().rangeWithScores("event", 0, -1)
 //        logger.info("캐시멤버와 스코어 :  $membersWithScores")
 
-        return event
+        return eventResponse
     }
 
     fun getEventByTitle(eventTitle : String) : EventResponse{
@@ -59,43 +58,50 @@ class RedisCacheService (
             ?: throw ModelNotFoundException("Event", null)
     }
 
+    fun getCachedValue(target: CacheTarget, key:String ): EventResponse? {
+        logger.info("${target.name} 캐시 값 가져오기 시작")
+        val cache = cacheManager.getCache(target.name)
+        val value = cache?.get(key)?.get() // 캐시에서 가져온 값. LinkedHashMap 형태.
 
-    fun chkCache(target: CacheTarget, key:String ): EventResponse? {
+        // cachedValue를 EventResponse로 변환
+        val eventResponse: EventResponse? = if (value is LinkedHashMap<*, *>) {
+            EventResponse.mapToEventResponse(value)
+        } else {
+            null
+        }
+        return eventResponse
+
+    }
+
+    fun chkCache(target: CacheTarget, key:String ): Boolean {
         logger.info("${target.name} 캐시 확인 시작")
         val cache = cacheManager.getCache(target.name)
         val value = cache?.get(key)?.get()
 
-        if (value != null) {    // 캐시에 일치하는 키 있을 때
+        if (value != null) {
             logger.info("캐시 적중 !! : $key")
             logger.info("값 : $value")
-
-            // cachedValue를 EventResponse로 변환
-            val eventResponse: EventResponse? = if (value is LinkedHashMap<*, *>) {
-                EventResponse.mapToEventResponse(value)
-            } else {
-                null // 캐시에서 가져온 값이 LinkedHashMap이 아닌 경우에 대한 처리
-            }
-            return eventResponse
-
-        } else {   // 캐시에 일치하는 키 없을 때
+            return true
+        } else {
             logger.info("캐시 실패 !! : $key")
-            return null
+            return false
         }
     }
 
-    fun putCache(target:CacheTarget, key: String, value : Any){
-        logger.info("캐시에 등록 :  $key , $value")
+    fun putCache(target:CacheTarget, key: String, eventResponse : EventResponse){
+        logger.info("캐시에 등록 :  $key , $eventResponse")
         val cache = cacheManager.getCache(target.name)
-        cache?.put(key, value) // 등록
+        cache?.put(key, eventResponse) // 등록
+        logger.info("실제 등록 :  $key , ${cache?.get(key)}")
     }
 
     fun refreshCacheTtl(target: CacheTarget, key: String) {
         logger.info("캐시에 재등록 :  $key ")
         val cache = cacheManager.getCache(target.name)
-        cache?.get(key)?.let { value ->
-            cache.evict(key) // 캐시 삭제
-            cache.put(key, value) // 다시 등록
-        }
+        val value = cache?.get(key)?.get() // get 한번 더 안하면 [{}] ?
+        cache?.evict(key) // 캐시 삭제
+        cache?.put(key, value) // 다시 등록
+        logger.info("실제 재등록 : ${cache?.get(key)}")
     }
 
     // 인기검색어 리스트 1위~10위까지
