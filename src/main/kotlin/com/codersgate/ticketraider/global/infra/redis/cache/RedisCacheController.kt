@@ -14,10 +14,8 @@ class RedisCacheController(
 ) {
     @PostMapping("/search")
     fun search(
-        @RequestParam keyword: String,
-        @RequestParam(required = false) eventId: Long?,
-        @RequestParam(required = false) eventTitle: String?,
+        @RequestParam eventTitle: String,
     ) : ResponseEntity<EventResponse> {
-        return ResponseEntity.status(HttpStatus.OK).body(redisCacheService.searchEvent(keyword, eventId, eventTitle))
+        return ResponseEntity.status(HttpStatus.OK).body(redisCacheService.searchEvent(eventTitle))
     }
 }
