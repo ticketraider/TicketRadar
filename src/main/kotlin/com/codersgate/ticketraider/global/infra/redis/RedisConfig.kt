@@ -49,8 +49,8 @@ class RedisConfig {
     @Bean
     fun redisTemplate(
         redisConnectionFactory: RedisConnectionFactory
-    ): RedisTemplate<String, String> {
-        val template = RedisTemplate<String, String>()
+    ): RedisTemplate<String, Any> {
+        val template = RedisTemplate<String, Any>()
         template.connectionFactory = redisConnectionFactory
 
         //String 자료구조를 위한 Serializer
@@ -58,8 +58,8 @@ class RedisConfig {
         template.valueSerializer = StringRedisSerializer()
 
         //Hash 자료구조를 위한 Serializer
-        template.hashKeySerializer = StringRedisSerializer()
-        template.hashValueSerializer = StringRedisSerializer()
+//        template.hashKeySerializer = StringRedisSerializer()
+//        template.hashValueSerializer = StringRedisSerializer()
 
         return template
     }
