@@ -4,13 +4,13 @@
     width="300"
 >
 <v-img
-    height="200px"
-    src="https://cdn.vuetifyjs.com/images/cards/sunshine.jpg"
+    height="400px"
+    src="../assets/SampleImg.webp"
     cover
 ></v-img>
 
 <v-card-title>
-  테스트공연 1
+  오페라의 유령
 </v-card-title>
 
 <v-card-subtitle>
@@ -34,6 +34,6 @@
 import { useRouter } from "vue-router";
 const router = useRouter();
 const join = () => {
-  router.push({ path: "/move" });
+  router.push({ path: "/event" });
 };
 </script>

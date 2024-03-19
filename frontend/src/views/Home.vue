@@ -8,26 +8,23 @@
     <title>Ticket Radar</title>
   </head>
   <body>
-  <header>
-    <HeaderView/>
-  </header>
-
   <main>
-    <div style="width: 1600px; padding:10px; display: flex; margin: 0 auto;">
-      <CardView/>
-      <CardView/>
-      <CardView/>
-      <CardView/>
-      <CardView/>
+    <div style="height: 1300px; width: 100%; padding: 100px;">
+      <div style="width: 1600px; padding:10px; display: flex; margin: 0 auto;">
+        <CardView/>
+        <CardView/>
+        <CardView/>
+        <CardView/>
+        <CardView/>
+      </div>
+      <div style="width: 1600px; padding:10px; display: flex; margin: 0 auto;">
+        <CardView/>
+        <CardView/>
+        <CardView/>
+        <CardView/>
+        <CardView/>
+      </div>
     </div>
-    <div style="width: 1600px; padding:10px; display: flex; margin: 0 auto;">
-      <CardView/>
-      <CardView/>
-      <CardView/>
-      <CardView/>
-      <CardView/>
-    </div>
-    <router-view />
   </main>
 
   <footer>
@@ -40,14 +37,11 @@
 @import "../css/styles/TestStyle.css";
 </style>
 <script>
-import CardView from "@/components/CardView.vue";
-import HeaderView from "@/components/HeaderView.vue";
+import CardView from "@/components/EventCard.vue";
 export default {
   name: 'App',
 
   components: {
-
-    HeaderView,
     CardView
   },
 
