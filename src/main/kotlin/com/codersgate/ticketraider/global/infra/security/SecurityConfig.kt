@@ -38,6 +38,7 @@ class SecurityConfig(
                 it.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             }.authorizeHttpRequests {
                 it.requestMatchers(
+                    "/**",
                     "/members/login",
                     "/members/signUp",
                     "/swagger-ui/**",
