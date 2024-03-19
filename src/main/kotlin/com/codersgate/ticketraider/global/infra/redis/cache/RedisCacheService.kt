@@ -80,29 +80,8 @@ class RedisCacheService (
         // 값이 존재하고, ValueWrapper가 null이 아닌 경우에만 실제 값을 얻어옴
         val eventResponse: EventResponse? = value?.get() as? EventResponse
 
-        // EventResponse 객체에서 필요한 데이터에 접근하여 사용
-//        eventResponse?.let {
-//            val id = it.id
-//            val title = it.title
-//            val likeCount = it.likeCount
-//            val startDate = it.startDate
-//            val endDate = it.endDate
-//            val eventInfo = it.eventInfo
-//            val averageRating = it.averageRating
-//            val posterImage = it.posterImage
-//            val place = it.place
-//            val price = it.price
-//            val reviewCount = it.reviewCount
-//        }
         return eventResponse
     }
-
-//        // cachedValue를 EventResponse로 변환
-//        val eventResponse: EventResponse? = if (value is LinkedHashMap<*, *>) {
-//            EventResponse.mapToEventResponse(value)
-//        } else {
-//            null
-//        }
 
 
     fun chkCache(target: CacheTarget, key:String ): Boolean {
