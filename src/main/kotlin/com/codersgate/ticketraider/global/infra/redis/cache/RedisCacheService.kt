@@ -1,9 +1,7 @@
 package com.codersgate.ticketraider.global.infra.redis.cache
 
 import com.codersgate.ticketraider.domain.event.dto.EventResponse
-import com.codersgate.ticketraider.domain.event.dto.price.PriceResponse
 import com.codersgate.ticketraider.domain.event.repository.EventRepository
-import com.codersgate.ticketraider.domain.event.service.EventService
 import com.codersgate.ticketraider.global.error.exception.ModelNotFoundException
 import org.slf4j.LoggerFactory
 import org.springframework.cache.CacheManager
@@ -14,31 +12,14 @@ import org.springframework.stereotype.Service
 @Service
 class RedisCacheService (
     private val redisTemplate: RedisTemplate<String, Any>,
-    private val eventService: EventService,
     private val eventRepository: EventRepository,
     private val cacheManager: CacheManager,
 ){
     companion object{
         val logger = LoggerFactory.getLogger(RedisCacheService::class.java)
-        enum class CacheTarget {
-            EVENT, TICKET
-        }
     }
 
     fun searchEvent(eventTitle: String): EventResponse {
-
-        logger.info("캐시에 등록 :  testInt , 12345")
-        val cache = cacheManager.getCache("TEST")
-        cache?.put("testInt" , 12345) // 등록
-        cache?.put("testString" , "12345") // 등록
-        cache?.put("testFloat" , 12.345) // 등록
-        var i = cache?.get("testInt")?.get()
-        var s = cache?.get("testString")?.get()
-        var f = cache?.get("testFloat")?.get()
-        logger.info("실제 등록 :  , ${cache?.get("testInt")} ")
-        logger.info("실제 등록 :  , ${cache?.get("testString")}")
-        logger.info("실제 등록 :  , ${cache?.get("testFloat")}")
-
 
         // 캐시에 있으면 바로 반환
         if (chkCache(CacheTarget.EVENT,eventTitle)){
@@ -99,10 +80,10 @@ class RedisCacheService (
         }
     }
 
-    fun putCache(target:CacheTarget, key: String, eventResponse : EventResponse){
-        logger.info("캐시에 등록 :  $key , $eventResponse")
+    fun putCache(target:CacheTarget, key: String, response : Any){
+        logger.info("캐시에 등록 :  $key , $response")
         val cache = cacheManager.getCache(target.name)
-        cache?.put(key, eventResponse) // 등록
+        cache?.put(key, response) // 등록
         logger.info("실제 등록 :  $key , ${cache?.get(key)}")
     }
 

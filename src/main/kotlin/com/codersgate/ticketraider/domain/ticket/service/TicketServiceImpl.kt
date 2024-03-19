@@ -2,6 +2,7 @@ package com.codersgate.ticketraider.domain.ticket.service
 
 import com.codersgate.ticketraider.domain.event.model.seat.Bookable
 import com.codersgate.ticketraider.domain.event.repository.EventRepository
+import com.codersgate.ticketraider.domain.event.repository.seat.AvailableSeatRepository
 import com.codersgate.ticketraider.domain.member.repository.MemberRepository
 import com.codersgate.ticketraider.domain.review.dto.ReviewResponse
 import com.codersgate.ticketraider.domain.ticket.dto.CreateTicketRequest
@@ -15,6 +16,8 @@ import com.codersgate.ticketraider.global.common.aop.redis.lock.PubSubLock
 import com.codersgate.ticketraider.global.error.exception.InvalidCredentialException
 import com.codersgate.ticketraider.global.error.exception.ModelNotFoundException
 import com.codersgate.ticketraider.global.error.exception.TicketReservationFailedException
+import com.codersgate.ticketraider.global.infra.redis.cache.CacheTarget
+import com.codersgate.ticketraider.global.infra.redis.cache.RedisCacheService
 import com.codersgate.ticketraider.global.infra.security.jwt.UserPrincipal
 import org.hibernate.Hibernate
 import org.slf4j.LoggerFactory
@@ -35,8 +38,8 @@ class TicketServiceImpl(
     private val ticketRepository: TicketRepository,
     private val memberRepository: MemberRepository,
     private val eventRepository: EventRepository,
-    private val redissonClient: RedissonClient,
-    private val cacheManager: CacheManager,
+    private val availableSeatRepository: AvailableSeatRepository,
+    private val redisCacheService: RedisCacheService,
 ) : TicketService {
     companion object {
         val logger = LoggerFactory.getLogger(TicketServiceImpl::class.java)
@@ -47,8 +50,6 @@ class TicketServiceImpl(
     override fun createTicket(memberId: Long, request: CreateTicketRequest) {
         val event = eventRepository.findByIdOrNull(request.eventId)
             ?: throw ModelNotFoundException("event", request.eventId)
-        val member = memberRepository.findByIdOrNull(memberId)
-            ?: throw ModelNotFoundException("member", memberId)
 
         Hibernate.initialize(event.availableSeats)   // 컬렉션을 명시적으로 초기화 ( LAZY 모드 )
 
@@ -65,78 +66,79 @@ class TicketServiceImpl(
         }
 
         // 예약 가능 좌석 선별
-        val newSeatList = request.seatList.filter { seat ->
-            //DB 체크
-            val isReserved = ticketRepository.chkTicket(
+       request.seatList.map{ seat ->
+           //캐싱 체크
+           val key = "${request.eventId}_${request.date}_${seat.ticketGrade}_${seat.seatNumber}"
+            if(redisCacheService.chkCache(CacheTarget.TICKET, key))
+                throw TicketReservationFailedException("${seat.seatNumber} 번 좌석은 선택할 수 없습니다. ( 이미 예약된 좌석 in Cache )")
+
+           //DB 체크
+           val isReserved = ticketRepository.chkTicket(
                 request.eventId,
                 request.date,
                 seat.ticketGrade,
                 seat.seatNumber
-            )
-            // 좌석 번호가 최대 좌석을 넘어가는지 체크
-            val seatLimit = when (seat.ticketGrade) {
-                TicketGrade.R -> availableSeat.maxSeatR
-                TicketGrade.S -> availableSeat.maxSeatS
-                TicketGrade.A -> availableSeat.maxSeatA
-            }
-
-            if (isReserved != null) {
-                throw TicketReservationFailedException("${seat.seatNumber} 번 좌석은 선택할 수 없습니다. ( 이미 예약된 좌석 in DB )")
-            }
-            else if ( seat.seatNumber !in 1..<seatLimit) {
-                throw TicketReservationFailedException("${seat.seatNumber} 번 좌석은 선택할 수 없습니다. (좌석 번호 범위 초과)")
-            }
-            else true // 유효한 좌석만 true 반환하여 새로운 리스트로 만듦.
-        }.toMutableList()
-
-        if(newSeatList.size == 0) {
-            throw TicketReservationFailedException("생성 가능한 좌석이 없습니다.")
+           )
+           if (isReserved != null) {
+               throw TicketReservationFailedException("${seat.seatNumber} 번 좌석은 선택할 수 없습니다. ( 이미 예약된 좌석 in DB )")
+           }
         }
-        // 티켓 생성
-        newSeatList.map{seat ->
 
-            ticketRepository.save(
-                Ticket(
-                    date = request.date,
-                    grade = seat.ticketGrade,
-                    seatNo = seat.seatNumber,
-                    event = event,
-                    member = member,
-                    price = when (seat.ticketGrade) {
-                        TicketGrade.R -> event.price!!.seatRPrice
-                        TicketGrade.S -> event.price!!.seatSPrice
-                        TicketGrade.A -> event.price!!.seatAPrice
-                    },
-                    place = event.place.name
-                )
+        // 티켓 생성
+        request.seatList.map{seat ->
+
+            val member = memberRepository.findByIdOrNull(memberId)
+                ?: throw ModelNotFoundException("member", memberId)
+
+            val ticket = Ticket(
+                date = request.date,
+                grade = seat.ticketGrade,
+                seatNo = seat.seatNumber,
+                event = event,
+                member = member,
+                price = when (seat.ticketGrade) {
+                    TicketGrade.R -> event.price!!.seatRPrice
+                    TicketGrade.S -> event.price!!.seatSPrice
+                    TicketGrade.A -> event.price!!.seatAPrice
+                },
+                place = event.place.name
             )
+
+            ticketRepository.save( ticket )
+
+            // 캐시에 등록
+            redisCacheService.putCache(CacheTarget.TICKET,
+                "${request.eventId}_${request.date}_${seat.ticketGrade}_${seat.seatNumber}",
+                TicketResponse.from(ticket))
+
             // 좌석 예약 수 수정
             availableSeat.increaseSeat(seat.ticketGrade)
             if (availableSeat.isFull()) {
                 availableSeat.close()
             }
+            availableSeatRepository.save(availableSeat)
         }
-        //모든 락 해제
         eventRepository.save(event)
     }
 
-    fun chkTicketCache(eventId: Long, date: LocalDate, grade: TicketGrade, seatNo: Int): Boolean {
-        logger.info("캐시의 티켓 확인 시작")
-        val cache = cacheManager.getCache("tickets")
-        logger.info("Cache : $cache")
-        val key = "${eventId}_${date}_${grade}_${seatNo}"
-        val ticket = cache?.get(key) // ticket : TicketResponse 상태
-
-        if (ticket != null) {    // 캐시에 일치하는 키 있을 때
-            logger.info("Cache hit for ticket: $key")
-            logger.info("Ticket in Cache : $ticket")
-            logger.info("이미 예매된 티켓입니다. ( in cache ) ")
-            return true
-        } else {   // 캐시에 일치하는 키 없을 때
-            logger.info("Cache miss for ticket: $key")
-            return false
-        }
-    }
+    // RedisCacheService 로 이동
+//    fun chkTicketCache(eventId: Long, date: LocalDate, grade: TicketGrade, seatNo: Int): Boolean {
+//        logger.info("캐시의 티켓 확인 시작")
+//        val cache = cacheManager.getCache("tickets")
+//        logger.info("Cache : $cache")
+//        val key = "${eventId}_${date}_${grade}_${seatNo}"
+//        val ticket = cache?.get(key) // ticket : TicketResponse 상태
+//
+//        if (ticket != null) {    // 캐시에 일치하는 키 있을 때
+//            logger.info("Cache hit for ticket: $key")
+//            logger.info("Ticket in Cache : $ticket")
+//            logger.info("이미 예매된 티켓입니다. ( in cache ) ")
+//            return true
+//        } else {   // 캐시에 일치하는 키 없을 때
+//            logger.info("Cache miss for ticket: $key")
+//            return false
+//        }
+//    }
 
     override fun getAllTicketList(pageable: Pageable, memberId: Long?, eventId: Long?): Page<TicketResponse> {
         return ticketRepository.getAllTicketList(pageable, memberId, eventId).map { TicketResponse.from(it) }
@@ -153,14 +155,14 @@ class TicketServiceImpl(
     }
 
     // 없어도 될듯
-    override fun updateTicketStatus(ticketId: Long, ticketStatus: TicketStatus) {
-        val ticket = ticketRepository.findByIdOrNull(ticketId)
-            ?: throw ModelNotFoundException("Ticket", ticketId)
-
-        ticket.switchTicketStatus(ticketStatus)
-
-        ticketRepository.save(ticket)
-    }
+//    override fun updateTicketStatus(ticketId: Long, ticketStatus: TicketStatus) {
+//        val ticket = ticketRepository.findByIdOrNull(ticketId)
+//            ?: throw ModelNotFoundException("Ticket", ticketId)
+//
+//        ticket.switchTicketStatus(ticketStatus)
+//
+//        ticketRepository.save(ticket)
+//    }
 
     override fun chkExpiredTickets() {
         ticketRepository.findAll().map {
@@ -204,17 +206,14 @@ class TicketServiceImpl(
                 else
                     throw InvalidCredentialException("")
             }
-
     }
 
     override fun deleteTicket(ticketId: Long) {
         val ticket = ticketRepository.findByIdOrNull(ticketId)
             ?: throw ModelNotFoundException("Ticket", ticketId)
+
+        // TODO() availableSeat 증감 필요. cancel 과 합칠 수 있을지 확인
+
         ticketRepository.delete(ticket)
     }
-}
-
-private fun generateKey(eventId: Long, date: LocalDate, grade: TicketGrade, seatNo: Int): String {
-    val key = "ID : ${eventId}, $date : ${grade}-${seatNo}"
-    return key
 }
