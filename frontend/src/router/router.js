@@ -8,10 +8,15 @@ const routes = [
         component: () => import('@/views/Home.vue'), // 동적 import
     },
     {
-        path: '/move',
-        name: 'Move',
+        path: '/event',
+        name: 'Event',
         component: () => import('@/views/Event.vue'),
     },
+    // {
+    //     path: '/reservation',
+    //     name: 'Reservation',
+    //     component: () => import('@/views/ReservationView.vue'),
+    // },
 ];
 
 // 이렇게 해도 된다.
