@@ -1,6 +1,7 @@
 package com.codersgate.ticketraider.global.infra.redis.cache
 
 import com.codersgate.ticketraider.domain.event.dto.EventResponse
+import com.codersgate.ticketraider.domain.event.dto.price.PriceResponse
 import com.codersgate.ticketraider.domain.event.repository.EventRepository
 import com.codersgate.ticketraider.domain.event.service.EventService
 import com.codersgate.ticketraider.global.error.exception.ModelNotFoundException
@@ -25,6 +26,19 @@ class RedisCacheService (
     }
 
     fun searchEvent(eventTitle: String): EventResponse {
+
+        logger.info("캐시에 등록 :  testInt , 12345")
+        val cache = cacheManager.getCache("TEST")
+        cache?.put("testInt" , 12345) // 등록
+        cache?.put("testString" , "12345") // 등록
+        cache?.put("testFloat" , 12.345) // 등록
+        var i = cache?.get("testInt")?.get()
+        var s = cache?.get("testString")?.get()
+        var f = cache?.get("testFloat")?.get()
+        logger.info("실제 등록 :  , ${cache?.get("testInt")} ")
+        logger.info("실제 등록 :  , ${cache?.get("testString")}")
+        logger.info("실제 등록 :  , ${cache?.get("testFloat")}")
+
 
         // 캐시에 있으면 바로 반환
         if (chkCache(CacheTarget.EVENT,eventTitle)){
@@ -61,17 +75,35 @@ class RedisCacheService (
     fun getCachedValue(target: CacheTarget, key:String ): EventResponse? {
         logger.info("${target.name} 캐시 값 가져오기 시작")
         val cache = cacheManager.getCache(target.name)
-        val value = cache?.get(key)?.get() // 캐시에서 가져온 값. LinkedHashMap 형태.
+        val value = cache?.get(key) // 캐시에서 가져온 값. LinkedHashMap 형태.
 
-        // cachedValue를 EventResponse로 변환
-        val eventResponse: EventResponse? = if (value is LinkedHashMap<*, *>) {
-            EventResponse.mapToEventResponse(value)
-        } else {
-            null
-        }
+        // 값이 존재하고, ValueWrapper가 null이 아닌 경우에만 실제 값을 얻어옴
+        val eventResponse: EventResponse? = value?.get() as? EventResponse
+
+        // EventResponse 객체에서 필요한 데이터에 접근하여 사용
+//        eventResponse?.let {
+//            val id = it.id
+//            val title = it.title
+//            val likeCount = it.likeCount
+//            val startDate = it.startDate
+//            val endDate = it.endDate
+//            val eventInfo = it.eventInfo
+//            val averageRating = it.averageRating
+//            val posterImage = it.posterImage
+//            val place = it.place
+//            val price = it.price
+//            val reviewCount = it.reviewCount
+//        }
         return eventResponse
-
     }
+
+//        // cachedValue를 EventResponse로 변환
+//        val eventResponse: EventResponse? = if (value is LinkedHashMap<*, *>) {
+//            EventResponse.mapToEventResponse(value)
+//        } else {
+//            null
+//        }
+
 
     fun chkCache(target: CacheTarget, key:String ): Boolean {
         logger.info("${target.name} 캐시 확인 시작")
