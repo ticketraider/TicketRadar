@@ -19,6 +19,7 @@ import org.springframework.data.redis.connection.RedisConnectionFactory
 import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer
 import org.springframework.data.redis.serializer.RedisSerializationContext
+import org.springframework.data.redis.serializer.RedisSerializer
 import org.springframework.data.redis.serializer.StringRedisSerializer
 import java.time.Duration
 
@@ -49,17 +50,20 @@ class RedisConfig {
     @Bean
     fun redisTemplate(
         redisConnectionFactory: RedisConnectionFactory
-    ): RedisTemplate<String, String> {
-        val template = RedisTemplate<String, String>()
+    ): RedisTemplate<String, Any> {
+        val template = RedisTemplate<String, Any>()
         template.connectionFactory = redisConnectionFactory
 
-        //String 자료구조를 위한 Serializer
+        // Key는 String으로 사용
         template.keySerializer = StringRedisSerializer()
-        template.valueSerializer = StringRedisSerializer()
+
+        // Value는 JSON 직렬화
+        val serializer: RedisSerializer<Any> = GenericJackson2JsonRedisSerializer(objectMapper())
+        template.valueSerializer = serializer
 
         //Hash 자료구조를 위한 Serializer
-        template.hashKeySerializer = StringRedisSerializer()
-        template.hashValueSerializer = StringRedisSerializer()
+//        template.hashKeySerializer = StringRedisSerializer()
+//        template.hashValueSerializer = StringRedisSerializer()
 
         return template
     }
@@ -74,35 +78,38 @@ class RedisConfig {
         return mapper
     }
 
-
     // Redis 캐시 메니저를 생성하는 메서드. 레디스 연결 팩토리 를 인자로 받아 캐시 매니저를 생성함
     @Bean
     fun cacheManager(cf: RedisConnectionFactory, objectMapper: ObjectMapper): CacheManager {
 
         // Redis 캐싱 구성을 생성하는 부분
-        val redisCacheConfiguration =
+        val defaultCacheConfig =
             RedisCacheConfiguration.defaultCacheConfig() // 기본 캐시 구성 사용.
                 .serializeKeysWith(  // 키를 직렬화 - StringRedisSerializer 사용
-                    RedisSerializationContext.SerializationPair.fromSerializer(StringRedisSerializer()))
+                    RedisSerializationContext.SerializationPair.fromSerializer(
+                        StringRedisSerializer()))
                 .serializeValuesWith( // 값을 직렬화 - GenericJackson2JsonRedisSerializer 사용
                     RedisSerializationContext.SerializationPair.fromSerializer(
                         GenericJackson2JsonRedisSerializer(objectMapper)
                     ))
-                .entryTtl(Duration.ofSeconds(30L)) // 캐시 만료시간  3분으로 설정
+                .entryTtl(Duration.ofMinutes(3L)) // 캐시 만료시간  3분으로 설정
 
         // "tickets" 라는 이름의 캐시에 대해 적용
         val ticketsCacheConfig = RedisCacheConfiguration.defaultCacheConfig()
             .entryTtl(Duration.ofMinutes(5))
-            .serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(StringRedisSerializer()))
-            .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(
-                GenericJackson2JsonRedisSerializer(objectMapper)
-            ))
+
+
+        // "events" 라는 이름의 캐시에 대해 적용
+        val eventsCacheConfig = RedisCacheConfiguration.defaultCacheConfig()
+            .entryTtl(Duration.ofMinutes(10))
+
 
 
         return RedisCacheManager // RedisCacheManager를 생성하기 위한 빌더 패턴을 사용
             .builder(cf) // RedisConnectionFactory 를 받아 CacheManager를 빌드
-            .cacheDefaults(redisCacheConfiguration) // 캐시 매니저의 기본 캐시 구성 설정. 위에서 만든 RedisCache 구성 사용
-            .withCacheConfiguration("tickets", ticketsCacheConfig) // "tickets" 라는 이름의 캐시에 대해 적용
+            .cacheDefaults(defaultCacheConfig) // 캐시 매니저의 기본 캐시 구성 설정. 위에서 만든 RedisCache 구성 사용
+            .withCacheConfiguration("TICKETS", ticketsCacheConfig) // "tickets" 라는 이름의 캐시에 대해 적용
+            .withCacheConfiguration("EVENTS", eventsCacheConfig) // "tickets" 라는 이름의 캐시에 대해 적용
             .build() // 최종적으로 빌드하여 반환. 캐싱을 관리하고 사용할 수 있도록 함.
     }
 }

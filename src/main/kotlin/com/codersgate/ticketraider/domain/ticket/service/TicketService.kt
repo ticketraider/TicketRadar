@@ -19,7 +19,8 @@ interface TicketService {
     fun getAllTicketList(pageable:Pageable, memberId:Long?, eventId:Long?) : Page<TicketResponse>
     fun getTicketById(ticketId: Long): TicketResponse
     fun getTicketListByUserId(userPrincipal: UserPrincipal , pageable: Pageable): Page<TicketResponse>
-    fun updateTicketStatus(ticketId: Long, ticketStatus: TicketStatus)
+
+//    fun updateTicketStatus(ticketId: Long, ticketStatus: TicketStatus)
     fun chkExpiredTickets()
     fun makePayment(userPrincipal: UserPrincipal, ticketIdList : MutableList<Long>) : MutableList<TicketResponse>
 

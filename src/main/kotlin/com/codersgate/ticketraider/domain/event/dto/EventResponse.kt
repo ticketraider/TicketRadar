@@ -1,12 +1,7 @@
 package com.codersgate.ticketraider.domain.event.dto
 
 import com.codersgate.ticketraider.domain.event.dto.price.PriceResponse
-import com.codersgate.ticketraider.domain.event.dto.seat.AvailableSeatResponse
 import com.codersgate.ticketraider.domain.event.model.Event
-import com.codersgate.ticketraider.domain.event.model.price.Price
-import com.codersgate.ticketraider.domain.event.model.seat.AvailableSeat
-import com.codersgate.ticketraider.domain.place.dto.PlaceResponse
-import com.codersgate.ticketraider.domain.place.model.Place
 import java.time.LocalDate
 
 data class EventResponse(
@@ -40,4 +35,3 @@ data class EventResponse(
         }
     }
 }
-

@@ -47,15 +47,15 @@ class SecurityConfig(
                 ).permitAll()
                     .anyRequest().authenticated()
             }.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter::class.java)
-            .oauth2Login { oauthConfig ->
-                oauthConfig.authorizationEndpoint {
-                    it.baseUri("/oauth2/login")  //oauth2/login/kakao
-                }.redirectionEndpoint {
-                    it.baseUri("/oauth2/callback/*") // /oauth2/callback/kakao
-                }.userInfoEndpoint {
-                    it.userService(oAuth2UserService)
-                }.successHandler(oAuth2LoginSuccessHandler)
-            }
+//            .oauth2Login { oauthConfig ->
+//                oauthConfig.authorizationEndpoint {
+//                    it.baseUri("/oauth2/login")  //oauth2/login/kakao
+//                }.redirectionEndpoint {
+//                    it.baseUri("/oauth2/callback/*") // /oauth2/callback/kakao
+//                }.userInfoEndpoint {
+//                    it.userService(oAuth2UserService)
+//                }.successHandler(oAuth2LoginSuccessHandler)
+//            }
             .exceptionHandling {
 //                it.authenticationEntryPoint(authenticationEntryPoint)
 //                it.accessDeniedHandler(accessDeniedHandler)

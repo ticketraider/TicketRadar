@@ -71,16 +71,17 @@ class TicketController(
             .body(ticketService.getTicketListByUserId(userPrincipal, pageable))
     }
 
-    @Operation(summary = "티켓 상태 변경")
-    @PutMapping("/update")
-    fun updateTicket(
-        @RequestParam ticketId: Long,
-        @RequestParam ticketStatus: TicketStatus
-    ): ResponseEntity<Unit> {
-        return ResponseEntity
-            .status(HttpStatus.CREATED)
-            .body(ticketService.updateTicketStatus(ticketId, ticketStatus))
-    }
+    // 티켓 업데이트를 수동으로 할 일이 없어 생략
+//    @Operation(summary = "티켓 상태 변경")
+//    @PutMapping("/update")
+//    fun updateTicket(
+//        @RequestParam ticketId: Long,
+//        @RequestParam ticketStatus: TicketStatus
+//    ): ResponseEntity<Unit> {
+//        return ResponseEntity
+//            .status(HttpStatus.CREATED)
+//            .body(ticketService.updateTicketStatus(ticketId, ticketStatus))
+//    }
 
     @Scheduled(cron = "0 0 12 * * MON-FRI") // 매주 월요일부터 금요일까지 매일 정오(12시)에 메서드가 실행
     @PatchMapping("/chkExpired")
