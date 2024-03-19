@@ -31,6 +31,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
 import java.util.concurrent.TimeUnit
+import kotlin.math.atan
 import kotlin.math.log
 
 @Service
@@ -119,6 +120,7 @@ class TicketServiceImpl(
             availableSeatRepository.save(availableSeat)
         }
         eventRepository.save(event)
+        //캐시 내 이벤트 항목 최신화 하지 않아도 됨. Response 에는 변동사항 없음
     }
 
     // RedisCacheService 로 이동
@@ -165,6 +167,7 @@ class TicketServiceImpl(
 //    }
 
     override fun chkExpiredTickets() {
+        // TODO() findAll 보다 동적쿼리로 대상만 찾을지?
         ticketRepository.findAll().map {
             if (it.date < LocalDate.now())
                 it.ticketStatus = TicketStatus.EXPIRED
@@ -189,31 +192,34 @@ class TicketServiceImpl(
                 paidTicketList.add(TicketResponse.from(it))
             }
         }
-
         return paidTicketList
     }
 
     override fun cancelTicket(ticketId: Long, userPrincipal: UserPrincipal) {
         ticketRepository.findByIdOrNull(ticketId)
-            ?.let {
-                if (it.member.id == userPrincipal.id) {
-                    it.event.availableSeats.map{seat ->
-                        if(seat.date == it.date)
-                            seat.decreaseSeat(it.grade)
-                    }
-                    ticketRepository.delete(it)
-                }
-                else
-                    throw InvalidCredentialException("")
+            ?.let { ticket ->
+                if (ticket.member.id == userPrincipal.id) { // 본인 확인 // 사실 본인 티켓만 확인되니 없어도 됨.
+                    deleteTicket(ticketId)                  // delete메서드 재사용
+                } else
+                    throw InvalidCredentialException("")    // 인가 오류
             }
     }
 
+
     override fun deleteTicket(ticketId: Long) {
         val ticket = ticketRepository.findByIdOrNull(ticketId)
+            ?.let{ ticket ->
+                ticket.event.availableSeats.filter { seat ->
+                    (seat.date == ticket.date) && (seat.event!!.id == ticket.event.id)  // 날짜, 이벤트 확인
+                }[0].let {
+                    it.decreaseSeat(ticket.grade)           // 좌석 수 줄임
+                    availableSeatRepository.save(it)
+                }
+
+                // 캐시 삭제
+                redisCacheService.delCache( CacheTarget.TICKET,"${ticket.event.id}_${ticket.date}_${ticket.grade}_${ticket.seatNo}")
+                ticketRepository.delete(ticket)
+            }
             ?: throw ModelNotFoundException("Ticket", ticketId)
-
-        // TODO() availableSeat 증감 필요. cancel 과 합칠 수 있을지 확인
-
-        ticketRepository.delete(ticket)
     }
 }

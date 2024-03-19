@@ -87,6 +87,11 @@ class RedisCacheService (
         logger.info("실제 등록 :  $key , ${cache?.get(key)}")
     }
 
+    fun delCache(target:CacheTarget, key: String){
+        val cache = cacheManager.getCache(target.name)
+        cache?.evict(key)
+    }
+
     fun refreshCacheTtl(target: CacheTarget, key: String) {
         logger.info("캐시에 재등록 :  $key ")
         val cache = cacheManager.getCache(target.name)
