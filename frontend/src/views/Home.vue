@@ -37,11 +37,11 @@
   </html>
 </template>
 <style>
-@import "./css/styles/TestStyle.css";
+@import "../css/styles/TestStyle.css";
 </style>
 <script>
-import CardView from "@/views/CardView.vue";
-import HeaderView from "@/views/HeaderView.vue";
+import CardView from "@/components/CardView.vue";
+import HeaderView from "@/components/HeaderView.vue";
 export default {
   name: 'App',
 

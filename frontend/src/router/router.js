@@ -5,12 +5,12 @@ const routes = [
     {
         path: '/',
         name: 'Home',
-        component: () => import('@/Main.vue'), // 동적 import
+        component: () => import('@/views/Home.vue'), // 동적 import
     },
     {
         path: '/move',
         name: 'Move',
-        component: () => import('@/Event.vue'),
+        component: () => import('@/views/Event.vue'),
     },
 ];
 
