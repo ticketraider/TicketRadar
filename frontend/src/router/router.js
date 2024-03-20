@@ -14,6 +14,16 @@ const routes = [
         component: () => import('@/views/Event.vue'),
     },
     {
+        path: '/eventList',
+        name: 'EventList',
+        component: () => import('@/views/EventListView.vue'),
+    },
+    {
+        path: '/eventDetail/:eventId',
+        name: 'EventDetail',
+        component: () => import('@/views/EventDetailView.vue'),
+    },
+    {
         path: '/ticket-viewer', // 경로 설정
         name: 'TicketViewer', // 이름 설정
         component: () => import('@/views/TicketViewerView.vue'),
