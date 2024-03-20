@@ -3,6 +3,19 @@ auth:
     issuer: team.sparta.com
     secret: c5t6gzuXneIM3d0Eafy2F3MrkK41BUfD
     accessTokenExpirationHour: 168
+cloud:
+  aws:
+    region:
+      static: ap-northeast-2
+    stack:
+      auto: false
+    credentials:
+      access-key: ${AWS_ACCESS_KEY}
+      secret-key: ${AWS_SECRET_KEY}
+    s3:
+      bucket: ticketraider-event
+
+
 spring:
   data:
     redis:
