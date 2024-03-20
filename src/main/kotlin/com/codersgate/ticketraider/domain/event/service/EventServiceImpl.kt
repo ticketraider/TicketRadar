@@ -14,6 +14,7 @@ import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import org.springframework.web.multipart.MultipartFile
 
 @Service
 class EventServiceImpl(
@@ -21,21 +22,23 @@ class EventServiceImpl(
     private val eventRepository: EventRepository,
     private val priceRepository: PriceRepository,
     private val availableSeatRepository: AvailableSeatRepository,
-    private val placeRepository: PlaceRepository
+    private val placeRepository: PlaceRepository,
+    private val s3Service: S3Service
 ) : EventService {
     @Transactional
-    override fun createEvent(eventRequest: EventRequest) {
+    override fun createEvent(eventRequest: EventRequest, file: MultipartFile?) {
         val category = categoryRepository.findByIdOrNull(eventRequest.categoryId)
             ?: throw ModelNotFoundException("category", eventRequest.categoryId)
         val place = placeRepository.findPlaceByName(eventRequest.place)
             ?: throw ModelNotFoundException("place", 0)//예외 추가 필요함
-
         //시작일과 끝나는 일 비교후 false 시 예외처리
         check(eventRequest.startDate <= eventRequest.endDate) {
             "끝나는날짜는 시작날짜보다 빠를수 없습니다."
         }
-
-        val (price, event) = eventRequest.toPriceAndEvent(category, place)
+        val posterImage =
+            if(file == null) { "" }
+            else { s3Service.putObject(file) }
+        val (price, event) = eventRequest.toPriceAndEvent(category, place, posterImage)
         event.price = price
         eventRepository.save(event)
         priceRepository.save(price)
