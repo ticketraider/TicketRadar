@@ -33,14 +33,15 @@ class EventController(
     }
 
     @Operation(summary = " 이벤트 수정")
-    @PutMapping("/{eventId}")
-fun updateEvent(
+    @PutMapping("/{eventId}", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
+    fun updateEvent(
         @PathVariable eventId: Long,
-        @Valid @RequestBody eventRequest: EventRequest,
+        @Valid @RequestPart eventRequest: EventRequest,
+        @RequestPart file: MultipartFile?
     ): ResponseEntity<Unit> {
     return ResponseEntity
         .status(HttpStatus.OK)
-        .body(eventService.updateEvent(eventId, eventRequest))
+        .body(eventService.updateEvent(eventId, eventRequest, file))
 }
 
     @Operation(summary = "이벤트 삭제")
