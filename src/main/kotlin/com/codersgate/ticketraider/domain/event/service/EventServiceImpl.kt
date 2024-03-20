@@ -9,6 +9,7 @@ import com.codersgate.ticketraider.domain.event.repository.price.PriceRepository
 import com.codersgate.ticketraider.domain.event.repository.seat.AvailableSeatRepository
 import com.codersgate.ticketraider.domain.place.repository.PlaceRepository
 import com.codersgate.ticketraider.global.error.exception.ModelNotFoundException
+import com.codersgate.ticketraider.global.infra.s3.S3Service
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.findByIdOrNull
@@ -47,7 +48,7 @@ class EventServiceImpl(
     }
 
     @Transactional
-    override fun updateEvent(eventId: Long, eventRequest: EventRequest) {
+    override fun updateEvent(eventId: Long, eventRequest: EventRequest, file: MultipartFile?) {
         val event = eventRepository.findByIdOrNull(eventId)
             ?: throw ModelNotFoundException("Event", eventId)
         val price = priceRepository.findByEventId(eventId)
@@ -56,6 +57,9 @@ class EventServiceImpl(
             ?: throw ModelNotFoundException("category", eventRequest.categoryId)
         val place = placeRepository.findPlaceByName(eventRequest.place)
             ?: throw ModelNotFoundException("place", 0)
+        val posterImage =
+            if(file == null) { "" }
+            else { s3Service.putObject(file) }
         val orgStartDate = event.startDate
         val orgEndDate = event.endDate
         //시작일과 끝나는 일 비교후 false 시 예외처리
@@ -63,7 +67,7 @@ class EventServiceImpl(
             "끝나는날짜는 시작날짜보다 빠를수 없습니다."
         }
         event.let {
-            it.posterImage = eventRequest.posterImage
+            it.posterImage = posterImage
             it.title = eventRequest.title
             it.eventInfo = eventRequest.eventInfo
             it.startDate = eventRequest.startDate
