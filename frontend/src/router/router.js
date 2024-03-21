@@ -28,6 +28,11 @@ const routes = [
         name: 'TicketViewer', // 이름 설정
         component: () => import('@/views/TicketViewerView.vue'),
     },
+    {
+        path: '/myTicketList', // 경로 설정
+        name: 'MyTicketList', // 이름 설정
+        component: () => import('@/views/MyTicketListView.vue'),
+    },
     // {
     //     path: '/reservation',
     //     name: 'Reservation',

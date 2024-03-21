@@ -14,6 +14,7 @@ import org.springframework.data.web.PageableDefault
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.scheduling.annotation.Scheduled
+import org.springframework.security.core.Authentication
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.*
@@ -64,8 +65,10 @@ class TicketController(
         @PageableDefault(
             size = 15, sort = ["id"]
         ) pageable: Pageable,
-        @AuthenticationPrincipal userPrincipal: UserPrincipal
+        authentication: Authentication // vue 에서 jwt 토큰을 받아오도록 함
+//        @AuthenticationPrincipal userPrincipal: UserPrincipal
     ): ResponseEntity<Page<TicketResponse>> {
+        val userPrincipal = authentication.principal as UserPrincipal // jwt 토큰에서 principal 추출
         return ResponseEntity
             .status(HttpStatus.OK)
             .body(ticketService.getTicketListByUserId(userPrincipal, pageable))
