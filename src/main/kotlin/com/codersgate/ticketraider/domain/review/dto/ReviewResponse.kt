@@ -7,6 +7,8 @@ data class ReviewResponse(
 
     val content: String,
 
+    val nickname : String,
+
     val rating: Int,
 
     val memberId : Long,  //userId 보단 memberId로 바꾸는 게 좋을것 같음
@@ -19,6 +21,7 @@ data class ReviewResponse(
             return ReviewResponse(
                 title = review.title,
                 content = review.content,
+                nickname = review.member.nickname,
                 rating = review.rating,
                 memberId = review.member.id!!,
                 eventId = review.event.id!!,

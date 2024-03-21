@@ -38,7 +38,9 @@ class ReviewServiceImpl(
             request.rating,
                 member,
                 ticket.event,
-            )
+            ).also{
+                it.loadNickname()
+            }
         )
     }
 

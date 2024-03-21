@@ -30,11 +30,19 @@ class Review (
     @JoinColumn(name = "event_id")
     val event : Event,
 
+    @Transient // 데이터베이스에 매핑되지 않는 임시 필드
+    var nickname: String? = null // 닉네임을 저장할 필드
+
     ) : BaseEntity()
     {
         @Id
         @GeneratedValue( strategy = GenerationType.IDENTITY)
         val id : Long? = null
+
+        // 닉네임을 가져오는 메서드
+        fun loadNickname() {
+            this.nickname = member.nickname // Member 엔티티의 닉네임을 가져와서 필드에 할당
+        }
 }
 
 
