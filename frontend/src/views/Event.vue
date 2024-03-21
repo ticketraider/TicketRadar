@@ -195,7 +195,7 @@
 }
 </style>
 <script>
-import ReviewCard from "@/components/ReviewCard.vue";
+import ReviewCard from "@/components/ReviewList.vue";
 export default {
   name: 'App',
 

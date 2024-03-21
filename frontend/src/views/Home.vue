@@ -37,7 +37,7 @@
 @import "../css/styles/TestStyle.css";
 </style>
 <script>
-import CardView from "@/components/EventCard.vue";
+import CardView from "@/components/__EventCard.vue";
 export default {
   name: 'App',
 
