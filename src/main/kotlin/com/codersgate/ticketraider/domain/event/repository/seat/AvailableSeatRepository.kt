@@ -9,6 +9,8 @@ interface AvailableSeatRepository : JpaRepository<AvailableSeat, Long> {
 
     fun findByPlaceId(placeId:Long): List<AvailableSeat?>
 
+    fun findByPlaceIdAndDate(placeId: Long, date: LocalDate): AvailableSeat?
+
     fun findByEventIdAndDate(eventId: Long, date: LocalDate): AvailableSeat?
 
     fun deleteByEventId(eventId: Long)

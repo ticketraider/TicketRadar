@@ -3,19 +3,17 @@ package com.codersgate.ticketraider.domain.event.controller
 
 import com.codersgate.ticketraider.domain.event.dto.EventRequest
 import com.codersgate.ticketraider.domain.event.dto.EventResponse
-import com.codersgate.ticketraider.domain.event.model.Event
 import com.codersgate.ticketraider.domain.event.service.EventService
 import io.swagger.v3.oas.annotations.Operation
 import jakarta.validation.Valid
-import org.springdoc.core.converters.models.PageableAsQueryParam
-import org.apache.coyote.Response
 import org.springframework.data.domain.Page
-
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.data.domain.Pageable
 import org.springframework.data.web.PageableDefault
+import org.springframework.http.MediaType
+import org.springframework.web.multipart.MultipartFile
 
 @RestController
 @RequestMapping("/events")
@@ -24,24 +22,26 @@ class EventController(
 {
 
     @Operation(summary = " 이벤트 생성")
-    @PostMapping
+    @PostMapping(consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
     fun createEvent(
-        @Valid @RequestBody eventRequest: EventRequest
+        @Valid @RequestPart(value = "eventRequest") eventRequest: EventRequest,
+        @RequestPart(value = "file", required = false) file: MultipartFile?
     ): ResponseEntity<Unit> {
         return ResponseEntity
         .status(HttpStatus.CREATED)
-        .body(eventService.createEvent(eventRequest))
+        .body(eventService.createEvent(eventRequest, file))
     }
 
     @Operation(summary = " 이벤트 수정")
-    @PutMapping("/{eventId}")
-fun updateEvent(
+    @PutMapping("/{eventId}", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
+    fun updateEvent(
         @PathVariable eventId: Long,
-        @Valid @RequestBody eventRequest: EventRequest,
+        @Valid @RequestPart eventRequest: EventRequest,
+        @RequestPart file: MultipartFile?
     ): ResponseEntity<Unit> {
     return ResponseEntity
         .status(HttpStatus.OK)
-        .body(eventService.updateEvent(eventId, eventRequest))
+        .body(eventService.updateEvent(eventId, eventRequest, file))
 }
 
     @Operation(summary = "이벤트 삭제")
@@ -75,17 +75,17 @@ fun updateEvent(
             .body(eventService.getEvent(eventId))
     }
 
-    @Operation(summary = "리뷰나 좋아요 많은 순 이벤트 조회")
-    @GetMapping("/like&review")
-    fun getPaginatedLikeList(
-        @PageableDefault(size = 15, sort = ["id"]) pageable : Pageable,
-        @RequestParam(value = "like", required = false) likeCount: Int?,
-        @RequestParam(value = "review") reviewCount : Int?,
-    ): ResponseEntity<Page<EventResponse?>> {
-            return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(eventService.getPaginatedCountList(pageable))
-    }
+//    @Operation(summary = "리뷰나 좋아요 많은 순 이벤트 조회")
+//    @GetMapping("/like&review")
+//    fun getPaginatedLikeList(
+//        @PageableDefault(size = 15, sort = ["id"]) pageable : Pageable,
+//        @RequestParam(value = "like", required = false) likeCount: Int?,
+//        @RequestParam(value = "review") reviewCount : Int?,
+//    ): ResponseEntity<Page<EventResponse?>> {
+//            return ResponseEntity
+//                .status(HttpStatus.OK)
+//                .body(eventService.getPaginatedCountList(pageable))
+//    }
 }
 
 

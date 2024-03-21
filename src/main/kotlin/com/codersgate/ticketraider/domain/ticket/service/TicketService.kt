@@ -13,11 +13,17 @@ import java.time.LocalDate
 
 interface TicketService {
 
-    fun createTicket(userPrincipal: UserPrincipal, request: CreateTicketRequest)
-    fun chkTicketCache(eventId:Long, date: LocalDate, grade:TicketGrade, seatNo:Int) : Boolean?
+    fun createTicket(memberId: Long, request: CreateTicketRequest)
+    //fun chkTicketCache(eventId:Long, date: LocalDate, grade:TicketGrade, seatNo:Int) : Boolean?
+
+    fun getAllTicketList(pageable:Pageable, memberId:Long?, eventId:Long?) : Page<TicketResponse>
     fun getTicketById(ticketId: Long): TicketResponse
-    fun getTicketListByUserId(user: UserPrincipal , pageable: Pageable): Page<TicketResponse>
-    fun updateTicket(ticketId: Long, ticketStatus: TicketStatus)
+    fun getTicketListByUserId(userPrincipal: UserPrincipal , pageable: Pageable): Page<TicketResponse>
+
+//    fun updateTicketStatus(ticketId: Long, ticketStatus: TicketStatus)
     fun chkExpiredTickets()
-    fun deleteTicket(ticketId: Long, user: UserPrincipal)
+    fun makePayment(userPrincipal: UserPrincipal, ticketIdList : MutableList<Long>) : MutableList<TicketResponse>
+
+    fun cancelTicket(ticketId: Long, userPrincipal: UserPrincipal)
+    fun deleteTicket(ticketId: Long)
 }

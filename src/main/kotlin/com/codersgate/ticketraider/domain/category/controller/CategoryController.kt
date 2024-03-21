@@ -23,7 +23,7 @@ class CategoryController(
 
     @Operation(summary = "카테고리 생성")
     @PostMapping
-    //@PreAuthorize("hasAnyRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN')")
     fun createCategory(
         @Valid @RequestBody request: CreateCategoryRequest
     ): ResponseEntity<Unit> {

@@ -1,7 +1,6 @@
 package com.codersgate.ticketraider.domain.member.entity
 
 import com.codersgate.ticketraider.domain.like.model.Like
-import com.codersgate.ticketraider.domain.member.dto.MemberRequest
 import com.codersgate.ticketraider.domain.review.model.Review
 import com.codersgate.ticketraider.domain.ticket.entity.Ticket
 import com.codersgate.ticketraider.global.common.BaseEntity
@@ -11,14 +10,14 @@ import org.hibernate.annotations.SQLRestriction
 
 @Table(name = "members")
 @Entity
-@SQLDelete(sql = "UPDATE members SET is_deleted = true WHERE id = ?") // DELETE 쿼리 날아올 시 대신 실행
+@SQLDelete(sql = "UPDATE members SET is_deleted = true WHERE id = ?")
 @SQLRestriction("is_deleted = false")
 class Member(
     @Column(name = "email", unique = true)
     var email: String,
 
     @Column(name = "password")
-    var password: String,
+    var password: String? = null,
 
     @Column(name = "nickname", unique = true)
     var nickname: String,
@@ -33,17 +32,24 @@ class Member(
     @OneToMany(mappedBy = "member", fetch = FetchType.EAGER)
     val likes: List<Like> = emptyList(),
 
-    @OneToMany(mappedBy = "member", fetch = FetchType.EAGER)
-    val reviews: List<Review> = emptyList()
 
-) : BaseEntity() {
+    @OneToMany(mappedBy = "member", fetch = FetchType.EAGER)
+    val reviews: List<Review> = emptyList(),
+
+    ) : BaseEntity() {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null
 
-    fun updateProfile(email: String, password: String, nickname: String) {
-        this.email = email
+    fun updateProfile(password: String, nickname: String) {
         this.password = password
         this.nickname = nickname
     }
+}
+enum class MemberRole {
+    ADMIN, MEMBER
+}
+
+enum class Provider {
+    KAKAO, NAVER, GOOGLE, COMMON
 }

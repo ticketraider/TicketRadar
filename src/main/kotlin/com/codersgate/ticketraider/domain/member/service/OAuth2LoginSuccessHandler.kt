@@ -1,7 +1,6 @@
-package com.codersgate.ticketraider.domain.oauth.service
+package com.codersgate.ticketraider.domain.member.service
 
-import com.codersgate.ticketraider.domain.member.entity.MemberRole
-import com.codersgate.ticketraider.domain.oauth.dto.OAuth2UserInfo
+import com.codersgate.ticketraider.domain.member.dto.OAuth2UserInfo
 import com.codersgate.ticketraider.global.infra.security.jwt.JwtPlugin
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
@@ -13,7 +12,7 @@ import org.springframework.stereotype.Component
 @Component
 class OAuth2LoginSuccessHandler(
     private val jwtPlugin: JwtPlugin,
-    private val socialMemberService: SocialMemberService
+    private val memberService: MemberService
 ): AuthenticationSuccessHandler {
 
     override fun onAuthenticationSuccess(
@@ -22,12 +21,8 @@ class OAuth2LoginSuccessHandler(
         authentication: Authentication
     ) {
         val userInfo = authentication.principal as OAuth2UserInfo
-        val accessToken = jwtPlugin.generateAccessToken(
-            subject = userInfo.id,
-            email = userInfo.email,
-            role = MemberRole.MEMBER.name
-        )
+        val accessToken = memberService.socialLogin(userInfo)
         response.contentType = MediaType.APPLICATION_JSON_VALUE
-        response.writer.write(accessToken)
+        response.writer.write(accessToken.toString())
     }
 }

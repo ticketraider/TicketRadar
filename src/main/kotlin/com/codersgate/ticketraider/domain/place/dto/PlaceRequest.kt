@@ -24,9 +24,9 @@ data class PlaceRequest(
 
     fun updateSeatByPlace(seat: AvailableSeat, place: Place): AvailableSeat {
         seat.totalSeat = place.totalSeat
-        seat.seatR = place.seatR
-        seat.seatS = place.seatS
-        seat.seatA = place.seatA
+        seat.maxSeatR = place.seatR
+        seat.maxSeatS = place.seatS
+        seat.maxSeatA = place.seatA
         return seat
     }
 }

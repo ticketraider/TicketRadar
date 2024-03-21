@@ -9,5 +9,6 @@ interface CustomEventRepository {
 
     fun findByPageable(pageable: Pageable, categoryId: Long?, status: String?): Page<Event>
 
-    fun findByPageableAndcount(pageable: Pageable): Page<Event?>
+    fun findByPageableAndCount(pageable: Pageable): Page<Event?>
+
 }

@@ -1,6 +1,6 @@
 package com.codersgate.ticketraider.domain.place.service
 
-import com.codersgate.ticketraider.domain.event.repository.EventRepository
+import com.codersgate.ticketraider.domain.event.dto.EventResponse
 import com.codersgate.ticketraider.domain.event.repository.seat.AvailableSeatRepository
 import com.codersgate.ticketraider.domain.place.dto.PlaceRequest
 import com.codersgate.ticketraider.domain.place.dto.PlaceResponse
@@ -9,6 +9,7 @@ import com.codersgate.ticketraider.domain.ticket.repository.TicketRepository
 import com.codersgate.ticketraider.global.error.exception.ModelNotFoundException
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 @Service
 class PlaceServiceImpl(
@@ -23,10 +24,18 @@ class PlaceServiceImpl(
 
     }
 
+    @Transactional
     override fun updatePlace(placeId: Long, request: PlaceRequest) {
         val place = placeRepository.findByIdOrNull(placeId)
             ?: throw ModelNotFoundException("place", placeId)
-        place.let { request.toPlace() }
+        place.let {
+            it.name = request.name
+            it.seatR = request.seatR
+            it.seatS = request.seatS
+            it.seatA = request.seatA
+            it.totalSeat = request.seatR + request.seatS + request.seatA
+            it.address = request.address
+        }
         placeRepository.save(place)
 
         val seatList = availableSeatRepository.findByPlaceId(placeId)
@@ -57,5 +66,12 @@ class PlaceServiceImpl(
         val place = placeRepository.findByIdOrNull(placeId)
             ?: throw ModelNotFoundException("place", placeId)
         return PlaceResponse.from(place)
+    }
+
+    override fun getEventList(placeId: Long): List<EventResponse>? {
+        return placeRepository.findByIdOrNull(placeId)
+            ?.let {
+                it.eventList.map { e -> EventResponse.from(e) }
+            }
     }
 }

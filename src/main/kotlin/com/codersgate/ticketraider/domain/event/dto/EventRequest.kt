@@ -17,9 +17,6 @@ import java.time.format.DateTimeFormatter
 data class EventRequest(
 
     val categoryId: Long,
-
-    val posterImage: String,
-
     @field: Size(min = 1, max = 100, message = "Title must be between 1 and 100 characters")
     @JsonProperty("title")
     val title: String,
@@ -46,16 +43,10 @@ data class EventRequest(
 
     val place: String,
 
-    @field: Size(min = 1, message = "Price cannot be less than 1")
-    @JsonProperty("seatRPrice")
     val seatRPrice: Int,
 
-    @field: Size(min = 1, message = "Price cannot be less than 1")
-    @JsonProperty("seatSPrice")
     val seatSPrice: Int,
 
-    @field: Size(min = 1, message = "Price cannot be less than 1")
-    @JsonProperty("seatAPrice")
     val seatAPrice: Int,
 
     ) {
@@ -76,7 +67,7 @@ data class EventRequest(
             "^2[0-9]{3}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])\$"
     }
 
-    fun toPriceAndEvent(category: Category, place: Place): Pair<Price, Event> {
+    fun toPriceAndEvent(category: Category, place: Place, posterImage: String): Pair<Price, Event> {
         val event = Event(
             posterImage = posterImage,
             title = title,
@@ -96,15 +87,15 @@ data class EventRequest(
         return Pair(price, event)
     }
 
-    fun toAvailableSeat(event: Event, place: Place, localDate: LocalDate): AvailableSeat {
+    fun toAvailableSeat(event: Event, localDate: LocalDate): AvailableSeat {
         val availableSeat = AvailableSeat(
             event = event,
             date = localDate,//여기도 알맞은 날짜 넣도록하기
-            maxSeatR = place.seatR,
-            maxSeatS = place.seatS,
-            maxSeatA = place.seatA,
-            totalSeat = place.totalSeat,
-            place = place
+            maxSeatR = event.place.seatR,
+            maxSeatS = event.place.seatS,
+            maxSeatA = event.place.seatA,
+            totalSeat = event.place.totalSeat,
+            place = event.place
         )
         return availableSeat
     }

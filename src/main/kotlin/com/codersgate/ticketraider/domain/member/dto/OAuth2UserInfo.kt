@@ -1,4 +1,4 @@
-package com.codersgate.ticketraider.domain.oauth.dto
+package com.codersgate.ticketraider.domain.member.dto
 
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest
@@ -24,6 +24,7 @@ data class OAuth2UserInfo(
             return when (provider) {
                 "KAKAO", "kakao" -> ofKakao(provider, userRequest, originUser)
                 "NAVER", "naver" -> ofNaver(provider, userRequest, originUser)
+                "GOOGLE", "google" -> ofGoogle(provider, userRequest, originUser)
                 else -> throw RuntimeException("지원하지 않는 OAuth Provider 입니다.")
             }
         }
@@ -35,8 +36,6 @@ data class OAuth2UserInfo(
             val account = originUser.attributes["kakao_account"] as Map<*, *>
             val email = account["email"] ?: ""
 
-//            val accessToken = userRequest.accessToken.tokenValue
-
             return OAuth2UserInfo(
                 id = (originUser.attributes[userNameAttributeName] as Long).toString(),
                 provider = provider.uppercase(),
@@ -46,12 +45,23 @@ data class OAuth2UserInfo(
         }
         private fun ofNaver(provider: String, userRequest: OAuth2UserRequest, originUser: OAuth2User): OAuth2UserInfo {
             val profile = originUser.attributes["response"] as Map<*, *>
-//            val userNameAttributeName = userRequest.clientRegistration.providerDetails.userInfoEndpoint.userNameAttributeName
             val nickname = profile["nickname"] ?: ""
             val email = profile["email"] ?: ""
 
             return OAuth2UserInfo(
                 id = profile["id"].toString(),
+                provider = provider.uppercase(),
+                nickname = nickname as String,
+                email = email as String
+            )
+        }
+        private fun ofGoogle(provider: String, userRequest: OAuth2UserRequest, originUser: OAuth2User): OAuth2UserInfo {
+            val userNameAttributeName = userRequest.clientRegistration.providerDetails.userInfoEndpoint.userNameAttributeName
+            val nickname = originUser.attributes["name"] ?: ""
+            val email = originUser.attributes["email"] ?: ""
+
+            return OAuth2UserInfo(
+                id = originUser.attributes[userNameAttributeName].toString(),
                 provider = provider.uppercase(),
                 nickname = nickname as String,
                 email = email as String

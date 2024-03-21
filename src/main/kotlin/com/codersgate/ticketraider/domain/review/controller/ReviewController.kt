@@ -40,15 +40,15 @@ class ReviewController(
     }
 
 
-    @Operation(summary = "통합 조회(전체/유저ID/이벤트ID")
+    @Operation(summary = "리뷰 통합 조회(전체/유저ID/이벤트ID")
     @GetMapping("/v2")
     fun getReviewList_V2(
         @PageableDefault(size = 5, sort = ["id"]) pageable: Pageable,
-        @AuthenticationPrincipal userPrincipal: UserPrincipal?,
+        @RequestParam(required = false) memberId: Long?,
         @RequestParam(required = false) eventId: Long?,
     ) : ResponseEntity<Page<ReviewResponse>>
     {
-        return ResponseEntity.status(HttpStatus.OK).body(reviewService.getReviewList_V2(pageable, userPrincipal?.id, eventId))
+        return ResponseEntity.status(HttpStatus.OK).body(reviewService.getReviewList_V2(pageable, memberId, eventId))
     }
 
 

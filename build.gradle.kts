@@ -83,7 +83,9 @@ dependencies {
     implementation ("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
     implementation ("com.fasterxml.jackson.core:jackson-databind")
 
-
+    implementation ("org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE")
+    implementation(platform("software.amazon.awssdk:bom:2.25.13"))
+    implementation("software.amazon.awssdk:s3")
 }
 
 tasks.withType<KotlinCompile> {
