@@ -40,3 +40,4 @@ out/
 .kotlin
 
 application.yml
+/frontend/src/components/trash/
