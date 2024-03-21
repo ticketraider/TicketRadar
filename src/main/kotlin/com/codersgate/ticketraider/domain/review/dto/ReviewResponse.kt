@@ -4,7 +4,7 @@ import com.codersgate.ticketraider.domain.review.model.Review
 import java.time.format.DateTimeFormatter
 
 data class ReviewResponse(
-    val createdAt : String,
+    val modifiedAt : String,
 
     val title: String,
 
@@ -25,7 +25,7 @@ data class ReviewResponse(
             val  FormattedDate = review.updatedAt!!.format(formatter)
 
             return ReviewResponse(
-                createdAt = FormattedDate.toString(),
+                modifiedAt = FormattedDate.toString(),
                 title = review.title,
                 content = review.content,
                 nickname = review.member.nickname,
