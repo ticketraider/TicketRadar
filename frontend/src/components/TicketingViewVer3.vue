@@ -2,7 +2,7 @@
 export default {
   data() {
     return {
-      date: new Date('2024-03-20'),
+      date: new Date('2024-03-29'),
       minDate: '2024-03-29',
       maxDate: '2024-05-19',
       seats: this.generateSeats(),
@@ -65,7 +65,7 @@ export default {
 </script>
 
 <template>
-  <div style="margin: 150px 10px auto 1px; background-color: #7980aa; border-radius: 5px">
+  <div style="margin: 150px 10px auto 1px; background-color: #aa98ba; border-radius: 5px">
       <v-container>
         <v-row justify="space-around">
           <v-date-picker
@@ -79,7 +79,7 @@ export default {
 
     <!-- Button trigger modal -->
     <button type="button"
-            style="width: 100%; height: 50px; background-color: #473baa; border-radius: 10px;"
+            style="width: 100%; height: 50px; background-color: #392365; border-radius: 10px;"
             data-bs-toggle="modal" data-bs-target="#staticBackdrop">
       <h5 style="color: white">예매하기</h5>
     </button>
@@ -90,12 +90,12 @@ export default {
          aria-labelledby="staticBackdropLabel" aria-hidden="true">
       <div class="modal-dialog">
         <div class="modal-content">
-          <div class="modal-header" style="background-color: #473baa">
+          <div class="modal-header" style="background-color: #392365">
             <h1 class="modal-title fs-5" id="staticBackdropLabel" style="color:white;">티켓 예매창</h1>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <!--          모달 바디-->
-          <div class="modal-body" style="background-color: #7980aa">
+          <div class="modal-body" style="background-color: #aa98ba">
 
 
             <v-stepper :items="['Step 1', 'Step 2', 'Step 3']">
@@ -117,7 +117,7 @@ export default {
                     <tr>
                       <th>날짜</th>
                       <th class="text-end"></th>
-                      <th class="text-end">2024-03-29</th>
+                      <th class="text-end">{{date.toLocaleDateString()}}</th>
                     </tr>
 
                     <tr>
@@ -180,7 +180,7 @@ export default {
                     <tr>
                       <th>날짜</th>
                       <th class="text-end"></th>
-                      <th class="text-end">2024-03-29</th>
+                      <th class="text-end">{{date.toLocaleDateString()}}</th>
                     </tr>
 
                     <tr>
@@ -204,7 +204,6 @@ export default {
                   </v-table>
                 </v-sheet>
                 <div>
-
                   <button type="button" class="btn btn-primary">예매하기</button>
                 </div>
               </template>
@@ -212,7 +211,7 @@ export default {
 
 
           </div>
-          <div class="modal-footer" style="background-color: #473baa">
+          <div class="modal-footer" style="background-color: #392365">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
           </div>
         </div>

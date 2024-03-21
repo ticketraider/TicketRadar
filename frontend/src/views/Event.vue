@@ -11,15 +11,15 @@
   <main>
     <div style="display: flex">
       <div class="event">
-        <div style="width: 100%; height: 60px; background-color: #473baa; border-radius: 10px; margin: auto auto 10px auto; text-align: center">
-          <h2 style="color: white">뮤지컬 오페라의 유령</h2>
+        <div style="width: 100%; height: 60px; background-color: #392365; border-radius: 10px; margin: auto auto 10px auto; text-align: center">
+          <h2 style="color: white; font-weight: bold">뮤지컬 오페라의 유령</h2>
         </div>
         <div class="이미지포함이벤트설명" style="display: flex; margin: auto auto 10px auto;">
           <div class="img">
           </div>
           <!--          공연 정보를 담는 디브-->
           <div
-              style="width: 800px; height: 600px; background-color: #473baa; border-radius: 10px; margin: auto auto auto 10px;">
+              style="width: 800px; height: 600px; background-color: #392365; border-radius: 10px; margin: auto auto auto 10px;">
             <!--            안에 들어가는 정보들-->
             <div class="공연정보담고있는디브">
               <div class="공연정보1">
@@ -74,15 +74,15 @@
           </div>
         </div>
         <div style="; width: 100%; height: 80px; text-align: right">
-          <button type="button" style="width: 110px; height: 56px; background-color: #473baa; border-radius: 20px; ">
+          <button type="button" style="width: 110px; height: 56px; background-color: #392365; border-radius: 20px; ">
             <h5 style="color: white">좋아요</h5>
           </button>
         </div>
         <!--        여기 아래로는 리뷰들-->
         <div class="리뷰를담은디브">
-          <div style="height: 60px; background-color: #473baa; border-radius: 10px">
+          <div style="height: 60px; background-color: #392365; border-radius: 10px">
             <div style="display: flex;">
-              <h5 style="margin: 17px 10px auto auto; color: white;">리뷰 갯수 :</h5>
+              <h5 style="margin: 17px 10px auto auto; color: #aa98ba;">리뷰 개수 :</h5>
               <h5 style="margin: 17px auto auto 10px; color: white;">5</h5>
             </div>
           </div>
@@ -133,7 +133,7 @@
 }
 
 .공연정보1 {
-  color: white;
+  color: #aa98ba;
   width: 160px;
   height: 100%;
   text-align: right;
@@ -147,7 +147,7 @@
 }
 
 .event {
-  background-color: #7980aa;
+  background-color: #aa98ba;
   border-radius: 20px;
   height: 2000px;
   width: 1200px;

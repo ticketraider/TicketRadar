@@ -12,11 +12,26 @@ const routes = [
         name: 'Event',
         component: () => import('@/views/Event.vue'),
     },
-    // {
-    //     path: '/reservation',
-    //     name: 'Reservation',
-    //     component: () => import('@/views/ReservationView.vue'),
-    // },
+    {
+        path: '/login',
+        name: 'Login',
+        component: () => import('@/views/LoginView.vue'),
+    },
+    {
+        path: '/sign-up',
+        name: 'SignUp',
+        component: () => import('@/views/SignUpView.vue'),
+    },
+    {
+        path: '/admin',
+        name: 'BackOffice',
+        component: () => import('@/views/BackOffice.vue'),
+    },
+    {
+        path: '/tickets/list',
+        name: 'TicketList',
+        component: () => import('@/views/MyTicketList.vue'),
+    },
 ];
 
 // 이렇게 해도 된다.
