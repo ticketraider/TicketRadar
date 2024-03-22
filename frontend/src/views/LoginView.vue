@@ -48,7 +48,7 @@ let email = ''; // 사용자 입력을 저장할 변수
 let password = ''; // 사용자 입력을 저장할 변수
 
 const signUp = () => {
-  router.push({path: "/sign_up"})
+  router.push({path: "/sign-up"})
 }
 
 const signIn = async () => {
