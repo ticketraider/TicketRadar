@@ -64,7 +64,8 @@ const signIn = async () => {
     console.log(response.data);
     const token = response.data.token; // 토큰 추출
     localStorage.setItem('token', token); // 토큰 로컬 스토리지에 저장
-    await router.push('/eventList'); // 이벤트 목록 페이지로 이동
+    await router.push('/eventList');
+    location.reload();// 이벤트 목록 페이지로 이동
 
   } catch (error) {
     // 로그인 실패 시 처리

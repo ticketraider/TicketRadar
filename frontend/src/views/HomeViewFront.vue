@@ -11,7 +11,18 @@
   <main>
     <div style="height: 1300px; width: 100%; padding: 100px;">
       <div style="width: 1600px; padding:10px; display: flex; margin: 0 auto;">
-        <MyTicketList/>
+        <CardView/>
+        <CardView/>
+        <CardView/>
+        <CardView/>
+        <CardView/>
+      </div>
+      <div style="width: 1600px; padding:10px; display: flex; margin: 0 auto;">
+        <CardView/>
+        <CardView/>
+        <CardView/>
+        <CardView/>
+        <CardView/>
       </div>
     </div>
   </main>
@@ -26,12 +37,12 @@
 @import "../css/styles/TestStyle.css";
 </style>
 <script>
-import MyTicketList from "@/components/MyTicketList.vue";
+import CardView from "@/components/EventCardFront.vue";
 export default {
   name: 'App',
 
   components: {
-    MyTicketList,
+    CardView
   },
 
   data: () => ({

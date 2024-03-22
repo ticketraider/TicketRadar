@@ -1,8 +1,9 @@
 <script setup>
 
 import { computed } from 'vue';
-import jwtDecode from 'jwt-decode';
-import { useRoute, useRouter } from 'vue-router';
+// import jwtDecode from 'jwt-decode';
+import { useRouter } from 'vue-router';
+import {jwtDecode} from "jwt-decode";
 
 const router = useRouter();
 
@@ -14,7 +15,7 @@ const isLoggedIn = computed(() => !!token);
 const userRole = computed(() => {
   if (!token) return null;
   const decoded = jwtDecode(token);
-  return decoded.role; // 'role'은 토큰 내에 담겨있는 사용자 역할을 나타내는 속성입니다.
+  return decoded.role // 'role'은 토큰 내에 담겨있는 사용자 역할을 나타내는 속성입니다.
 });
 const isAdmin = computed(() => userRole.value === 'ADMIN');
 
@@ -33,7 +34,7 @@ function logout() {
 }
 
 function goToMyPage() {
-  router.push({ path: "/tickets/list" }); // 'mypage'는 마이페이지의 라우터 이름입니다.
+  router.push({ path: "/myTicketList" }); // 'mypage'는 마이페이지의 라우터 이름입니다.
 }
 
 function goToAdminMode() {
@@ -72,13 +73,13 @@ const goHome = () => {
 
     <nav>
       <!-- 로그인되지 않았을 때 보여질 버튼들 -->
-      <button v-if="!isLoggedIn" @click="login">로그인</button>
-      <button v-if="!isLoggedIn" @click="register">회원가입</button>
+      <button v-if="!isLoggedIn" class="btn btn-outline-light me-2" @click="login">로그인</button>
+      <button v-if="!isLoggedIn" class="btn btn-outline-info" @click="register">회원가입</button>
       <!-- 로그인되었을 때 보여질 버튼들 -->
-      <button v-if="isLoggedIn" @click="logout">로그아웃</button>
-      <button v-if="isLoggedIn" @click="goToMyPage">마이페이지</button>
+      <button v-if="isLoggedIn" class="btn btn-outline-light me-2" @click="logout">로그아웃</button>
+      <button v-if="isLoggedIn" class="btn btn-outline-info" @click="goToMyPage">마이페이지</button>
       <!-- 관리자 역할일 때 보여질 버튼 -->
-      <button v-if="isAdmin" @click="goToAdminMode">관리자모드</button>
+      <button v-if="isAdmin" class="btn btn-danger" style="margin-left: 8px" @click="goToAdminMode">관리자모드</button>
     </nav>
 
 

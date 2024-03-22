@@ -7,7 +7,7 @@
 </template>
 
 <script>
-import TicketViewer from '@/components/TicketViewer.vue';
+import TicketViewer from '@/components/TicketViewerBack.vue';
 
 export default {
   components: {

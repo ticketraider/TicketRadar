@@ -6,22 +6,22 @@ const routes = [
     {
         path: '/',
         name: 'Home',
-        component: () => import('@/views/Home.vue'), // 동적 import
+        component: () => import('@/views/HomeViewFront.vue'), // 동적 import
     },
     {
         path: '/event',
         name: 'Event',
-        component: () => import('@/views/Event.vue'),
+        component: () => import('@/views/EventDetailViewFront.vue'),
     },
     {
         path: '/eventList',
         name: 'EventList',
-        component: () => import('@/views/EventListView.vue'),
+        component: () => import('@/views/EventListViewBack.vue'),
     },
     {
         path: '/eventDetail/:eventId',
         name: 'EventDetail',
-        component: () => import('@/views/EventDetailView.vue'),
+        component: () => import('@/views/EventDetailViewBack.vue'),
     },
     {
         path: '/ticket-viewer', // 경로 설정
@@ -31,7 +31,7 @@ const routes = [
     {
         path: '/myTicketList', // 경로 설정
         name: 'MyTicketList', // 이름 설정
-        component: () => import('@/views/MyTicketListView.vue'),
+        component: () => import('@/views/MyTicketListViewBack.vue'),
         meta: { requiresAuth: true } // 로그인 필요 여부를 메타 필드로 추가
     },
     // {
@@ -52,7 +52,7 @@ const routes = [
     {
         path: '/admin',
         name: 'BackOffice',
-        component: () => import('@/views/BackOffice.vue'),
+        component: () => import('@/views/BackOfficeFront.vue'),
         meta: { requiresAuth: true } // 로그인 필요 여부를 메타 필드로 추가
     },
 ];
