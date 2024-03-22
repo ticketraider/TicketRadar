@@ -19,13 +19,13 @@ abstract class BaseEntity {
 //    @JsonDeserialize(using = LocalDateTimeDeserializer::class)
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
-    val createdAt: LocalDateTime? = null
+    val createdAt: LocalDateTime? = LocalDateTime.now()
 
 //    @JsonSerialize(using = LocalDateTimeSerializer::class)
 //    @JsonDeserialize(using = LocalDateTimeDeserializer::class)
     @UpdateTimestamp
     @Column(nullable = false)
-    val updatedAt: LocalDateTime? = null
+    val updatedAt: LocalDateTime? = LocalDateTime.now()
 
     @Column(nullable = false)
     var isDeleted: Boolean = false

@@ -9,7 +9,7 @@ import org.hibernate.annotations.SQLRestriction
 
 @Entity
 @SQLDelete(sql = "UPDATE likes SET is_deleted = true WHERE id = ?") // DELETE 쿼리 날아올 시 대신 실행
-@SQLRestriction("is_deleted = false")
+//@SQLRestriction("is_deleted = false")
 @Table(name = "likes")
 class Like (
 

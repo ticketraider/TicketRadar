@@ -36,8 +36,8 @@ class ReviewServiceImpl(
             request.title,
             request.content,
             request.rating,
-                member,
-                ticket.event,
+            member,
+            ticket.event,
             )
         )
     }
