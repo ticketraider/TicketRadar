@@ -14,17 +14,34 @@
         </v-col>
       </v-row>
     </div>
-    <!-- 페이지 네이션 -->
-    <div class="pagination">
-      <v-btn @click="fetchReviews(currentPage - 1)" :disabled="currentPage === 0">
-        이전 페이지
-      </v-btn>
-      <span>현재 페이지: {{ currentPage + 1 }}</span>
-      <v-btn @click="fetchReviews(currentPage + 1)" :disabled="currentPage === totalPages - 1">
-        다음 페이지
-      </v-btn>
-    </div>
+<!--    &lt;!&ndash; 페이지 네이션 &ndash;&gt;-->
+<!--    <div class="pagination">-->
+<!--      <v-btn @click="fetchReviews(currentPage - 1)" :disabled="currentPage === 0">-->
+<!--        이전 페이지-->
+<!--      </v-btn>-->
+<!--      <span>현재 페이지: {{ currentPage + 1 }}</span>-->
+<!--      <v-btn @click="fetchReviews(currentPage + 1)" :disabled="currentPage === totalPages - 1">-->
+<!--        다음 페이지-->
+<!--      </v-btn>-->
+<!--    </div>-->
   </div>
+
+  <div class="text-center">
+    <v-container>
+      <v-row justify="center">
+        <v-col cols="8">
+          <v-container class="max-width">
+            <v-pagination
+                v-model="page"
+                :length="20"
+                class="my-4"
+            ></v-pagination>
+          </v-container>
+        </v-col>
+      </v-row>
+    </v-container>
+  </div>
+
 </template>
 
 <script>

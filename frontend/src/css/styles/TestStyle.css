@@ -1,14 +1,12 @@
 /* 기본 글로벌 스타일 */
-body {
-  font-family: 'Arial', sans-serif;
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+main {
+  height: 100%;
+  background-color: #c6c9e7;
 }
 
 /* 헤더 스타일 */
 header {
-  background-color: midnightblue;
+  background-color: #0a0925;
   color: white;
   padding: 20px 40px;
 }
