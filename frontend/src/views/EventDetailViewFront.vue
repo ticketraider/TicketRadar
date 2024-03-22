@@ -161,8 +161,8 @@
 }
 </style>
 <script>
-import TicketingViewVer3 from "@/components/TicketingViewVer3.vue";
-import ReviewList from "@/components/ReviewList.vue";
+import TicketingViewVer3 from "@/components/TicketingComponentVer3Front.vue";
+import ReviewList from "@/components/ReviewListBack.vue";
 export default {
   name: 'App',
 

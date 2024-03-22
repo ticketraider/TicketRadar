@@ -9,8 +9,8 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
-import EventCard from "@/components/EventCard.vue";
-import ReviewList from "@/components/ReviewList.vue";
+import EventCard from "@/components/EventCardBack.vue";
+import ReviewList from "@/components/ReviewListBack.vue";
 import { useRoute } from "vue-router";
 
 const event = ref(null);
