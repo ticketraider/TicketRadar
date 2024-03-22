@@ -41,7 +41,7 @@ class ReviewController(
 
 
     @Operation(summary = "리뷰 통합 조회(전체/유저ID/이벤트ID")
-    @GetMapping("/v2")
+    @GetMapping()
     fun getReviewList_V2(
         @PageableDefault(size = 5, sort = ["id"]) pageable: Pageable,
         @RequestParam(required = false) memberId: Long?,
@@ -53,7 +53,7 @@ class ReviewController(
 
 
     @Operation(summary = "전체 조회")
-    @GetMapping()
+    @GetMapping("/all")
     fun getReviewList(
         @PageableDefault(size = 5, sort = ["id"]) pageable: Pageable
     ) : ResponseEntity<Page<ReviewResponse>>

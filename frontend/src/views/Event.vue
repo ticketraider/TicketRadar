@@ -87,11 +87,7 @@
             </div>
           </div>
 <!--리뷰 추가될때마다 1개씩 추가-->
-          <ReviewCard/>
-          <ReviewCard/>
-          <ReviewCard/>
-          <ReviewCard/>
-          <ReviewCard/>
+          <ReviewList/>
           <!--리뷰 페이지네이션-->
           <div class="text-center">
             <v-container>
@@ -165,13 +161,13 @@
 }
 </style>
 <script>
-import ReviewCard from "@/components/ReviewCard.vue";
 import TicketingViewVer3 from "@/components/TicketingViewVer3.vue";
+import ReviewList from "@/components/ReviewList.vue";
 export default {
   name: 'App',
 
   components: {
-    ReviewCard,
+    ReviewList,
     TicketingViewVer3
   },
 
