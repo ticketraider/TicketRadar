@@ -10,7 +10,7 @@ import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
-import org.springframework.security.core.annotation.AuthenticationPrincipal
+import org.springframework.security.core.Authentication
 import org.springframework.web.bind.annotation.*
 
 
@@ -55,8 +55,9 @@ class MemberController(
     @PutMapping("/update")
     fun updateProfile(
         @Valid @RequestBody updateProfileRequest: UpdateProfileRequest,
-        @AuthenticationPrincipal user: UserPrincipal
+        authentication: Authentication
     ): ResponseEntity<Unit> {
+        val user = authentication.principal as UserPrincipal
         return ResponseEntity
             .status(HttpStatus.OK)
             .body(memberService.updateProfile(updateProfileRequest, user))
@@ -66,8 +67,9 @@ class MemberController(
     @PreAuthorize("hasAnyRole('MEMBER', 'ADMIN')")
     @DeleteMapping("/members/unregister")
     fun unregister(
-        @AuthenticationPrincipal user: UserPrincipal
+        authentication: Authentication
     ): ResponseEntity<Unit> {
+        val user = authentication.principal as UserPrincipal
         return ResponseEntity
             .status(HttpStatus.OK)
             .body(memberService.unregister(user))
