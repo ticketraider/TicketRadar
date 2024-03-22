@@ -34,7 +34,7 @@ function logout() {
 }
 
 function goToMyPage() {
-  router.push({ path: "/myTicketList" }); // 'mypage'는 마이페이지의 라우터 이름입니다.
+  router.push({ path: "/my-page" }); // 'mypage'는 마이페이지의 라우터 이름입니다.
 }
 
 function goToAdminMode() {
