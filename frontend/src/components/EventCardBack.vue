@@ -95,7 +95,7 @@ const reserveTicket = () => {
   margin-left: 40px
 }
 
-.event {
+.event-detail {
   background-color: #7980aa;
   border-radius: 20px;
   height: 2000px;

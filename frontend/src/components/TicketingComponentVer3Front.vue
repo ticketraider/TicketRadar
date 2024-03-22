@@ -1,10 +1,31 @@
+<script setup>
+import {ref, onMounted} from 'vue';
+import axios from 'axios';
+import {useRoute} from "vue-router";
+
+const event = ref(null);
+const route = useRoute(); // useRoute()를 사용하여 현재 라우팅 정보를 가져옴
+
+const fetchEventDetail = async () => {
+  const eventId = Number(route.params.eventId); // 이벤트 ID를 Long으로 변환
+  try {
+    const response = await axios.get(`http://localhost:8080/events/${eventId}`);
+    event.value = response.data;
+  } catch (error) {
+    console.error('이벤트 상세 정보를 불러오는 동안 오류가 발생했습니다:', error);
+  }
+};
+
+onMounted(() => {
+  const eventId = route.params.eventId; // 라우팅 정보에서 eventId를 가져옴
+  fetchEventDetail(eventId); // 받아온 이벤트 ID 값을 사용하여 이벤트 상세 정보 호출
+});
+</script>
 <script>
 export default {
   data() {
     return {
       date: new Date('2024-03-29'),
-      minDate: '2024-03-29',
-      maxDate: '2024-05-19',
       seats: this.generateSeats(),
       selectedSeats: [],
     };
@@ -64,15 +85,15 @@ export default {
 
 </script>
 
-<template>
-  <div style="margin: 150px 10px auto 1px; background-color: #aa98ba; border-radius: 5px">
+<template >
+  <div style="margin: 150px 10px auto 1px; background-color: #aa98ba; border-radius: 5px" v-if="event">
       <v-container>
         <v-row justify="space-around">
           <v-date-picker
               v-model="date"
               :allowed-dates="allowedDates"
-              :max="maxDate"
-              :min="minDate"
+              :max="event.endDate"
+              :min="event.startDate"
           ></v-date-picker>
         </v-row>
       </v-container>
@@ -109,7 +130,7 @@ export default {
                     <tr>
                       <th>이름</th>
                       <th class="text-end"></th>
-                      <th class="text-end">오페라의 유령</th>
+                      <th class="text-end">{{event.title}}{{event.endDate.toString()}}</th>
                     </tr>
                     </thead>
 
@@ -123,7 +144,7 @@ export default {
                     <tr>
                       <th>장소</th>
                       <th class="text-end"></th>
-                      <th class="text-end">블루스퀘어 신한카드홀</th>
+                      <th class="text-end">{{ event.place }}</th>
                     </tr>
                     </tbody>
                   </v-table>
@@ -172,7 +193,7 @@ export default {
                     <tr>
                       <th>이름</th>
                       <th class="text-end"></th>
-                      <th class="text-end">오페라의 유령</th>
+                      <th class="text-end">{{ event.title }}</th>
                     </tr>
                     </thead>
 
@@ -186,7 +207,7 @@ export default {
                     <tr>
                       <th>장소</th>
                       <th class="text-end"></th>
-                      <th class="text-end">블루스퀘어 신한카드홀</th>
+                      <th class="text-end">{{ event.place }}</th>
                     </tr>
 
                     <tr>

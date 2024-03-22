@@ -1,6 +1,5 @@
 <template>
   <div class="review-list">
-    <h1>리뷰 목록</h1>
     <div class="review-grid">
       <v-row>
         <v-col v-for="review in reviewList" :key="review.id" cols="12">

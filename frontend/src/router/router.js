@@ -19,9 +19,9 @@ const routes = [
         component: () => import('@/views/EventListViewBack.vue'),
     },
     {
-        path: '/eventDetail/:eventId',
+        path: '/event-detail/:eventId',
         name: 'EventDetail',
-        component: () => import('@/views/EventDetailViewBack.vue'),
+        component: () => import('@/views/EventDetailViewFront.vue'),
     },
     {
         path: '/ticket-viewer', // 경로 설정
