@@ -9,6 +9,7 @@ import com.querydsl.core.BooleanBuilder
 import com.querydsl.core.types.Expression
 import com.querydsl.core.types.Order
 import com.querydsl.core.types.OrderSpecifier
+import com.querydsl.core.types.dsl.CaseBuilder
 import com.querydsl.core.types.dsl.EntityPathBase
 import com.querydsl.core.types.dsl.PathBuilder
 import org.springframework.data.domain.Page
@@ -56,28 +57,33 @@ class EventRepositoryImpl : QueryDslSupport(), CustomEventRepository {
         }.toTypedArray()
     }
 
-    override fun findByPageableAndCount(pageable: Pageable): Page<Event?> {
-        val builder = BooleanBuilder()
-        val totalCount = queryFactory.select(event.count()).from(event).where(builder).fetchOne() ?: 0L
-        val query = queryFactory.selectFrom(event)
-            .where(builder)
-            .offset(pageable.offset)
-            .limit(pageable.pageSize.toLong())
-
-        if (pageable.sort.isSorted) {
-            when (pageable.sort.first()?.property) {
-                "likecount" -> query.orderBy(event.likeCount.desc())
-                "reviewcount" -> query.orderBy(event.reviewCount.desc())
-                "title" -> query.orderBy(event.title.asc())
-                "created_at" -> query.orderBy(event.createdAt.desc())
-                "average_rating" -> query.orderBy(event.averageRating.desc())
-                "place" -> query.orderBy(event.place.name.asc())
-
-                else -> query.orderBy(event.createdAt.asc())
+    override fun findByPageableAndCount(pageable: Pageable, keyword : String?): Page<Event?> {
+        val orderSpecifiers = mutableListOf<OrderSpecifier<*>>()
+        val totalCountQuery = queryFactory.select(event.count()).from(event)
+        val totalCount = totalCountQuery.fetchOne() ?: 0L
+        pageable.sort.forEach {
+            val orderSpecifier = when (it.property) {
+                "likecount" -> event.likeCount.desc()
+                "reviewcount" -> event.reviewCount.desc()
+                "title" -> event.title.asc()
+                "startDate" -> event.startDate.asc()
+                "average_rating" -> event.averageRating.desc()
+                "place" -> event.place.name.asc()
+                else -> event.startDate.asc()
             }
-        } else {
-            query.orderBy(event.createdAt.asc())
+            orderSpecifiers.add(orderSpecifier)
         }
+
+        if(!keyword.isNullOrBlank()){
+            orderSpecifiers.add(
+                CaseBuilder()
+                    .`when`(event.place.address.contains(keyword)).then(1)
+                    .otherwise(2)
+                    .asc()
+            )
+        }
+        val query = queryFactory.selectFrom(event)
+            .orderBy(*orderSpecifiers.toTypedArray())
         val events = query.fetch()
         return PageImpl(events, pageable, totalCount)
     }

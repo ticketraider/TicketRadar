@@ -47,6 +47,9 @@ class EventServiceImpl(
         checkSeatForUpdateAndCreate(event, eventRequest, availableSeatRepository)
     }
 
+    override fun getPaginatedCountList(pageable: Pageable, keyword : String?): Page<EventResponse?> {
+        return eventRepository.findByPageableAndCount(pageable, keyword).map {EventResponse.from(it!!)}
+    }
     @Transactional
     override fun updateEvent(eventId: Long, eventRequest: EventRequest, file: MultipartFile?) {
         val event = eventRepository.findByIdOrNull(eventId)

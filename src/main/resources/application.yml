@@ -109,8 +109,8 @@ logging:
       springframework:
         security: debug
 
-#server:
-#  port: 8081
+server:
+  port: 8081
 ---
 spring:
   config:

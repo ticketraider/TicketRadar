@@ -31,15 +31,18 @@ class ReviewServiceImpl(
             it.event.id == request.eventId && it.ticketStatus == TicketStatus.EXPIRED
         }?: throw IllegalStateException("Expired ticket not found for event id: ${request.eventId}")
 
-        reviewRepository.save(
-            Review(
+        val review = Review(
             request.title,
             request.content,
             request.rating,
-                member,
-                ticket.event,
-            )
+            member,
+            ticket.event,
         )
+
+        reviewRepository.save(review)
+        ticket.event.addRating(request.rating)
+        eventRepository.save(ticket.event)
+
     }
 
     override fun getReviewList_V2(pageable: Pageable, memberId : Long?, eventId : Long?) : Page<ReviewResponse>
@@ -69,9 +72,11 @@ class ReviewServiceImpl(
     override fun updateReview(reviewId: Long, request: UpdateReviewRequest) {
         val review = reviewRepository.findByIdOrNull(reviewId)
             ?: throw NotFoundException()
+        review.event.deleteRating(review.rating)
         review.title = request.title
         review.content = request.content
         review.rating = request.rating
+        review.event.addRating(review.rating)
 
         reviewRepository.save(review)
     }
@@ -79,6 +84,7 @@ class ReviewServiceImpl(
     override fun deleteReview(reviewId: Long) {
         val review = reviewRepository.findByIdOrNull(reviewId)
             ?: throw NotFoundException()
+        review.event.deleteRating(review.rating)
         reviewRepository.delete(review)
     }
 }
