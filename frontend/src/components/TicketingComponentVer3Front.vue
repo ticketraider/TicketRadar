@@ -130,7 +130,7 @@ export default {
                     <tr>
                       <th>이름</th>
                       <th class="text-end"></th>
-                      <th class="text-end">{{event.title}}{{event.endDate.toString()}}</th>
+                      <th class="text-end">{{event.title}}</th>
                     </tr>
                     </thead>
 
