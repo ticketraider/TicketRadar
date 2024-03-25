@@ -40,7 +40,6 @@ class TicketServiceImpl(
     private val memberRepository: MemberRepository,
     private val eventRepository: EventRepository,
     private val availableSeatRepository: AvailableSeatRepository,
-    private val redisCacheService: RedisCacheService,
 ) : TicketService {
     companion object {
         val logger = LoggerFactory.getLogger(TicketServiceImpl::class.java)
@@ -68,10 +67,6 @@ class TicketServiceImpl(
 
         // 예약 가능 좌석 선별
        request.seatList.map{ seat ->
-           //캐싱 체크
-           val key = "${request.eventId}_${request.date}_${seat.ticketGrade}_${seat.seatNumber}"
-            if(redisCacheService.chkCache(CacheTarget.TICKET, key))
-                throw TicketReservationFailedException("${seat.seatNumber} 번 좌석은 선택할 수 없습니다. ( 이미 예약된 좌석 in Cache )")
 
            //DB 체크
            val isReserved = ticketRepository.chkTicket(
@@ -107,11 +102,6 @@ class TicketServiceImpl(
 
             ticketRepository.save( ticket )
 
-            // 캐시에 등록
-            redisCacheService.putCache(CacheTarget.TICKET,
-                "${request.eventId}_${request.date}_${seat.ticketGrade}_${seat.seatNumber}",
-                TicketResponse.from(ticket))
-
             // 좌석 예약 수 수정
             availableSeat.increaseSeat(seat.ticketGrade)
             if (availableSeat.isFull()) {
@@ -122,25 +112,6 @@ class TicketServiceImpl(
         eventRepository.save(event)
         //캐시 내 이벤트 항목 최신화 하지 않아도 됨. Response 에는 변동사항 없음
     }
-
-    // RedisCacheService 로 이동
-//    fun chkTicketCache(eventId: Long, date: LocalDate, grade: TicketGrade, seatNo: Int): Boolean {
-//        logger.info("캐시의 티켓 확인 시작")
-//        val cache = cacheManager.getCache("tickets")
-//        logger.info("Cache : $cache")
-//        val key = "${eventId}_${date}_${grade}_${seatNo}"
-//        val ticket = cache?.get(key) // ticket : TicketResponse 상태
-//
-//        if (ticket != null) {    // 캐시에 일치하는 키 있을 때
-//            logger.info("Cache hit for ticket: $key")
-//            logger.info("Ticket in Cache : $ticket")
-//            logger.info("이미 예매된 티켓입니다. ( in cache ) ")
-//            return true
-//        } else {   // 캐시에 일치하는 키 없을 때
-//            logger.info("Cache miss for ticket: $key")
-//            return false
-//        }
-//    }
 
     override fun getAllTicketList(pageable: Pageable, memberId: Long?, eventId: Long?): Page<TicketResponse> {
         return ticketRepository.getAllTicketList(pageable, memberId, eventId).map { TicketResponse.from(it) }
@@ -155,16 +126,6 @@ class TicketServiceImpl(
     override fun getTicketListByUserId(userPrincipal: UserPrincipal, pageable: Pageable): Page<TicketResponse> {
         return ticketRepository.getListByUserId(pageable, userPrincipal.id).map { TicketResponse.from(it) }
     }
-
-    // 없어도 될듯
-//    override fun updateTicketStatus(ticketId: Long, ticketStatus: TicketStatus) {
-//        val ticket = ticketRepository.findByIdOrNull(ticketId)
-//            ?: throw ModelNotFoundException("Ticket", ticketId)
-//
-//        ticket.switchTicketStatus(ticketStatus)
-//
-//        ticketRepository.save(ticket)
-//    }
 
     override fun chkExpiredTickets() {
         // TODO() findAll 보다 동적쿼리로 대상만 찾을지?
@@ -216,8 +177,6 @@ class TicketServiceImpl(
                     availableSeatRepository.save(it)
                 }
 
-                // 캐시 삭제
-                redisCacheService.delCache( CacheTarget.TICKET,"${ticket.event.id}_${ticket.date}_${ticket.grade}_${ticket.seatNo}")
                 ticketRepository.delete(ticket)
             }
             ?: throw ModelNotFoundException("Ticket", ticketId)

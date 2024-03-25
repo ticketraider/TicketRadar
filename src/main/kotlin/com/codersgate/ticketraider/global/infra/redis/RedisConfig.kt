@@ -98,12 +98,9 @@ class RedisConfig {
         val ticketsCacheConfig = RedisCacheConfiguration.defaultCacheConfig()
             .entryTtl(Duration.ofMinutes(5))
 
-
         // "events" 라는 이름의 캐시에 대해 적용
         val eventsCacheConfig = RedisCacheConfiguration.defaultCacheConfig()
             .entryTtl(Duration.ofMinutes(10))
-
-
 
         return RedisCacheManager // RedisCacheManager를 생성하기 위한 빌더 패턴을 사용
             .builder(cf) // RedisConnectionFactory 를 받아 CacheManager를 빌드
