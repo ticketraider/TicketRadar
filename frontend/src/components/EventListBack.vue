@@ -1,40 +1,42 @@
 <template>
   <div class="event-list">
-    <h1>이벤트 목록</h1>
+    <h1></h1>
     <div class="event-grid">
       <v-card v-for="event in eventList" :key="event.id" class="event-card">
         <!-- 이벤트 정보를 표시하는 부분 -->
-        <v-img
-            height="200"
-            :src="event.posterImage"
-            alt="Event Poster"
-            cover
-        ></v-img>
-
-        <v-card-title>{{ event.title }}</v-card-title>
-
-        <v-card-subtitle>{{ event.eventInfo }}</v-card-subtitle>
-
-        <v-card-actions>
-          <v-btn
-              @click="reserve(event.id)"
-              color="orange"
-              dark
-          >
-            예매하러 가기
-          </v-btn>
-        </v-card-actions>
+        <v-card class="mx-auto" style="width: 300px; background-color: white">
+          <v-img height="400px"  :src="event.posterImage"
+                 cover></v-img>
+          <v-card-title>
+            {{ event.title }}
+          </v-card-title>
+          <v-card-subtitle>
+            {{ event.eventInfo }}
+          </v-card-subtitle>
+          <v-card-actions>
+            <v-btn
+                @click="reserve(event.id)"
+                color=#0a0925
+                variant="text">
+              예매하러 가기
+            </v-btn>
+            <v-spacer></v-spacer>
+          </v-card-actions>
+        </v-card>
       </v-card>
     </div>
     <!-- 페이지 네이션 -->
-    <div class="pagination">
-      <v-btn @click="fetchEvents(currentPage - 1)" :disabled="currentPage === 0">
-        이전 페이지
-      </v-btn>
-      <span>현재 페이지: {{ currentPage + 1 }}</span>
-      <v-btn @click="fetchEvents(currentPage + 1)" :disabled="currentPage === totalPages - 1">
-        다음 페이지
-      </v-btn>
+    <div style="width: 100%; margin: 10px">
+      <div class="pagination" style="margin-left: 680px ">
+        <v-btn @click="fetchEvents(currentPage - 1)" :disabled="currentPage === 0"
+               style="background-color: #0a0925; color: white;">
+          이전
+        </v-btn>
+        <v-btn @click="fetchEvents(currentPage + 1)" :disabled="currentPage === totalPages - 1"
+        style="margin-left: 20px; background-color: #0a0925; color: white;">
+          다음
+        </v-btn>
+      </div>
     </div>
   </div>
 </template>

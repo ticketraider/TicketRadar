@@ -3,6 +3,7 @@ package com.codersgate.ticketraider.domain.event.service
 import com.codersgate.ticketraider.domain.category.repository.CategoryRepository
 import com.codersgate.ticketraider.domain.event.dto.EventRequest
 import com.codersgate.ticketraider.domain.event.dto.EventResponse
+import com.codersgate.ticketraider.domain.event.dto.price.PriceResponse
 import com.codersgate.ticketraider.domain.event.model.Event
 import com.codersgate.ticketraider.domain.event.repository.EventRepository
 import com.codersgate.ticketraider.domain.event.repository.price.PriceRepository
@@ -26,6 +27,12 @@ class EventServiceImpl(
     private val placeRepository: PlaceRepository,
     private val s3Service: S3Service
 ) : EventService {
+    override fun getPrice(eventId: Long): PriceResponse {
+        val event = eventRepository.findByIdOrNull(eventId)
+            ?: throw ModelNotFoundException("Event", eventId)
+        return PriceResponse.from(event.price!!)
+    }
+
     @Transactional
     override fun createEvent(eventRequest: EventRequest, file: MultipartFile?) {
         val category = categoryRepository.findByIdOrNull(eventRequest.categoryId)

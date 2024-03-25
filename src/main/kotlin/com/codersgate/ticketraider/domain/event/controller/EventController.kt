@@ -3,6 +3,7 @@ package com.codersgate.ticketraider.domain.event.controller
 
 import com.codersgate.ticketraider.domain.event.dto.EventRequest
 import com.codersgate.ticketraider.domain.event.dto.EventResponse
+import com.codersgate.ticketraider.domain.event.dto.price.PriceResponse
 import com.codersgate.ticketraider.domain.event.service.EventService
 import io.swagger.v3.oas.annotations.Operation
 import jakarta.validation.Valid
@@ -20,6 +21,15 @@ import org.springframework.web.multipart.MultipartFile
 class EventController(
     private val eventService : EventService)
 {
+    @Operation(summary = "가격 조회")
+    @GetMapping("/price/{eventId}")
+    fun getPrice(
+        @PathVariable eventId: Long
+    ): ResponseEntity<PriceResponse>{
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(eventService.getPrice(eventId))
+    }
 
     @Operation(summary = " 이벤트 생성")
     @PostMapping(consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])

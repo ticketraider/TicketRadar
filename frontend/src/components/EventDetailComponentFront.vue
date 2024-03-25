@@ -50,7 +50,7 @@ onMounted(() => {
             <h5>장소</h5>
           </div>
           <div class="공연정보2">
-            <h5>{{ event.place }}</h5>
+            <h5>{{ event.place.name }}</h5>
           </div>
         </div>
         <div class="공연정보담고있는디브">

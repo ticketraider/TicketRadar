@@ -23,7 +23,7 @@
 @import "../css/styles/TestStyle.css";
 </style>
 <script>
-import TicketingComponentVer3 from "@/components/TicketingComponentVer3Front.vue";
+import TicketingComponentVer3 from "@/components/TicketingComponentVer4Front.vue";
 import EventDetailComponentFront from "@/components/EventDetailComponentFront.vue";
 export default {
   name: 'App',

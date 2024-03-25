@@ -8,8 +8,8 @@
     <title>Ticket Radar</title>
   </head>
   <body>
-  <main>
-    <div style="height: 1300px; width: 100%; padding: 100px;">
+  <main style="height: 1000px">
+    <div style=" width: 100%; padding: 100px;">
       <div style="width: 1600px; padding:10px; display: flex; margin: 0 auto;">
         <EventList/>
       </div>

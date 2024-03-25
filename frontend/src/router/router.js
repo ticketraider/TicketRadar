@@ -9,12 +9,7 @@ const routes = [
         component: () => import('@/views/HomeViewFront.vue'), // 동적 import
     },
     {
-        path: '/event',
-        name: 'Event',
-        component: () => import('@/views/EventDetailViewFront.vue'),
-    },
-    {
-        path: '/eventList',
+        path: '/event-list',
         name: 'EventList',
         component: () => import('@/views/EventListViewBack.vue'),
     },

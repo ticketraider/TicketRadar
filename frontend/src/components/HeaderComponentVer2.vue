@@ -36,6 +36,9 @@ function logout() {
 function goToMyPage() {
   router.push({ path: "/my-page" }); // 'mypage'는 마이페이지의 라우터 이름입니다.
 }
+function goEventList() {
+  router.push({ path: '/event-list' });
+}
 
 function goToAdminMode() {
   router.push({ path: '/admin' }); // 'admin'은 관리자모드의 라우터 이름입니다.
@@ -86,13 +89,13 @@ const goHome = () => {
   </div>
   <nav>
     <ul>
-      <li><a href="#" class="category">뮤지컬</a></li>
-      <li><a href="#" class="category">콘서트</a></li>
-      <li><a href="#" class="category">스포츠</a></li>
-      <li><a href="#" class="category">전시/행사</a></li>
-      <li><a href="#" class="category">클래식/무용</a></li>
-      <li><a href="#" class="category">아동/가족</a></li>
-      <li><a href="#" class="category">연극</a></li>
+      <li><a href="#" class="category" @click="goEventList">뮤지컬</a></li>
+      <li><a href="#" class="category" @click="goEventList">콘서트</a></li>
+      <li><a href="#" class="category" @click="goEventList">스포츠</a></li>
+      <li><a href="#" class="category" @click="goEventList">전시/행사</a></li>
+      <li><a href="#" class="category" @click="goEventList">클래식/무용</a></li>
+      <li><a href="#" class="category" @click="goEventList">아동/가족</a></li>
+      <li><a href="#" class="category" @click="goEventList">연극</a></li>
     </ul>
   </nav>
 </template>
