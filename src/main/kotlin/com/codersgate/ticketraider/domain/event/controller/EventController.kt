@@ -3,6 +3,7 @@ package com.codersgate.ticketraider.domain.event.controller
 
 import com.codersgate.ticketraider.domain.event.dto.EventRequest
 import com.codersgate.ticketraider.domain.event.dto.EventResponse
+import com.codersgate.ticketraider.domain.event.dto.price.PriceResponse
 import com.codersgate.ticketraider.domain.event.service.EventService
 import io.swagger.v3.oas.annotations.Operation
 import jakarta.validation.Valid
@@ -18,8 +19,17 @@ import org.springframework.web.multipart.MultipartFile
 @RestController
 @RequestMapping("/events")
 class EventController(
-    private val eventService : EventService)
-{
+    private val eventService: EventService
+) {
+    @Operation(summary = "가격 조회")
+    @GetMapping("/price/{eventId}")
+    fun getPrice(
+        @PathVariable eventId: Long
+    ): ResponseEntity<PriceResponse> {
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(eventService.getPrice(eventId))
+    }
 
     @Operation(summary = " 이벤트 생성")
     @PostMapping(consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
@@ -28,8 +38,8 @@ class EventController(
         @RequestPart(value = "file", required = false) file: MultipartFile?
     ): ResponseEntity<Unit> {
         return ResponseEntity
-        .status(HttpStatus.CREATED)
-        .body(eventService.createEvent(eventRequest, file))
+            .status(HttpStatus.CREATED)
+            .body(eventService.createEvent(eventRequest, file))
     }
 
     @Operation(summary = " 이벤트 수정")
@@ -39,14 +49,14 @@ class EventController(
         @Valid @RequestPart eventRequest: EventRequest,
         @RequestPart file: MultipartFile?
     ): ResponseEntity<Unit> {
-    return ResponseEntity
-        .status(HttpStatus.OK)
-        .body(eventService.updateEvent(eventId, eventRequest, file))
-}
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(eventService.updateEvent(eventId, eventRequest, file))
+    }
 
     @Operation(summary = "이벤트 삭제")
     @DeleteMapping("/{eventId}")
-    fun deleteEvent(@PathVariable eventId: Long) : ResponseEntity<Unit>{
+    fun deleteEvent(@PathVariable eventId: Long): ResponseEntity<Unit> {
         eventService.deleteEvent(eventId)
         return ResponseEntity
             .status(HttpStatus.NO_CONTENT)
@@ -57,19 +67,29 @@ class EventController(
     @GetMapping
     fun getEventList(
         @PageableDefault(size = 5, sort = ["id"]) pageable: Pageable,
-        @RequestParam(value = "status", required = false) status : String?,
-        @RequestParam categoryId: Long?
-    ): ResponseEntity<Page<EventResponse>>{
+        @RequestParam sortStatus: String?,
+        @RequestParam searchStatus: String?,
+        @RequestParam category: String?,
+        @RequestParam keyword: String?,
+    ): ResponseEntity<Page<EventResponse>> {
         return ResponseEntity
             .status(HttpStatus.OK)
-            .body(eventService.getPaginatedEventList(pageable, status, categoryId))
+            .body(
+                eventService.getPaginatedEventList(
+                    pageable,
+                    sortStatus,
+                    searchStatus,
+                    category,
+                    keyword
+                )
+            )
     }
 
     @Operation(summary = "이벤트 조회")
     @GetMapping("/{eventId}")
     fun getEvent(
         @PathVariable eventId: Long
-    ): ResponseEntity<EventResponse>{
+    ): ResponseEntity<EventResponse> {
         return ResponseEntity
             .status(HttpStatus.OK)
             .body(eventService.getEvent(eventId))

@@ -1,6 +1,7 @@
 package com.codersgate.ticketraider.domain.ticket.controller
 
 import com.codersgate.ticketraider.domain.review.dto.ReviewResponse
+import com.codersgate.ticketraider.domain.ticket.dto.BookedTicketResponse
 import com.codersgate.ticketraider.domain.ticket.dto.CreateTicketRequest
 import com.codersgate.ticketraider.domain.ticket.dto.TicketResponse
 import com.codersgate.ticketraider.domain.ticket.entity.TicketStatus
@@ -18,6 +19,7 @@ import org.springframework.security.core.Authentication
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.*
+import java.time.LocalDate
 
 @RestController
 @RequestMapping("/tickets")
@@ -54,9 +56,17 @@ class TicketController(
         @PageableDefault(size = 5, sort = ["id"]) pageable: Pageable,
         @RequestParam(required = false) memberId: Long?,
         @RequestParam(required = false) eventId: Long?,
-    ) : ResponseEntity<Page<TicketResponse>>
-    {
+    ): ResponseEntity<Page<TicketResponse>> {
         return ResponseEntity.status(HttpStatus.OK).body(ticketService.getAllTicketList(pageable, memberId, eventId))
+    }
+
+    @Operation(summary = "예약된 티켓 조회(좌석배치용)")
+    @GetMapping("/ticket-list/{eventId}")
+    fun getBookedTicket(
+        @PathVariable eventId: Long,
+        @RequestParam date: LocalDate
+    ): ResponseEntity<BookedTicketResponse> {
+        return ResponseEntity.status(HttpStatus.OK).body(ticketService.getBookedTicket(eventId, date))
     }
 
     @Operation(summary = "멤버 티켓리스트 조회")
@@ -89,8 +99,7 @@ class TicketController(
     @Scheduled(cron = "0 0 12 * * MON-FRI") // 매주 월요일부터 금요일까지 매일 정오(12시)에 메서드가 실행
     @PatchMapping("/chkExpired")
     @Operation(summary = "만료 티켓 확인")
-    fun chkExpiredTicket() : ResponseEntity<Unit>
-    {
+    fun chkExpiredTicket(): ResponseEntity<Unit> {
         ticketService.chkExpiredTickets()
         return ResponseEntity
             .status(HttpStatus.OK)
@@ -101,9 +110,8 @@ class TicketController(
     @Operation(summary = "티켓 결제하기")
     fun makePayment(
         @AuthenticationPrincipal userPrincipal: UserPrincipal,
-        @RequestParam ticketIdList : MutableList<Long>,
-    ) : ResponseEntity<List<TicketResponse>>
-    {
+        @RequestParam ticketIdList: MutableList<Long>,
+    ): ResponseEntity<List<TicketResponse>> {
 
         return ResponseEntity
             .status(HttpStatus.OK)
@@ -132,7 +140,6 @@ class TicketController(
             .status(HttpStatus.OK)
             .body(ticketService.deleteTicket(ticketId))
     }
-
 
 
 }

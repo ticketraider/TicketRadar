@@ -2,6 +2,7 @@ package com.codersgate.ticketraider.domain.event.dto
 
 import com.codersgate.ticketraider.domain.event.dto.price.PriceResponse
 import com.codersgate.ticketraider.domain.event.model.Event
+import com.codersgate.ticketraider.domain.place.dto.PlaceResponse
 import java.time.LocalDate
 
 data class EventResponse(
@@ -13,7 +14,7 @@ data class EventResponse(
     val eventInfo: String,
     val averageRating: Float,
     val posterImage: String,
-    val place: String,
+    val place: PlaceResponse,
     val price: PriceResponse,
     val reviewCount : Int,
 ) {
@@ -28,7 +29,7 @@ data class EventResponse(
                 eventInfo = event.eventInfo,
                 averageRating = event.averageRating,
                 posterImage = event.posterImage,
-                place = event.place.name,
+                place = PlaceResponse.from(event.place),
                 reviewCount = event.reviewCount,
                 price = PriceResponse.from(event.price!!)
             )

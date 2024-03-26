@@ -7,7 +7,7 @@ import java.time.LocalDate
 
 interface TicketRepository: JpaRepository<Ticket, Long>, CustomTicketRepository {
     fun findAllByMemberId(memberId : Long) : List<Ticket>
-    fun findAllByEventId(eventId:Long) : List<Ticket?>
+    fun findAllByEventIdAndDate(eventId:Long, date: LocalDate) : List<Ticket?>
 
     fun existsByEventIdAndDateAndGradeAndSeatNo(eventId: Long, date: LocalDate, grade: TicketGrade, seatNo: Int): Boolean
 }

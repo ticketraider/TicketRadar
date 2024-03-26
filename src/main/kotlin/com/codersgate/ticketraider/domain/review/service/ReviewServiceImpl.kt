@@ -8,6 +8,7 @@ import com.codersgate.ticketraider.domain.review.dto.UpdateReviewRequest
 import com.codersgate.ticketraider.domain.review.model.Review
 import com.codersgate.ticketraider.domain.review.repository.ReviewRepository
 import com.codersgate.ticketraider.domain.ticket.entity.TicketStatus
+import jakarta.transaction.Transactional
 import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -21,6 +22,7 @@ class ReviewServiceImpl(
     private val eventRepository: EventRepository,
 ) : ReviewService{
 
+    @Transactional
     override fun createReview(memberId: Long, request: CreateReviewRequest) {
 
         val member = memberRepository.findByIdOrNull(memberId)
@@ -28,18 +30,21 @@ class ReviewServiceImpl(
 
         // 티켓 내역 확인
         val ticket =  member.tickets.find{
-            it.event.id == request.eventId && it.ticketStatus == TicketStatus.EXPIRED
+            it.event.id == request.eventId
+//                    && it.ticketStatus == TicketStatus.EXPIRED
         }?: throw IllegalStateException("Expired ticket not found for event id: ${request.eventId}")
 
-        reviewRepository.save(
+        val review = reviewRepository.save(
             Review(
-            request.title,
-            request.content,
-            request.rating,
-            member,
-            ticket.event,
+                request.title,
+                request.content,
+                request.rating,
+                member,
+                ticket.event,
             )
         )
+        review.event.addRating(request.rating)
+        reviewRepository.save(review)
     }
 
     override fun getReviewList_V2(pageable: Pageable, memberId : Long?, eventId : Long?) : Page<ReviewResponse>
@@ -69,6 +74,9 @@ class ReviewServiceImpl(
     override fun updateReview(reviewId: Long, request: UpdateReviewRequest) {
         val review = reviewRepository.findByIdOrNull(reviewId)
             ?: throw NotFoundException()
+        review.event.deleteRating(review.rating)
+        review.event.addRating(request.rating)
+
         review.title = request.title
         review.content = request.content
         review.rating = request.rating
@@ -79,6 +87,7 @@ class ReviewServiceImpl(
     override fun deleteReview(reviewId: Long) {
         val review = reviewRepository.findByIdOrNull(reviewId)
             ?: throw NotFoundException()
+        review.event.deleteRating(review.rating)
         reviewRepository.delete(review)
     }
 }
