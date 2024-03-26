@@ -45,6 +45,9 @@
 <script>
 import axios from 'axios';
 
+// 로컬 스토리지에서 JWT 토큰 가져오기
+const token = localStorage.getItem('token');
+
 export default {
   data() {
     return {
@@ -57,42 +60,28 @@ export default {
         place: '',
         seatRPrice: 0,
         seatSPrice: 0,
-        seatAPrice: 0
+        seatAPrice: 0,
+        posterImage : ''
       },
-      file: null // For file upload
+
     };
   },
   methods: {
-    async createEvent(event) {
-
+    async createEvent() {
       try {
-        const file = event.target.file[0]
-        console.log(file)
-        const formData = new FormData();
-        formData.append('eventRequest', JSON.stringify(this.eventRequest));
-        formData.append('file', this.file);
-
-        console.log(formData)
-
-        const token = localStorage.getItem('token');
-
-        await axios.post('http://localhost:8080/events', {
-
-        }, {
+        console.log(this.eventRequest)
+        // Axios를 사용하여 API에 POST 요청을 보냅니다.
+        await axios.post('http://localhost:8080/events', this.eventRequest, {
           headers: {
-            'Content-Type': 'multipart/form-data',
             Authorization: `Bearer ${token}` // JWT 토큰을 포함한 Authorization 헤더 설정
           }
         });
 
-        // 성공 처리
         console.log('이벤트가 성공적으로 생성되었습니다!');
       } catch (error) {
-        // 오류 처리
         console.error('이벤트 생성 중 오류 발생:', error);
       }
-    },
-
+    }
   }
 };
 </script>
