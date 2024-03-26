@@ -26,7 +26,7 @@
 @import "../css/styles/TestStyle.css";
 </style>
 <script>
-import EventList from "@/components/EventListBack.vue";
+import EventList from "@/components/EventListComponent.vue";
 export default {
   name: 'App',
 

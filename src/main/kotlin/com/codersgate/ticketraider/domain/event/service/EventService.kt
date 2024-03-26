@@ -11,14 +11,20 @@ import org.springframework.web.multipart.MultipartFile
 @Service
 interface EventService {
 
-    fun getPrice(eventId: Long) : PriceResponse
+    fun getPrice(eventId: Long): PriceResponse
     fun createEvent(eventRequest: EventRequest, file: MultipartFile?)
 
     fun updateEvent(eventId: Long, eventRequest: EventRequest, file: MultipartFile?)
 
     fun deleteEvent(eventId: Long)
 
-    fun getPaginatedEventList(pageable: Pageable, status : String?, categoryId: Long?) : Page<EventResponse>?
+    fun getPaginatedEventList(
+        pageable: Pageable,
+        sortStatus: String?,
+        searchStatus: String?,
+        category: String?,
+        keyword: String?
+    ): Page<EventResponse>?
 
     fun getEvent(eventId: Long): EventResponse
 

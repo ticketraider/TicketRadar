@@ -12,7 +12,7 @@
     <div style="display: flex">
       <EventDetailComponentFront/>
       <!--   예매시 날짜 선택창과 예매버튼-->
-      <TicketingComponentVer3/>
+      <TicketingComponent/>
 
     </div>
   </main>
@@ -23,14 +23,14 @@
 @import "../css/styles/TestStyle.css";
 </style>
 <script>
-import TicketingComponentVer3 from "@/components/TicketingComponentVer4Front.vue";
+import TicketingComponent from "@/components/TicketingComponentVer5Front.vue";
 import EventDetailComponentFront from "@/components/EventDetailComponentFront.vue";
 export default {
   name: 'App',
 
   components: {
     EventDetailComponentFront,
-    TicketingComponentVer3
+    TicketingComponent
   },
 
   data: () => ({

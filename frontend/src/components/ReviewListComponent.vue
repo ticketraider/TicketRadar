@@ -2,7 +2,8 @@
   <form style="color: white; width: 90%; height: 180px; margin: 50px auto auto auto">
     <div style="display: flex">
       <div class="mb-3">
-        <input type="email" placeholder="리뷰 제목" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+        <input type="text" placeholder="리뷰 제목" v-model="reviewTitle" class="form-control" id="exampleInputEmail1"
+               aria-describedby="emailHelp">
       </div>
       <div style="margin-bottom: 10px">
         <v-rating
@@ -14,11 +15,13 @@
 
     </div>
     <div class="mb-3">
-      <input type="password" placeholder="리뷰 내용" class="form-control" id="exampleInputPassword1">
+      <input type="text" placeholder="리뷰 내용" v-model="reviewContent" class="form-control" id="exampleInputPassword1">
     </div>
     <div style="text-align: right;">
-      <button type="submit" class="btn btn-primary"
-              style="background-color: #392365; border-color: #392365; margin-left: 15px;">리뷰 남기기
+      <button type="button" class="btn btn-primary"
+              style="background-color: #392365; border-color: #392365; margin-left: 15px;"
+              @click="submitReview"
+      >리뷰 남기기
       </button>
     </div>
 
@@ -89,9 +92,10 @@ export default {
     return {
       rating: 3,
       page: 1,
+      reviewTitle: '', // 리뷰 제목을 위한 데이터 프로퍼티
+      reviewContent: '', // 리뷰 내용을 위한 데이터 프로퍼티
     }
   },
-
   setup() {
     const reviewList = ref([]);
     const currentPage = ref(0);
@@ -124,8 +128,44 @@ export default {
       fetchReviews(currentPage.value);
     });
 
-    return {reviewList, currentPage, totalPages, fetchReviews, displayRating};
-  }
+    return {eventId, reviewList, currentPage, totalPages, fetchReviews, displayRating};
+  },
+  methods: {
+
+    async submitReview() {
+      try {
+        const reviewDetail = {
+          title: this.reviewTitle,
+          content: this.reviewContent,
+          rating: this.rating,
+          eventId: this.eventId//여기에 이벤트ID 받아와야됨
+        };
+        console.log(reviewDetail)
+        const token = localStorage.getItem('token');
+
+        await axios.post('http://localhost:8080/reviews/create', reviewDetail
+            ,
+            {
+              headers: {
+                Authorization: `Bearer ${token}` // JWT 토큰을 포함한 Authorization 헤더 설정
+              }
+            });
+
+        alert('리뷰가 성공적으로 생성되었습니다.');
+
+        this.reviewTitle = ''; // 입력 필드 초기화
+        this.reviewContent = ''; // 입력 필드 초기화
+        window.location.reload()// 리뷰 목록을 다시 불러옵니다.
+
+      } catch (error) {
+        if (error.response.status === 500) {
+          alert("리뷰를 남기기 전에 티켓을 먼저 예매해주세요")
+        } else {
+          alert("알수없는 에러가 발생 했습니다.")
+        }
+      }
+    }
+  },
 }
 </script>
 

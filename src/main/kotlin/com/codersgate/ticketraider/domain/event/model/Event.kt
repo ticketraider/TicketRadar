@@ -56,6 +56,20 @@ class Event(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null
+
+    fun addRating(rating:Int){
+        var totalRating = averageRating*reviewCount
+        totalRating+= rating
+        reviewCount++
+        averageRating = totalRating.toFloat() / reviewCount
+    }
+
+    fun deleteRating(rating: Int){
+        var totalRating = averageRating*reviewCount
+        totalRating-= rating
+        reviewCount--
+        averageRating = totalRating.toFloat() / reviewCount
+    }
 }
 
 
