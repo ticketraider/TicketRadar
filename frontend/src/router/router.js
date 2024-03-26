@@ -52,7 +52,7 @@ const routes = [
     {
         path: '/admin',
         name: 'BackOffice',
-        component: () => import('@/views/BackOfficeFront.vue'),
+        component: () => import('@/views/BackOffice.vue'),
         meta: { requiresAuth: true } // 로그인 필요 여부를 메타 필드로 추가
     },
 ];
