@@ -15,8 +15,8 @@
 
 
 <script setup>
-import CategoryForm from '@/components/CategoryForm.vue';
-import EventForm from '@/components/EventForm.vue';
+import CategoryForm from '@/components/BackOffice/CategoryForm.vue';
+import EventForm from '@/components/BackOffice/EventForm.vue';
 </script>
 
 

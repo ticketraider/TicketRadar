@@ -20,7 +20,8 @@ const app = createApp(App)
     .use(vuetify)
     .mount('#app');
 
-// API 주소를 상수값으로 등록
-app.config.globalProperties.$apiUrl = 'http://localhost:8080/';
+// 백엔드 API 주소를 상수로 등록
+const apiUrl = 'http://localhost:8080/';
+app.config.globalProperties.$apiUrl = apiUrl;
 
 app.mount('#app');
