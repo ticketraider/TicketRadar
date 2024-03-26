@@ -20,28 +20,35 @@ import org.springframework.web.multipart.MultipartFile
 class EventController(
     private val eventService : EventService)
 {
-
     @Operation(summary = " 이벤트 생성")
-    @PostMapping(consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
+    @PostMapping
     fun createEvent(
-        @Valid @RequestPart(value = "eventRequest") eventRequest: EventRequest,
-        @RequestPart(value = "file", required = false) file: MultipartFile?
+        @Valid @RequestBody eventRequest: EventRequest
     ): ResponseEntity<Unit> {
         return ResponseEntity
         .status(HttpStatus.CREATED)
-        .body(eventService.createEvent(eventRequest, file))
+        .body(eventService.createEvent(eventRequest))
+    }
+
+    @Operation(summary = "이미지 업로드")
+    @PostMapping("/image", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
+    fun uploadImage(
+        @RequestPart(value = "file", required = false) file: MultipartFile?
+    ): ResponseEntity<String> {
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(eventService.uploadImage(file))
     }
 
     @Operation(summary = " 이벤트 수정")
-    @PutMapping("/{eventId}", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
+    @PutMapping("/{eventId}")
     fun updateEvent(
         @PathVariable eventId: Long,
-        @Valid @RequestPart eventRequest: EventRequest,
-        @RequestPart file: MultipartFile?
+        @Valid @RequestBody eventRequest: EventRequest
     ): ResponseEntity<Unit> {
     return ResponseEntity
         .status(HttpStatus.OK)
-        .body(eventService.updateEvent(eventId, eventRequest, file))
+        .body(eventService.updateEvent(eventId, eventRequest))
 }
 
     @Operation(summary = "이벤트 삭제")

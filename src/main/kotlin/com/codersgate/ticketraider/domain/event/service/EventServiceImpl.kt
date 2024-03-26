@@ -27,7 +27,7 @@ class EventServiceImpl(
     private val s3Service: S3Service
 ) : EventService {
     @Transactional
-    override fun createEvent(eventRequest: EventRequest, file: MultipartFile?) {
+    override fun createEvent(eventRequest: EventRequest) {
         val category = categoryRepository.findByIdOrNull(eventRequest.categoryId)
             ?: throw ModelNotFoundException("category", eventRequest.categoryId)
         val place = placeRepository.findPlaceByName(eventRequest.place)
@@ -36,10 +36,9 @@ class EventServiceImpl(
         check(eventRequest.startDate <= eventRequest.endDate) {
             "끝나는날짜는 시작날짜보다 빠를수 없습니다."
         }
-        val posterImage =
-            if(file == null) { "" }
-            else { s3Service.putObject(file) }
-        val (price, event) = eventRequest.toPriceAndEvent(category, place, posterImage)
+
+        val (price, event) = eventRequest.toPriceAndEvent(category, place)
+        event.posterImage = "https://shorturl.at/kFIV0"
         event.price = price
         eventRepository.save(event)
         priceRepository.save(price)
@@ -47,8 +46,14 @@ class EventServiceImpl(
         checkSeatForUpdateAndCreate(event, eventRequest, availableSeatRepository)
     }
 
+    override fun uploadImage(file: MultipartFile?): String {
+        return  if(file == null) { "" }
+        else { s3Service.putObject(file) }
+    }
+
+
     @Transactional
-    override fun updateEvent(eventId: Long, eventRequest: EventRequest, file: MultipartFile?) {
+    override fun updateEvent(eventId: Long, eventRequest: EventRequest) {
         val event = eventRepository.findByIdOrNull(eventId)
             ?: throw ModelNotFoundException("Event", eventId)
         val price = priceRepository.findByEventId(eventId)
@@ -57,9 +62,7 @@ class EventServiceImpl(
             ?: throw ModelNotFoundException("category", eventRequest.categoryId)
         val place = placeRepository.findPlaceByName(eventRequest.place)
             ?: throw ModelNotFoundException("place", 0)
-        val posterImage =
-            if(file == null) { "" }
-            else { s3Service.putObject(file) }
+
         val orgStartDate = event.startDate
         val orgEndDate = event.endDate
         //시작일과 끝나는 일 비교후 false 시 예외처리
@@ -67,7 +70,7 @@ class EventServiceImpl(
             "끝나는날짜는 시작날짜보다 빠를수 없습니다."
         }
         event.let {
-            it.posterImage = posterImage
+            it.posterImage = eventRequest.posterImage
             it.title = eventRequest.title
             it.eventInfo = eventRequest.eventInfo
             it.startDate = eventRequest.startDate
