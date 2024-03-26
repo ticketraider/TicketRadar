@@ -39,12 +39,12 @@ const createCategory = () => {
 <template>
   <div class="accordion-item">
     <h2 class="accordion-header">
-      <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne"
-              aria-expanded="false" aria-controls="collapseOne">
+      <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#createCategory"
+              aria-expanded="false" aria-controls="createCategory">
         카테고리 생성
       </button>
     </h2>
-    <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#accordionExample">
+    <div id="createCategory" class="accordion-collapse collapse" data-bs-parent="#accordionCategory">
       <div class="accordion-body">
         <div class="mb-3">
           <label for="categoryTitle" class="form-label">타이틀</label>

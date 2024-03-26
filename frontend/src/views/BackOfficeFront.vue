@@ -1,15 +1,21 @@
 <template>
   <main>
-    <div
-        style="background-color: #aa98ba; padding: 30px; margin: 30px auto 100px auto; min-height: 700px; height: 1520px; width: 60%; border-radius: 20px">
-
-      <!--      카테고리-->
-      <CategoryForm/>
-
-      <!--      이벤트-->
-      <EventForm/>
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col">
+          <!-- 카테고리 -->
+          <CategoryForm/>
+        </div>
+        <div class="col">
+          <!-- 장소 -->
+          <PlaceForm/>
+        </div>
+        <div class="col">
+          <!-- 이벤트 -->
+          <EventForm/>
+        </div>
+      </div>
     </div>
-
   </main>
 </template>
 
@@ -17,6 +23,7 @@
 <script setup>
 import CategoryForm from '@/components/BackOffice/CategoryForm.vue';
 import EventForm from '@/components/BackOffice/EventForm.vue';
+import PlaceForm from '@/components/BackOffice/PlaceForm.vue';
 </script>
 
 

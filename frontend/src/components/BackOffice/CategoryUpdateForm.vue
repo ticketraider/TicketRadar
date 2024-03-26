@@ -43,13 +43,12 @@ const updateCategory = () => {
   <div class="accordion-item">
     <h2 class="accordion-header">
       <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-              data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+              data-bs-target="#updateCategory" aria-expanded="false" aria-controls="updateCategory">
         카테고리 수정
       </button>
     </h2>
-    <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+    <div id="updateCategory" class="accordion-collapse collapse" data-bs-parent="#accordionCategory">
       <div class="accordion-body">
-
         <div class="mb-3">
           <label for="categoryId" class="form-label">카테고리 ID</label>
           <input v-model="Category.updateId"  type="number" class="form-control" id="exampleInputEmail1"
