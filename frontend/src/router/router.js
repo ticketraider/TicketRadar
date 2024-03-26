@@ -9,35 +9,25 @@ const routes = [
         component: () => import('@/views/HomeViewFront.vue'), // 동적 import
     },
     {
-        path: '/event',
-        name: 'Event',
-        component: () => import('@/views/EventDetailViewFront.vue'),
-    },
-    {
-        path: '/eventList',
+        path: '/event-list',
         name: 'EventList',
         component: () => import('@/views/EventListViewBack.vue'),
     },
     {
-        path: '/eventDetail/:eventId',
+        path: '/event-detail/:eventId',
         name: 'EventDetail',
-        component: () => import('@/views/EventDetailViewBack.vue'),
+        component: () => import('@/views/EventDetailViewFront.vue'),
     },
     {
         path: '/ticket-viewer', // 경로 설정
         name: 'TicketViewer', // 이름 설정
         component: () => import('@/views/TicketViewerView.vue'),
     },
-    {
-        path: '/myTicketList', // 경로 설정
-        name: 'MyTicketList', // 이름 설정
-        component: () => import('@/views/MyTicketListViewBack.vue'),
-        meta: { requiresAuth: true } // 로그인 필요 여부를 메타 필드로 추가
-    },
     // {
-    //     path: '/reservation',
-    //     name: 'Reservation',
-    //     component: () => import('@/views/ReservationView.vue'),
+    //     path: '/myTicketList', // 경로 설정
+    //     name: 'MyTicketList', // 이름 설정
+    //     component: () => import('@/views/MyTicketListViewBack.vue'),
+    //     meta: { requiresAuth: true } // 로그인 필요 여부를 메타 필드로 추가
     // },
     {
         path: '/login',
@@ -52,9 +42,24 @@ const routes = [
     {
         path: '/admin',
         name: 'BackOffice',
-        component: () => import('@/views/BackOfficeFront.vue'),
+        component: () => import('@/views/BackOffice.vue'),
         meta: { requiresAuth: true } // 로그인 필요 여부를 메타 필드로 추가
     },
+    {
+        path: '/my-page',
+        component: () => import('@/views/MyPageView.vue'),
+        children: [
+            {
+                path: 'userinfo',
+                component: () => import('../components/mypage/UserInfoComponentFront.vue'),
+            },
+            {
+                path: 'tickets',
+                component: () => import('../components/mypage/MyTicketListComponent.vue'),
+            },
+        ],
+    },
+
 ];
 
 export const router = createRouter({

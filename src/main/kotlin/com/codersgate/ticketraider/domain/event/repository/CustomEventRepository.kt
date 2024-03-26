@@ -7,7 +7,13 @@ import org.springframework.data.domain.Pageable
 
 interface CustomEventRepository {
 
-    fun findByPageable(pageable: Pageable, categoryId: Long?, status: String?): Page<Event>
+    fun findByPageable(
+        pageable: Pageable,
+        searchStatus: String?,
+        sortStatus: String?,
+        category: String?,
+        keyword: String?
+    ): Page<Event>
 
     fun findByPageableAndCount(pageable: Pageable): Page<Event?>
 

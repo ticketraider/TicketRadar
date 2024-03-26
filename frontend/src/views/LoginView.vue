@@ -64,6 +64,11 @@ const signIn = async () => {
     console.log(response.data);
     const token = response.data.token; // 토큰 추출
     localStorage.setItem('token', token); // 토큰 로컬 스토리지에 저장
+
+    // 이후에는 토큰을 사용하여 요청을 보낼 때마다 헤더에 포함하여 전송
+    axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+
+
     await router.push('/eventList');
     location.reload();// 이벤트 목록 페이지로 이동
 
@@ -86,6 +91,7 @@ const displayToken = () => {
     const key = localStorage.key(i);
     const value = localStorage.getItem(key);
     console.log(`Key: ${key}, Value: ${value}`);
+    console.log('요청 헤더:', axios.defaults.headers);
   }
 }
 

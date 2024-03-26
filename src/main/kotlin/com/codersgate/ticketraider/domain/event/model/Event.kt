@@ -47,7 +47,7 @@ class Event(
     @JoinColumn(name = "category_id")
     var category: Category,
 
-    @OneToOne(mappedBy = "event", fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
+    @OneToOne(mappedBy = "event", fetch = FetchType.EAGER, cascade = [CascadeType.ALL], orphanRemoval = true)
     var price: Price? = null,
 
     @OneToMany(mappedBy = "event", fetch = FetchType.EAGER, cascade = [CascadeType.ALL], orphanRemoval = true)
@@ -56,6 +56,20 @@ class Event(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null
+
+    fun addRating(rating:Int){
+        var totalRating = averageRating*reviewCount
+        totalRating+= rating
+        reviewCount++
+        averageRating = totalRating.toFloat() / reviewCount
+    }
+
+    fun deleteRating(rating: Int){
+        var totalRating = averageRating*reviewCount
+        totalRating-= rating
+        reviewCount--
+        averageRating = totalRating.toFloat() / reviewCount
+    }
 }
 
 
