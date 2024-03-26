@@ -25,10 +25,10 @@
                   style="background-color: #392365; border-color: #392365; margin-left: 15px;"
                   @click="signIn">로그인
           </button>
-          <button type="button" class="btn btn-primary"
-                  style="background-color: #392365; border-color: #392365; margin-left: 15px;"
-                  @click="displayToken">토큰 출력
-          </button>
+<!--          <button type="button" class="btn btn-primary"-->
+<!--                  style="background-color: #392365; border-color: #392365; margin-left: 15px;"-->
+<!--                  @click="displayToken">토큰 출력-->
+<!--          </button>-->
           <button type="button" class="btn btn-primary"
                   style="background-color: #392365; border-color: #392365; margin-left: 15px;"
                   @click="logOut">로그아웃
@@ -60,14 +60,11 @@ const signIn = async () => {
     });
 
     // 로그인 성공 시 처리
-    console.log("응답 : ", response.data);
-    console.log(response.data);
     const token = response.data.token; // 토큰 추출
     localStorage.setItem('token', token); // 토큰 로컬 스토리지에 저장
 
     // 이후에는 토큰을 사용하여 요청을 보낼 때마다 헤더에 포함하여 전송
     axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-
 
     await router.push('/eventList');
     location.reload();// 이벤트 목록 페이지로 이동
@@ -75,25 +72,27 @@ const signIn = async () => {
   } catch (error) {
     // 로그인 실패 시 처리
     console.error(error);
+    alert("로그인에 실패하였습니다.");
   }
 }
 const logOut = async () => {
-  console.log("로그아웃전")
-  displayToken()
-  localStorage.removeItem('token');
-  console.log("로그아웃후")
-  displayToken()
-}
-
-
-const displayToken = () => {
-  for (let i = 0; i < localStorage.length; i++) {
-    const key = localStorage.key(i);
-    const value = localStorage.getItem(key);
-    console.log(`Key: ${key}, Value: ${value}`);
-    console.log('요청 헤더:', axios.defaults.headers);
+  if (localStorage.getItem('token')) {
+    localStorage.removeItem('token');
+    alert("로그아웃 되었습니다.");
+  } else {
+    alert("로그인 되어있지 않습니다.");
   }
 }
+
+
+// const displayToken = () => {
+//   for (let i = 0; i < localStorage.length; i++) {
+//     const key = localStorage.key(i);
+//     const value = localStorage.getItem(key);
+//     console.log(`Key: ${key}, Value: ${value}`);
+//     console.log('요청 헤더:', axios.defaults.headers);
+//   }
+// }
 
 </script>
 

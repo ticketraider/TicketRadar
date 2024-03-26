@@ -1,7 +1,6 @@
 // Vuex 때 처럼 create* 함수를 제공한다.
 import { createWebHistory, createRouter } from 'vue-router';
 
-
 const routes = [
     {
         path: '/',
@@ -43,7 +42,7 @@ const routes = [
         path: '/admin',
         name: 'BackOffice',
         component: () => import('@/views/BackOffice.vue'),
-        meta: { requiresAuth: true } // 로그인 필요 여부를 메타 필드로 추가
+        meta: { requiresAuth: true, requiresAdmin: true } // 로그인 및 관리자 권한 필요
     },
     {
         path: '/my-page',
@@ -58,25 +57,45 @@ const routes = [
                 component: () => import('../components/mypage/MyTicketListComponent.vue'),
             },
         ],
+        meta: { requiresAuth: true } // 로그인 및 관리자 권한 필요
     },
 
 ];
 
+import {jwtDecode} from "jwt-decode";
+// 라우터 생성
 export const router = createRouter({
     history: createWebHistory(),
     routes,
 });
 
+// 네비게이션 가드 설정
 router.beforeEach((to, from, next) => {
-    const isAuthenticated = localStorage.getItem('token'); // 로그인 여부 확인
-    const requiresAuth = to.matched.some(record => record.meta.requiresAuth); // 해당 경로가 인증 필요한지 확인
+    const isAuthenticated = localStorage.getItem('token'); // 토큰 가져오기
 
-    if (requiresAuth && !isAuthenticated) {
-        // 사용자가 인증이 필요한 페이지로 이동하려고 하지만 로그인하지 않은 경우
-        next('/login'); // 로그인 페이지로 리다이렉트
-    } else {
-        next(); // 그 외의 경우에는 이동 허용
+    if (to.meta.requiresAuth && !isAuthenticated) {
+        // 인증이 필요한 페이지에 접근하려고 하는데, 로그인하지 않은 경우
+        alert("로그인이 필요합니다.")
+        next('/login');
+        return; // 다음 페이지로 넘어가지 않음
     }
+
+    if (to.meta.requiresAdmin && isAuthenticated) {
+        alert('관리자페이지접근')
+        // 관리자 권한이 필요한 페이지에 접근하려고 하는데, 관리자가 아닌 경우
+        const token = jwtDecode(isAuthenticated); // 토큰 해독
+        alert(token)
+        const userRole = token.role; // 사용자 역할 추출
+        alert(token.role)
+        console.log("userRole : ", userRole)
+        if (userRole !== 'ADMIN') {
+            alert("관리자만 접근할 수 있습니다.")
+            next('/'); // 권한이 없음을 나타내는 페이지로 리다이렉트
+            return; // 다음 페이지로 넘어가지 않음
+        }
+    }
+    next(); // 다음 페이지로 이동
 });
 
-//export default router;
+// 생성한 라우터 내보내기
+export default router;
