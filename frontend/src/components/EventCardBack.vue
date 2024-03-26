@@ -44,10 +44,28 @@ const fetchEventDetail = async () => {
   try {
     const response = await axios.get(`http://localhost:8080/events/${eventId}`);
     event.value = response.data;
+    console.log('event.value : ', event.value);
+    generateSeats(event)
   } catch (error) {
     console.error('이벤트 상세 정보를 불러오는 동안 오류가 발생했습니다:', error);
   }
 };
+
+function generateSeats(event) {
+  console.log('generate(event.value) : ', event.value.price.seatRPrice);
+  console.log('generate(event.value) : ', event.value.availableSeats.valueOf());
+  // event가 비어 있는지 확인
+  if (!event || !event.value || !event.value.price) {
+    console.error('이벤트 정보가 없거나 가격 정보가 없습니다.');
+    return;
+  }
+
+  // event의 price 객체에서 seatRPrice에 접근하여 사용
+  const seatRPrice = event.value.price.seatRPrice;
+  console.log('R석 가격:', seatRPrice);
+
+  // 여기에 seat 생성 로직 추가
+}
 
 onMounted(() => {
   const eventId = route.params.eventId; // 라우팅 정보에서 eventId를 가져옴

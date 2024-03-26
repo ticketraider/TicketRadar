@@ -23,11 +23,11 @@ class MemberController(
     @PostMapping("/signUp")
     fun signUp(
         @Valid @RequestBody memberRequest: MemberRequest,
-        @RequestParam role: MemberRole
     ): ResponseEntity<Unit> {
+
         return ResponseEntity
             .status(HttpStatus.OK)
-            .body(memberService.signUp(memberRequest, role))
+            .body(memberService.signUp(memberRequest, MemberRole.MEMBER))
     }
 
     @Operation(summary = "로그인")

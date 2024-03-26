@@ -34,6 +34,7 @@ class CategoryServiceImpl(
             "이미 존재하는 Title 입니다."
         }
         category.title = request.title
+        categoryRepository.save(category)
     }
 
     override fun deleteCategory(categoryId: Long) {
