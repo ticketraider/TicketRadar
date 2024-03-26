@@ -96,7 +96,8 @@ class TicketController(
 //            .body(ticketService.updateTicketStatus(ticketId, ticketStatus))
 //    }
 
-    @Scheduled(cron = "0 0 12 * * MON-FRI") // 매주 월요일부터 금요일까지 매일 정오(12시)에 메서드가 실행
+
+    @Scheduled(cron = "0 0 0 * * ?") // 매일 정오(12시)에 메서드가 실행
     @PatchMapping("/chkExpired")
     @Operation(summary = "만료 티켓 확인")
     fun chkExpiredTicket(): ResponseEntity<Unit> {

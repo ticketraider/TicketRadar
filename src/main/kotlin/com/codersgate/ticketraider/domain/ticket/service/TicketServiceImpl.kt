@@ -41,7 +41,6 @@ class TicketServiceImpl(
     private val memberRepository: MemberRepository,
     private val eventRepository: EventRepository,
     private val availableSeatRepository: AvailableSeatRepository,
-    private val redisCacheService: RedisCacheService,
 ) : TicketService {
     companion object {
         val logger = LoggerFactory.getLogger(TicketServiceImpl::class.java)
@@ -131,7 +130,6 @@ class TicketServiceImpl(
         val bookedTicketArray: Array<String> = ticketList.map { "${it!!.grade}${it.seatNo}" }.toTypedArray()
         return BookedTicketResponse(bookedTicketArray)
     }
-
     override fun getAllTicketList(pageable: Pageable, memberId: Long?, eventId: Long?): Page<TicketResponse> {
         return ticketRepository.getAllTicketList(pageable, memberId, eventId).map { TicketResponse.from(it) }
     }
