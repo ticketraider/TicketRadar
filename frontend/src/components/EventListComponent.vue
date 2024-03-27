@@ -1,5 +1,9 @@
 <template>
   <div class="event-list">
+    <div class="event-searchCorrect">
+      일치하는 이벤트
+
+    </div>
     <div class="event-grid">
       <v-card v-for="event in eventList" :key="event.id" class="event-card">
         <v-card class="mx-auto" style="width: 300px; background-color: white">
@@ -67,10 +71,6 @@ const fetchEvents = async (page = 0) => {
   sortStatus.value = route.query.sort;
   searchCriterion.value = route.query.criterion;
 
-  console.log(searchKeyword.value)
-  console.log(searchCriterion.value)
-  console.log(sortStatus.value)
-  console.log(selectedCategory.value)
 
   try {
     let apiUrl = '';
