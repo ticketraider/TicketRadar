@@ -85,7 +85,20 @@ const fetchEvents = async (page = 0) => {
         },
       }
     }
-    else if ( props.type === 'search'){
+    else if( props.type === 'likes' || props.type === 'reviews' || props.type === 'rating') {
+      apiUrl = 'http://localhost:8080/events'
+      request = {
+        params: {
+          page: page,
+          size: pageSize,
+          category: selectedCategory.value,
+          keyword: searchKeyword.value,
+          sortStatus: props.type,              //  좋아요, 리뷰,
+          searchStatus: searchCriterion.value //  제목 or 장소
+        },
+      }
+    }
+    else {
       apiUrl = 'http://localhost:8080/events'
       request = {
         params: {
@@ -103,32 +116,11 @@ const fetchEvents = async (page = 0) => {
         request.sortStatus = 'likes'
       }
     }
-    else if ( props.type === 'category'){
-      apiUrl = 'http://localhost:8080/events'
-      request = {
-        params: {
-          page: page,
-          size: pageSize,
-          category: selectedCategory.value,
-          keyword: searchKeyword.value,
-          sortStatus: sortStatus.value,       //  좋아요, 리뷰,
-          searchStatus: searchCriterion.value //  제목 or 장소
-        },
-      }
-      if (props.type === 'rating') {
-        request.sortStatus = 'rating'
-      } else if (props.type === 'likes') {
-        request.sortStatus = 'likes'
-      }
-    }
-
-
-
-
 
     console.log(`${props.type} request : `, request)
     const response = await axios.get(apiUrl, request);
     console.log(`${props.type} Response : `, response)
+
     if(props.type === 'popularity')
       eventList.value = response.data;
     else{

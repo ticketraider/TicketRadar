@@ -14,15 +14,15 @@
         </div>
       </div>
       <div class="top5">
-        <h1>좋아요 순 TOP.5</h1>
+        <h1>리뷰 순 TOP.5</h1>
         <div style="width: 1600px; padding:10px; display: flex; margin: 0 auto;">
-          <EventList :type="'likes'"/>
+          <EventList :type="'reviews'"/>
         </div>
       </div>
       <div class="top5">
-        <h1>오픈예정일 순 TOP.5</h1>
+        <h1>좋아요 순 TOP.5</h1>
         <div style="width: 1600px; padding:10px; display: flex; margin: 0 auto;">
-          <EventList :type="''"/>
+          <EventList :type="'likes'"/>
         </div>
       </div>
     </main>
