@@ -70,18 +70,18 @@ class TicketController(
     }
 
     @Operation(summary = "멤버 티켓리스트 조회")
-    @GetMapping("/getTicketListByUserId")
+    @GetMapping("/ticket-list/user")
     fun getTicketListByUserId(
         @PageableDefault(
             size = 15, sort = ["id"]
         ) pageable: Pageable,
-        authentication: Authentication // vue 에서 jwt 토큰을 받아오도록 함
-//        @AuthenticationPrincipal userPrincipal: UserPrincipal
+//        authentication: Authentication // vue 에서 jwt 토큰을 받아오도록 함
+        @AuthenticationPrincipal userPrincipal: UserPrincipal
     ): ResponseEntity<Page<TicketResponse>> {
-        val userPrincipal = authentication.principal as UserPrincipal // jwt 토큰에서 principal 추출
+//        val userPrincipal = authentication.principal as UserPrincipal // jwt 토큰에서 principal 추출
         return ResponseEntity
             .status(HttpStatus.OK)
-            .body(ticketService.getTicketListByUserId(userPrincipal, pageable))
+            .body(ticketService.getTicketListByUserId(pageable, userPrincipal.id))
     }
 
     // 티켓 업데이트를 수동으로 할 일이 없어 생략

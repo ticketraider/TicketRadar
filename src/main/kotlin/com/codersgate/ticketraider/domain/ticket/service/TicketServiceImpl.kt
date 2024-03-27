@@ -130,8 +130,8 @@ class TicketServiceImpl(
         return TicketResponse.from(ticket)
     }
 
-    override fun getTicketListByUserId(userPrincipal: UserPrincipal, pageable: Pageable): Page<TicketResponse> {
-        return ticketRepository.getListByUserId(pageable, userPrincipal.id).map { TicketResponse.from(it) }
+    override fun getTicketListByUserId(pageable: Pageable, memberId: Long): Page<TicketResponse> {
+        return ticketRepository.getListByUserId(pageable, memberId).map{ TicketResponse.from(it) }
     }
 
     override fun chkExpiredTickets() {

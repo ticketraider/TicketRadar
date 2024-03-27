@@ -27,12 +27,10 @@ class EventRepositoryImpl : QueryDslSupport(), CustomEventRepository {
         val builder = BooleanBuilder()
 
         if (category != null) {
-            println("카테고리 지나감")
             builder.and(event.category.title.eq(category))
         }
         if (searchStatus != null) {
             if (searchStatus == "title") {
-                println("타이틀 지나감")
                 builder.and(event.title.like("%$keyword%"))
             }
             if (searchStatus == "location") {
@@ -57,7 +55,6 @@ class EventRepositoryImpl : QueryDslSupport(), CustomEventRepository {
             query.orderBy(event.reviewCount.desc())
         }
         if (sortStatus == "rating") {
-            println("레이팅 지나감")
             query.orderBy(event.averageRating.desc())
         }
         else {

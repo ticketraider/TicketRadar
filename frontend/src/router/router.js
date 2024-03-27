@@ -18,11 +18,11 @@ const routes = [
         name: 'EventDetail',
         component: () => import('@/views/EventDetailViewFront.vue'),
     },
-    {
-        path: '/ticket-viewer', // 경로 설정
-        name: 'TicketViewer', // 이름 설정
-        component: () => import('@/views/TicketViewerView.vue'),
-    },
+    // {
+    //     path: '/ticket-viewer', // 경로 설정
+    //     name: 'TicketViewer', // 이름 설정
+    //     component: () => import('@/views/TicketViewerView.vue'),
+    // },
     // {
     //     path: '/myTicketList', // 경로 설정
     //     name: 'MyTicketList', // 이름 설정
@@ -55,7 +55,7 @@ const routes = [
             },
             {
                 path: 'tickets',
-                component: () => import('../components/mypage/MyTicketListComponent.vue'),
+                component: () => import('../components/mypage/MyTicketListComponentVer2.vue'),
             },
         ],
     },

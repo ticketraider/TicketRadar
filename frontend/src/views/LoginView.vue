@@ -69,7 +69,7 @@ const signIn = async () => {
     axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
 
-    await router.push('/eventList');
+    await router.push('/event-list');
     location.reload();// 이벤트 목록 페이지로 이동
 
   } catch (error) {
