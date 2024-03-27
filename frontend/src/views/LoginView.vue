@@ -66,6 +66,7 @@ const signIn = async () => {
     // 이후에는 토큰을 사용하여 요청을 보낼 때마다 헤더에 포함하여 전송
     axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
+
     await router.push('/event-list');
     location.reload();// 이벤트 목록 페이지로 이동
 
