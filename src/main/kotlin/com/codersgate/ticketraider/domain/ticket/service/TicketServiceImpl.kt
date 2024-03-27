@@ -68,10 +68,6 @@ class TicketServiceImpl(
 
         // 예약 가능 좌석 선별
         request.seatList.map { seat ->
-            //캐싱 체크
-            val key = "${request.eventId}_${request.date}_${seat.ticketGrade}_${seat.seatNumber}"
-            if (redisCacheService.chkCache(CacheTarget.TICKET, key))
-                throw TicketReservationFailedException("${seat.seatNumber} 번 좌석은 선택할 수 없습니다. ( 이미 예약된 좌석 in Cache )")
 
             //DB 체크
             val isReserved = ticketRepository.chkTicket(
@@ -107,12 +103,6 @@ class TicketServiceImpl(
 
             ticketRepository.save(ticket)
 
-            // 캐시에 등록
-            redisCacheService.putCache(
-                CacheTarget.TICKET,
-                "${request.eventId}_${request.date}_${seat.ticketGrade}_${seat.seatNumber}",
-                TicketResponse.from(ticket)
-            )
 
             // 좌석 예약 수 수정
             availableSeat.increaseSeat(seat.ticketGrade)
@@ -194,11 +184,6 @@ class TicketServiceImpl(
                     availableSeatRepository.save(it)
                 }
 
-                // 캐시 삭제
-                redisCacheService.delCache(
-                    CacheTarget.TICKET,
-                    "${ticket.event.id}_${ticket.date}_${ticket.grade}_${ticket.seatNo}"
-                )
                 ticketRepository.delete(ticket)
             }
             ?: throw ModelNotFoundException("Ticket", ticketId)
