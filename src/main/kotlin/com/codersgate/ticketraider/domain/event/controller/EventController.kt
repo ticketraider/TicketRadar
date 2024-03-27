@@ -68,7 +68,7 @@ class EventController(
     fun getEventList(
         @PageableDefault(size = 5, sort = ["id"]) pageable: Pageable,
         @RequestParam(required = false, defaultValue = "rating") sortStatus: String,
-        @RequestParam(required = false, defaultValue = "title") searchStatus: String,
+        @RequestParam(required = false) searchStatus: String?,
         @RequestParam(required = false) category: String?,
         @RequestParam(required = false) keyword: String?,
     ): ResponseEntity<Page<EventResponse>> {

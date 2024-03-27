@@ -14,14 +14,8 @@ import {loadFonts} from './plugins/webfontloader'
 
 loadFonts()
 
-const app = createApp(App)
+createApp(App)
     .use(BootstrapVue3)
     .use(router)
     .use(vuetify)
     .mount('#app');
-
-// 백엔드 API 주소를 상수로 등록
-const apiUrl = 'http://localhost:8080/';
-app.config.globalProperties.$apiUrl = apiUrl;
-
-app.mount('#app');
