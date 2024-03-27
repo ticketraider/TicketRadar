@@ -17,8 +17,8 @@ class EventRepositoryImpl : QueryDslSupport(), CustomEventRepository {
     private val price = QPrice.price
     override fun findByPageable(
         pageable: Pageable,
-        searchStatus: String?,
         sortStatus: String?,
+        searchStatus: String?,
         category: String?,
         keyword: String?
     ): Page<Event> {
@@ -27,12 +27,19 @@ class EventRepositoryImpl : QueryDslSupport(), CustomEventRepository {
         val builder = BooleanBuilder()
 
         if (category != null) {
+            println("카테고리 지나감")
             builder.and(event.category.title.eq(category))
-        } else if (searchStatus == "제목") {
-            builder.and(event.title.like("%$keyword%"))
-        } else if (searchStatus == "장소") {
-            builder.and(event.place.name.like("%$keyword%"))
         }
+        if (searchStatus != null) {
+            if (searchStatus == "title") {
+                println("타이틀 지나감")
+                builder.and(event.title.like("%$keyword%"))
+            }
+            if (searchStatus == "location") {
+                builder.and(event.place.address.like("%$keyword%"))
+            }
+        }
+
 
 
         val query = queryFactory.selectFrom(event)
@@ -43,13 +50,17 @@ class EventRepositoryImpl : QueryDslSupport(), CustomEventRepository {
 //            .orderBy(*getOrderSpecifier(pageable, event, sortStatus))
 //            .fetch()
 
-        if (sortStatus == "좋아요 순") {
+        if (sortStatus == "likes") {
             query.orderBy(event.likeCount.desc())
-        } else if (searchStatus == "리뷰 순") {
+        }
+        if (sortStatus == "reviews") {
             query.orderBy(event.reviewCount.desc())
-        } else if (searchStatus == "평점 순") {
+        }
+        if (sortStatus == "rating") {
+            println("레이팅 지나감")
             query.orderBy(event.averageRating.desc())
-        } else {
+        }
+        else {
             query.orderBy(event.averageRating.desc())
         }
 

@@ -47,7 +47,11 @@ const pageSize = 5;
 let totalPages = ref(0);
 const router = useRouter();
 const route = useRoute();
-const selectedCategory = ref(route.query.category);
+const selectedCategory = ref("");
+const searchKeyword = ref("");
+const sortStatus = ref("");
+const searchCriterion = ref("");
+
 
 const props = defineProps({
   type: {
@@ -57,6 +61,17 @@ const props = defineProps({
 });
 
 const fetchEvents = async (page = 0) => {
+
+  selectedCategory.value = route.query.category;
+  searchKeyword.value = route.query.search;
+  sortStatus.value = route.query.sort;
+  searchCriterion.value = route.query.criterion;
+
+  console.log(searchKeyword.value)
+  console.log(searchCriterion.value)
+  console.log(sortStatus.value)
+  console.log(selectedCategory.value)
+
   try {
 
     let apiUrl = '';
@@ -85,6 +100,9 @@ const fetchEvents = async (page = 0) => {
         page: page,
         size: pageSize,
         category: selectedCategory.value,
+        keyword: searchKeyword.value,
+        sortStatus: sortStatus.value,
+        searchStatus: searchCriterion.value
       },
     });
     eventList.value = response.data.content;
@@ -96,10 +114,10 @@ const fetchEvents = async (page = 0) => {
 };
 
 // selectedCategory 변화 감지 및 해당 카테고리의 이벤트 목록 불러오기
-watch(() => route.query.category, (newCategory) => {
-  selectedCategory.value = newCategory;
-  fetchEvents(0); // 카테고리가 바뀌면 첫 페이지부터 이벤트를 불러옵니다.
-});
+watch(() => route.query, () => {
+  fetchEvents(currentPage.value);
+}, { deep: true });
+
 
 onMounted(() => {
   fetchEvents(currentPage.value);

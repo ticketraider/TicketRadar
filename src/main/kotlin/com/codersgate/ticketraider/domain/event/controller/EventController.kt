@@ -67,10 +67,10 @@ class EventController(
     @GetMapping
     fun getEventList(
         @PageableDefault(size = 5, sort = ["id"]) pageable: Pageable,
-        @RequestParam sortStatus: String?,
-        @RequestParam searchStatus: String?,
-        @RequestParam category: String?,
-        @RequestParam keyword: String?,
+        @RequestParam(required = false, defaultValue = "rating") sortStatus: String,
+        @RequestParam(required = false, defaultValue = "title") searchStatus: String,
+        @RequestParam(required = false) category: String?,
+        @RequestParam(required = false) keyword: String?,
     ): ResponseEntity<Page<EventResponse>> {
         return ResponseEntity
             .status(HttpStatus.OK)
