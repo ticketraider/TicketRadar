@@ -49,9 +49,38 @@ const router = useRouter();
 const route = useRoute();
 const selectedCategory = ref(route.query.category);
 
+const props = defineProps({
+  type: {
+    type: String,
+    required: true
+  }
+});
+
 const fetchEvents = async (page = 0) => {
   try {
-    const response = await axios.get('http://localhost:8080/events', {
+
+    let apiUrl = '';
+    // type에 따라 다른 API 호출
+    if( props.type === 'popularity'){
+      apiUrl = 'http://localhost:8080/popularValues';
+      const response = await axios.get(apiUrl, {
+        params: {
+          limit: 5,
+        },
+      });
+    }
+    else if (props.type === 'rating') {
+      apiUrl = 'http://localhost:8080/events';
+    } else if (props.type === 'likes') {
+      apiUrl = 'http://localhost:8080/events';
+    } else if (props.type === 'open') {
+      apiUrl = 'http://localhost:8080/events';
+    } else {
+      // 기본적으로 모든 이벤트 가져오기
+      apiUrl = 'http://localhost:8080/events';
+    }
+
+    const response = await axios.get(apiUrl, {
       params: {
         page: page,
         size: pageSize,

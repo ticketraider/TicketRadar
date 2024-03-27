@@ -57,7 +57,7 @@
 }
 </style>
 <script>
-import CardView from "@/components/EventCardFront.vue";
+import CardView from "@/components/trash/EventCardFront.vue";
 
 export default {
   name: 'App',

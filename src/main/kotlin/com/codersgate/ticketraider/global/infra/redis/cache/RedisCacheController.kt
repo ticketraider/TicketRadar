@@ -31,9 +31,11 @@ class RedisCacheController(
 
     @GetMapping("/popularValues")
     fun getPopularValues(
+        @RequestParam(required = false) limit: Long?,
     ) : ResponseEntity<List<EventResponse>>
     {
-        return ResponseEntity.status(HttpStatus.OK).body(redisCacheService.getPopularValues(5))
+        val l = limit?:5
+        return ResponseEntity.status(HttpStatus.OK).body(redisCacheService.getPopularValues(l))
     }
 
     @Scheduled(cron = "0 0 0 * * ?") // 매일 자정에 실행

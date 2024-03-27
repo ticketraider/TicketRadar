@@ -5,17 +5,17 @@ const routes = [
     {
         path: '/',
         name: 'Home',
-        component: () => import('@/views/HomeViewFront.vue'), // 동적 import
+        component: () => import('@/views/HomeView.vue'), // 동적 import
     },
     {
         path: '/event-list',
         name: 'EventList',
-        component: () => import('@/views/EventListViewBack.vue'),
+        component: () => import('@/views/EventListView.vue'),
     },
     {
         path: '/event-detail/:eventId',
         name: 'EventDetail',
-        component: () => import('@/views/EventDetailViewFront.vue'),
+        component: () => import('@/views/EventDetailView.vue'),
     },
     {
         path: '/ticket-viewer', // 경로 설정
@@ -32,6 +32,7 @@ const routes = [
         path: '/login',
         name: 'Login',
         component: () => import('@/views/LoginView.vue'),
+        meta: { requiresAuth: false } // 로그인 필요
     },
     {
         path: '/sign-up',
@@ -57,7 +58,7 @@ const routes = [
                 component: () => import('../components/mypage/MyTicketListComponent.vue'),
             },
         ],
-        meta: { requiresAuth: true } // 로그인 및 관리자 권한 필요
+        meta: { requiresAuth: true } // 로그인 필요
     },
 
 ];
@@ -73,6 +74,12 @@ export const router = createRouter({
 router.beforeEach((to, from, next) => {
     const isAuthenticated = localStorage.getItem('token'); // 토큰 가져오기
 
+    if (to.path === '/login' && isAuthenticated) {
+        // 이미 로그인한 사용자는 로그인 페이지에 접근할 수 없도록 리디렉션
+        next('/');
+        return;
+    }
+
     if (to.meta.requiresAuth && !isAuthenticated) {
         // 인증이 필요한 페이지에 접근하려고 하는데, 로그인하지 않은 경우
         alert("로그인이 필요합니다.")
@@ -81,15 +88,11 @@ router.beforeEach((to, from, next) => {
     }
 
     if (to.meta.requiresAdmin && isAuthenticated) {
-        alert('관리자페이지접근')
         // 관리자 권한이 필요한 페이지에 접근하려고 하는데, 관리자가 아닌 경우
         const token = jwtDecode(isAuthenticated); // 토큰 해독
-        alert(token)
         const userRole = token.role; // 사용자 역할 추출
-        alert(token.role)
-        console.log("userRole : ", userRole)
         if (userRole !== 'ADMIN') {
-            alert("관리자만 접근할 수 있습니다.")
+            alert(`관리자만 접근할 수 있습니다. ${userRole}`)
             next('/'); // 권한이 없음을 나타내는 페이지로 리다이렉트
             return; // 다음 페이지로 넘어가지 않음
         }
