@@ -1,7 +1,7 @@
 <template>
-  <main style="height: 1000px">
+  <main style="height: 1450px">
     <div
-        style="background-color: #aa98ba; padding: 30px; margin: 30px auto; height: 800px; width: 67%; border-radius: 20px">
+        style="background-color: #aa98ba; padding: 30px; margin: 30px auto; height: 1250px; width: 67%; border-radius: 20px">
       <div class="mypage">
         <div style="display:flex;">
 
@@ -18,7 +18,7 @@
             </div>
           </aside>
 
-          <div style="background-color: #392365; height: 740px; width: 20px; border-radius: 5px;">
+          <div style="background-color: #392365; height: 1190px; width: 20px; border-radius: 5px;">
           </div>
 
           <section style="padding-left: 10px">
