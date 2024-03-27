@@ -37,7 +37,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted, watch, defineProps } from 'vue';
 import axios from 'axios';
 import { useRoute, useRouter } from 'vue-router';
 
@@ -56,7 +56,7 @@ const searchCriterion = ref("");
 const props = defineProps({
   type: {
     type: String,
-    required: true
+    required: false
   }
 });
 
@@ -73,41 +73,70 @@ const fetchEvents = async (page = 0) => {
   console.log(selectedCategory.value)
 
   try {
-
     let apiUrl = '';
+    let request = '';
+
     // type에 따라 다른 API 호출
     if( props.type === 'popularity'){
-      apiUrl = 'http://localhost:8080/popularValues';
-      const response = await axios.get(apiUrl, {
+      apiUrl = 'http://localhost:8080/popularValues'
+      request = {
         params: {
           limit: 5,
         },
-      });
+      }
     }
-    else if (props.type === 'rating') {
-      apiUrl = 'http://localhost:8080/events';
-    } else if (props.type === 'likes') {
-      apiUrl = 'http://localhost:8080/events';
-    } else if (props.type === 'open') {
-      apiUrl = 'http://localhost:8080/events';
-    } else {
-      // 기본적으로 모든 이벤트 가져오기
-      apiUrl = 'http://localhost:8080/events';
+    else if ( props.type === 'search'){
+      apiUrl = 'http://localhost:8080/events'
+      request = {
+        params: {
+          page: page,
+              size: pageSize,
+              category: selectedCategory.value,
+              keyword: searchKeyword.value,
+              sortStatus: sortStatus.value,       //  좋아요, 리뷰,
+              searchStatus: searchCriterion.value //  제목 or 장소
+        },
+      }
+      if (props.type === 'rating') {
+        request.sortStatus = 'rating'
+      } else if (props.type === 'likes') {
+        request.sortStatus = 'likes'
+      }
+    }
+    else if ( props.type === 'category'){
+      apiUrl = 'http://localhost:8080/events'
+      request = {
+        params: {
+          page: page,
+          size: pageSize,
+          category: selectedCategory.value,
+          keyword: searchKeyword.value,
+          sortStatus: sortStatus.value,       //  좋아요, 리뷰,
+          searchStatus: searchCriterion.value //  제목 or 장소
+        },
+      }
+      if (props.type === 'rating') {
+        request.sortStatus = 'rating'
+      } else if (props.type === 'likes') {
+        request.sortStatus = 'likes'
+      }
     }
 
-    const response = await axios.get(apiUrl, {
-      params: {
-        page: page,
-        size: pageSize,
-        category: selectedCategory.value,
-        keyword: searchKeyword.value,
-        sortStatus: sortStatus.value,
-        searchStatus: searchCriterion.value
-      },
-    });
-    eventList.value = response.data.content;
-    totalPages.value = response.data.totalPages;
-    currentPage.value = page;
+
+
+
+
+    console.log(`${props.type} request : `, request)
+    const response = await axios.get(apiUrl, request);
+    console.log(`${props.type} Response : `, response)
+    if(props.type === 'popularity')
+      eventList.value = response.data;
+    else{
+      eventList.value = response.data.content;
+      totalPages.value = response.data.totalPages;
+      currentPage.value = page;
+    }
+    console.log(`type : ${props.type} : ${eventList.value}`)
   } catch (error) {
     console.error('이벤트 목록을 불러오는 동안 오류가 발생했습니다:', error);
   }
