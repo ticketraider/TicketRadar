@@ -14,7 +14,7 @@
 @import "./css/styles/TestStyle.css";
 </style>
 <script>
-import HeaderViewVer2 from "@/components/HeaderComponentVer2.vue";
+import HeaderViewVer2 from "@/components/HeaderComponentVer3.vue";
 
 export default {
   name: 'App',
