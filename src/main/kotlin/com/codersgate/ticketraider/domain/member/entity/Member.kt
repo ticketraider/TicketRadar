@@ -27,7 +27,7 @@ class Member(
     @Column(name = "role", nullable = false)
     val role: MemberRole,
 
-    @OneToMany(mappedBy = "member", fetch = FetchType.EAGER, cascade = [CascadeType.ALL])
+    @OneToMany(mappedBy = "member", fetch = FetchType.EAGER, cascade = [CascadeType.ALL], orphanRemoval = true)
     val tickets: List<Ticket> = emptyList(),
 
     @OneToMany(mappedBy = "member", fetch = FetchType.EAGER)
@@ -47,6 +47,7 @@ class Member(
         this.nickname = nickname
     }
 }
+
 enum class MemberRole {
     ADMIN, MEMBER
 }
