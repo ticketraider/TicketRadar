@@ -1,7 +1,6 @@
 package com.codersgate.ticketraider.global.infra.redis.cache
 
 import com.codersgate.ticketraider.domain.event.dto.EventResponse
-import io.lettuce.core.protocol.CommandKeyword
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.scheduling.annotation.Scheduled
@@ -35,7 +34,7 @@ class RedisCacheController(
     ) : ResponseEntity<List<EventResponse>>
     {
         val l = limit?:5
-        return ResponseEntity.status(HttpStatus.OK).body(redisCacheService.getPopularValues(l))
+        return ResponseEntity.status(HttpStatus.OK).body(redisCacheService.getPopularResults(l))
     }
 
     @Scheduled(cron = "0 0 0 * * ?") // 매일 자정에 실행

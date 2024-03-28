@@ -33,10 +33,10 @@ onMounted(() => {
     <div class="이미지포함이벤트설명" style="display: flex; margin: auto auto 10px auto;">
       <v-img class="img" :src="event.posterImage" cover alt="Event Poster">
       </v-img>
-      <!--          공연 정보를 담는 디브-->
+      <!-- 공연 정보를 담는 디브-->
       <div
           style="width: 800px; height: 500px; background-color: #392365; border-radius: 10px; margin: auto auto auto 10px;">
-        <!--            안에 들어가는 정보들-->
+        <!-- 안에 들어가는 정보들-->
         <div class="공연정보담고있는디브">
           <div class="공연정보1">
             <h5></h5>

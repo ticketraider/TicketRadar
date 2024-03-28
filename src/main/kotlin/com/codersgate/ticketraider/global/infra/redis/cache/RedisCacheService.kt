@@ -6,9 +6,9 @@ import com.codersgate.ticketraider.global.error.exception.ModelNotFoundException
 import org.slf4j.LoggerFactory
 import org.springframework.cache.CacheManager
 import org.springframework.data.redis.core.RedisTemplate
-import org.springframework.data.redis.core.ZSetOperations
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
+import java.awt.print.Pageable
 
 
 @Service
@@ -35,22 +35,54 @@ class RedisCacheService (
                 }
         }
 
-        // 없으면 찾아서 반환
-        val eventResponse =  getEventByTitle(eventTitle)
-
-        incrementSearchCount(eventTitle)
-
-        // 캐시에 등록.
-        putCache(CacheTarget.EVENT, eventTitle, eventResponse)
-
-        return eventResponse
+        // 캐시에 없으면 찾아서 반환
+        return getEventByTitle(eventTitle).also{// 없으면  throw, 종료
+            incrementSearchCount(eventTitle)
+            //최소 n점 부터 캐시에 저장
+            putCache(CacheTarget.EVENT, eventTitle, it) // 캐시에 등록.
+        }
     }
+
+//    fun searchEventList(keyword: String): List<EventResponse> {
+//
+//        // 캐시에 있으면 바로 반환
+//        if (chkCache(CacheTarget.EVENT,keyword)){
+//            //캐싱 시간 초기화
+//            refreshCacheTtl(CacheTarget.EVENT, keyword)
+//            val value =  getCachedValue(CacheTarget.EVENT, keyword)
+//                ?.let{
+//                    incrementSearchCount(keyword)
+//                    return it
+//                }
+//        }
+//
+//        // 캐시에 없으면 찾아서 반환
+//        return getEventListByTitle(keyword).also{// 없으면  throw, 종료
+//            incrementSearchCount(keyword)
+//            //최소 n점 부터 캐시에 저장
+//            putCache(CacheTarget.EVENT, keyword, it) // 캐시에 등록.
+//        }
+//    }
 
     fun getEventByTitle(eventTitle : String) : EventResponse{
         return eventRepository.findByTitle(eventTitle)
             ?.let { EventResponse.from(it) }
             ?: throw ModelNotFoundException("Event", null)
     }
+
+//    fun getEventListByTitle(eventTitle : String) : List<EventResponse>{
+//
+////        pageable: Pageable,
+////        sortStatus: String?,
+////        searchStatus: String?,
+////        category: String?,
+////        keyword: String?
+//        val pageable:Pageable = {page = 0 , size = 0}
+//
+//        return eventRepository.findByPageable( eventTitle)
+//            ?.let { EventResponse.from(it) }
+//            ?: throw ModelNotFoundException("Event", null)
+//    }
 
     //장소 검색
 //    fun getPlaceByTitle(eventTitle : String) : EventResponse{
@@ -122,7 +154,7 @@ class RedisCacheService (
         return popList
     }
 
-     fun getPopularValues(limit: Long): List<EventResponse> {
+     fun getPopularResults(limit: Long): List<EventResponse> {
         val popKeys = getPopularKeywords(5)
          val popValues =
              popKeys.map {
@@ -134,7 +166,7 @@ class RedisCacheService (
 
     @Scheduled(cron = "0 0 0 * * ?") // 매일 자정에 실행
     fun decreaseScoresAndRemoveExpired() {
-        var popularSearches = redisTemplate.opsForZSet().rangeWithScores(SEARCH_KEY, 0, -1)
+        val popularSearches = redisTemplate.opsForZSet().rangeWithScores(SEARCH_KEY, 0, -1)
 
         if (popularSearches != null) {
             for (typedTuple in popularSearches) {

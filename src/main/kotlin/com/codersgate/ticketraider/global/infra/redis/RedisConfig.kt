@@ -62,8 +62,10 @@ class RedisConfig {
         template.valueSerializer = serializer
 
         //Hash 자료구조를 위한 Serializer
-//        template.hashKeySerializer = StringRedisSerializer()
-//        template.hashValueSerializer = StringRedisSerializer()
+        template.hashKeySerializer = StringRedisSerializer()
+        template.hashValueSerializer = StringRedisSerializer()
+
+        template.setEnableTransactionSupport(true); // transaction 허용
 
         return template
     }
