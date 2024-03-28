@@ -3,37 +3,27 @@ package com.codersgate.ticketraider.domain.ticket.service
 import com.codersgate.ticketraider.domain.event.model.seat.Bookable
 import com.codersgate.ticketraider.domain.event.repository.EventRepository
 import com.codersgate.ticketraider.domain.event.repository.seat.AvailableSeatRepository
+import com.codersgate.ticketraider.domain.member.entity.MemberRole
 import com.codersgate.ticketraider.domain.member.repository.MemberRepository
-import com.codersgate.ticketraider.domain.review.dto.ReviewResponse
 import com.codersgate.ticketraider.domain.ticket.dto.BookedTicketResponse
 import com.codersgate.ticketraider.domain.ticket.dto.CreateTicketRequest
-import com.codersgate.ticketraider.domain.ticket.dto.SeatInfo
 import com.codersgate.ticketraider.domain.ticket.dto.TicketResponse
 import com.codersgate.ticketraider.domain.ticket.entity.Ticket
 import com.codersgate.ticketraider.domain.ticket.entity.TicketGrade
 import com.codersgate.ticketraider.domain.ticket.entity.TicketStatus
 import com.codersgate.ticketraider.domain.ticket.repository.TicketRepository
-import com.codersgate.ticketraider.global.common.aop.redis.lock.PubSubLock
 import com.codersgate.ticketraider.global.error.exception.InvalidCredentialException
 import com.codersgate.ticketraider.global.error.exception.ModelNotFoundException
 import com.codersgate.ticketraider.global.error.exception.TicketReservationFailedException
-import com.codersgate.ticketraider.global.infra.redis.cache.CacheTarget
-import com.codersgate.ticketraider.global.infra.redis.cache.RedisCacheService
 import com.codersgate.ticketraider.global.infra.security.jwt.UserPrincipal
 import org.hibernate.Hibernate
 import org.slf4j.LoggerFactory
-import org.springframework.cache.CacheManager
-import org.redisson.api.RLock
-import org.redisson.api.RedissonClient
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
-import java.util.concurrent.TimeUnit
-import kotlin.math.atan
-import kotlin.math.log
 
 @Service
 class TicketServiceImpl(
@@ -163,22 +153,20 @@ class TicketServiceImpl(
     }
 
     override fun cancelTicket(ticketId: Long, userPrincipal: UserPrincipal) {
-        ticketRepository.findByIdOrNull(ticketId)
-            ?.let { ticket ->
-                if (ticket.member.id == userPrincipal.id) { // 본인 확인 // 사실 본인 티켓만 확인되니 없어도 됨.
-                    deleteTicket(ticketId)                  // delete메서드 재사용
-                } else
-                    throw InvalidCredentialException("")    // 인가 오류
-            }
-    }
-
-
-    override fun deleteTicket(ticketId: Long) {
+        if (userPrincipal.authorities.toString() != MemberRole.ADMIN.name) { // ADMIN 아닐 시
+            ticketRepository.findByIdOrNull(ticketId)
+                ?.let { ticket ->
+                    if (ticket.member.id != userPrincipal.id)  // 본인 확인 // 사실 본인 티켓만 확인되니 없어도 됨.
+                        throw InvalidCredentialException("")    // 인가 오류
+                }
+        }
         val ticket = ticketRepository.findByIdOrNull(ticketId)
             ?.let { ticket ->
-                ticket.event.availableSeats.filter { seat ->
-                    (seat.date == ticket.date) && (seat.event!!.id == ticket.event.id)  // 날짜, 이벤트 확인
-                }[0].let {
+                ticket.event.availableSeats
+                    .filter { seat ->
+                        (seat.date == ticket.date) && (seat.event!!.id == ticket.event.id)  // 날짜, 이벤트 확인
+                    }[0]
+                    .let {
                     it.decreaseSeat(ticket.grade)           // 좌석 수 줄임
                     availableSeatRepository.save(it)
                 }
@@ -188,3 +176,4 @@ class TicketServiceImpl(
             ?: throw ModelNotFoundException("Ticket", ticketId)
     }
 }
+

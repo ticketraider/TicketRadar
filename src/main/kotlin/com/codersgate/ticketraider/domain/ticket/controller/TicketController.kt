@@ -132,15 +132,15 @@ class TicketController(
     }
 
     // 관리자용
-    @Operation(summary = "티켓 삭제")
-    @DeleteMapping("/delete/{ticketId}")
-    fun deleteTicket(
-        @PathVariable ticketId: Long,
-    ): ResponseEntity<Unit> {
-        return ResponseEntity
-            .status(HttpStatus.OK)
-            .body(ticketService.deleteTicket(ticketId))
-    }
+//    @Operation(summary = "티켓 삭제")
+//    @DeleteMapping("/delete/{ticketId}")
+//    fun deleteTicket(
+//        @PathVariable ticketId: Long,
+//    ): ResponseEntity<Unit> {
+//        return ResponseEntity
+//            .status(HttpStatus.OK)
+//            .body(ticketService.deleteTicket(ticketId))
+//    }
 
 
 }
