@@ -37,11 +37,19 @@ class RedisCacheController(
         return ResponseEntity.status(HttpStatus.OK).body(redisCacheService.getPopularEventList(l))
     }
 
-//    @GetMapping("/updateCachedEventList")
-//    fun updateCachedEventList() : ResponseEntity< List<List<EventResponse>> >
-//    {
-//        return ResponseEntity.status(HttpStatus.OK).body(redisCacheService.updateCachedEventList())
-//    }
+    @GetMapping("/getCachedEventList")
+    fun getCachedEventList(
+        @RequestParam(required = true) key:String
+    ) : ResponseEntity<List<EventResponse>>
+    {
+        return ResponseEntity.status(HttpStatus.OK).body(redisCacheService.getCachedEventList(key))
+    }
+
+    @GetMapping("/updateCachedEventList")
+    fun updateCachedEventList() : ResponseEntity< List<List<EventResponse>> >
+    {
+        return ResponseEntity.status(HttpStatus.OK).body(redisCacheService.updateCachedEventList())
+    }
 
     @Scheduled(cron = "0 0 0 * * ?") // 매일 자정에 실행
     @PatchMapping("/decreaseScore")

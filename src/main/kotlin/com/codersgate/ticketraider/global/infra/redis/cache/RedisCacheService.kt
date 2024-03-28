@@ -1,8 +1,10 @@
 package com.codersgate.ticketraider.global.infra.redis.cache
 
 import com.codersgate.ticketraider.domain.event.dto.EventResponse
+import com.codersgate.ticketraider.domain.event.dto.price.PriceResponse
 import com.codersgate.ticketraider.domain.event.repository.EventRepository
 import com.codersgate.ticketraider.domain.event.service.EventService
+import com.codersgate.ticketraider.domain.place.dto.PlaceResponse
 import com.codersgate.ticketraider.global.error.exception.ModelNotFoundException
 import org.slf4j.LoggerFactory
 import org.springframework.cache.CacheManager
@@ -10,6 +12,7 @@ import org.springframework.data.domain.PageRequest
 import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
+import java.time.LocalDate
 
 
 @Service
@@ -45,12 +48,6 @@ class RedisCacheService (
         }
     }
 
-    // 프론트 홈에서 호출할 때 사용
-//    fun getCachedEventList(key: String): List<EventResponse> {
-//        val list = getCachedValue<List<EventResponse>>(CacheTarget.EVENT, key, )
-//        return list!!
-//    }
-
     fun getEventByTitle(eventTitle : String) : EventResponse{
         return eventRepository.findByTitle(eventTitle)
             ?.let { EventResponse.from(it) }
@@ -62,9 +59,43 @@ class RedisCacheService (
         val cache = cacheManager.getCache(target.name)
         val value = cache?.get(key) // 캐시에서 가져온 값. LinkedHashMap 형태.
 
-        return value?.get() as EventResponse
+        return value?.get() as? EventResponse // as? 에 ? 없으면 에러남 java.lang.ClassCastException: class java.util.LinkedHashMap cannot be cast to class com.codersgate.ticketraider.domain.event.dto.EventResponse (java.util.LinkedHashMap is in module java.base of loader 'bootstrap'; com.codersgate.ticketraider.domain.event.dto.EventResponse is in unnamed module of loader 'app')
     }
 
+    // 프론트 홈에서 호출할 때 사용
+    fun getCachedEventList(key: String): List<EventResponse> {
+        logger.info("${CacheTarget.EVENT} 캐시 값 가져오기 시작")
+        val cache = cacheManager.getCache(CacheTarget.EVENT.name)
+        val value = cache?.get(key) // 캐시에서 가져온 값. LinkedHashMap 형태.
+
+        val list = value?.get() as? List<Map<String, Any>> // 각 요소가 맵 형태이므로 타입을 지정합니다.
+
+        return list?.map { item ->
+            EventResponse(
+                id = (item["id"] as Int).toLong(),
+                title = item["title"] as String,
+                likeCount = item["likeCount"] as Int,
+                startDate = LocalDate.parse(item["startDate"] as String), // 문자열을 LocalDate로 변환합니다.
+                endDate = LocalDate.parse(item["endDate"] as String), // 문자열을 LocalDate로 변환합니다.
+                eventInfo = item["eventInfo"] as String,
+                averageRating = (item["averageRating"] as Double).toFloat(),
+                posterImage = item["posterImage"] as String,
+                place = PlaceResponse(
+                    name = (item["place"] as Map<String, Any>)["name"] as String,
+                    totalSeat = (item["place"] as Map<String, Any>)["totalSeat"] as Int,
+                    seatR = (item["place"] as Map<String, Any>)["seatR"] as Int,
+                    seatS = (item["place"] as Map<String, Any>)["seatS"] as Int,
+                    seatA = (item["place"] as Map<String, Any>)["seatA"] as Int
+                ),
+                price = PriceResponse(
+                    seatRPrice = (item["price"] as Map<String, Int>)["seatRPrice"] ?: 0,
+                    seatSPrice = (item["price"] as Map<String, Int>)["seatSPrice"] ?: 0,
+                    seatAPrice = (item["price"] as Map<String, Int>)["seatAPrice"] ?: 0
+                ),
+                reviewCount = item["reviewCount"] as Int
+            )
+        } ?: emptyList() // 만약 리스트가 null이면 빈 리스트를 반환합니다.
+    }
     fun chkCache(target: CacheTarget, key:String ): Boolean {
         logger.info("${target.name} 캐시 확인 시작")
         val cache = cacheManager.getCache(target.name)
@@ -92,28 +123,26 @@ class RedisCacheService (
         cache?.evict(key)
     }
 
-//    @Scheduled(cron = "0 0 * * * *") // 매 시간 0분 0초에 실행
-//    fun updateCachedEventList() : List<List<EventResponse>>
-//    {
-//        getCachedEventList("Popularity")
-//
-//        val listByPopularity = getPopularEventList(5)
-//        putCache(CacheTarget.EVENT, "rating", listByPopularity)
-//
-//        val listByRating =eventService.getPaginatedEventList(PageRequest.of(0, 5),
-//            "rating", "title", null, null )!!.toList()
-//        putCache(CacheTarget.EVENT, "rating", listByRating)
-//
-//        val listByReviews =eventService.getPaginatedEventList(PageRequest.of(0, 5),
-//            "reviews", "title", null, null )!!.toList()
-//        putCache(CacheTarget.EVENT, "reviews", listByReviews)
-//
-//        val listByLikes =eventService.getPaginatedEventList(PageRequest.of(0, 5),
-//            "likes", "title", null, null )!!.toList()
-//        putCache(CacheTarget.EVENT, "likes", listByLikes)
-//
-//        return listOf(listByPopularity, listByRating, listByReviews, listByLikes)
-//    }
+    @Scheduled(cron = "0 0 * * * *") // 매 시간 0분 0초에 실행
+    fun updateCachedEventList() : List<List<EventResponse>>
+    {
+        val listByPopularity = getPopularEventList(5)
+        putCache(CacheTarget.EVENT, "popularity", listByPopularity)
+
+        val listByRating =eventService.getPaginatedEventList(PageRequest.of(0, 5),
+            "rating", "title", null, "" )!!.toList()
+        putCache(CacheTarget.EVENT, "rating", listByRating)
+
+        val listByReviews =eventService.getPaginatedEventList(PageRequest.of(0, 5),
+            "reviews", "title", null, "" )!!.toList()
+        putCache(CacheTarget.EVENT, "reviews", listByReviews)
+
+        val listByLikes =eventService.getPaginatedEventList(PageRequest.of(0, 5),
+            "likes", "title", null, "" )!!.toList()
+        putCache(CacheTarget.EVENT, "likes", listByLikes)
+
+        return listOf(listByPopularity, listByRating, listByReviews, listByLikes)
+    }
 
 //  eventRepository.findByPageable(pageable, sortStatus, searchStatus, category, keyword)
 
