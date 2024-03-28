@@ -153,7 +153,7 @@ class TicketServiceImpl(
     }
 
     override fun cancelTicket(ticketId: Long, userPrincipal: UserPrincipal) {
-        if (userPrincipal.authorities.toString() != MemberRole.ADMIN.name) { // ADMIN 아닐 시
+        if (userPrincipal.authorities.toString() != "ROLE_ADMIN") { // ADMIN 아닐 시
             ticketRepository.findByIdOrNull(ticketId)
                 ?.let { ticket ->
                     if (ticket.member.id != userPrincipal.id)  // 본인 확인 // 사실 본인 티켓만 확인되니 없어도 됨.
