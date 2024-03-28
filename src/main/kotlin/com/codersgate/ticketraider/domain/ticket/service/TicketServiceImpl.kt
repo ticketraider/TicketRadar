@@ -112,7 +112,6 @@ class TicketServiceImpl(
             availableSeatRepository.save(availableSeat)
         }
         eventRepository.save(event)
-        //캐시 내 이벤트 항목 최신화 하지 않아도 됨. Response 에는 변동사항 없음
     }
 
     override fun getBookedTicket(eventId: Long, date: LocalDate): BookedTicketResponse {
