@@ -163,7 +163,9 @@ class TicketServiceImpl(
         return paidTicketList
     }
 
+    @Transactional
     override fun cancelTicket(ticketId: Long, userPrincipal: UserPrincipal) {
+        println("api 도달함")
         ticketRepository.findByIdOrNull(ticketId)
             ?.let { ticket ->
                 if (ticket.member.id == userPrincipal.id) { // 본인 확인 // 사실 본인 티켓만 확인되니 없어도 됨.
@@ -173,8 +175,9 @@ class TicketServiceImpl(
             }
     }
 
-
+    @Transactional
     override fun deleteTicket(ticketId: Long) {
+        println("2번째 api 도달함")
         val ticket = ticketRepository.findByIdOrNull(ticketId)
             ?.let { ticket ->
                 ticket.event.availableSeats.filter { seat ->

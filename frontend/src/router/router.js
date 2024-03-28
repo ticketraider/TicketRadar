@@ -51,7 +51,7 @@ const routes = [
         children: [
             {
                 path: 'userinfo',
-                component: () => import('../components/mypage/UserInfoComponentFront.vue'),
+                component: () => import('../components/mypage/UserInfoComponent.vue'),
             },
             {
                 path: 'tickets',

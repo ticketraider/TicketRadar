@@ -111,9 +111,20 @@ class MemberServiceImpl(
         return MemberResponse.from(member)
     }
 
+    override fun verifyCurrentPassword(currentPassword: String, memberId: Long): VerifyCurrentPasswordResponse {
+        val member = memberRepository.findByIdOrNull(memberId)
+            ?: throw ModelNotFoundException("Member", memberId)
+
+        if (!passwordEncoder.matches(currentPassword, member.password)){
+            throw InvalidCredentialException("")
+        }
+        return VerifyCurrentPasswordResponse(success = true, "비밀번호가 확인되었습니다.")
+
+    }
+
     @Transactional
-    override fun updateProfile(updateProfileRequest: UpdateProfileRequest, user: UserPrincipal) {
-        val member = memberRepository.findByIdOrNull(user.id)
+    override fun updateProfile(updateProfileRequest: UpdateProfileRequest, memberId: Long) {
+        val member = memberRepository.findByIdOrNull(memberId)
             ?: throw InvalidCredentialException("")
         val changedPassword = passwordEncoder.encode(updateProfileRequest.password)
         member.updateProfile(changedPassword, updateProfileRequest.nickname)
