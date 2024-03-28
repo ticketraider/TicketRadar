@@ -2,13 +2,14 @@ package com.codersgate.ticketraider.global.infra.redis.cache
 
 import com.codersgate.ticketraider.domain.event.dto.EventResponse
 import com.codersgate.ticketraider.domain.event.repository.EventRepository
+import com.codersgate.ticketraider.domain.event.service.EventService
 import com.codersgate.ticketraider.global.error.exception.ModelNotFoundException
 import org.slf4j.LoggerFactory
 import org.springframework.cache.CacheManager
+import org.springframework.data.domain.PageRequest
 import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
-import java.awt.print.Pageable
 
 
 @Service
@@ -16,6 +17,7 @@ class RedisCacheService (
     private val redisTemplate: RedisTemplate<String, Any>,
     private val eventRepository: EventRepository,
     private val cacheManager: CacheManager,
+    private val eventService: EventService,
 ){
     companion object{
         val logger = LoggerFactory.getLogger(RedisCacheService::class.java)
@@ -28,7 +30,7 @@ class RedisCacheService (
         if (chkCache(CacheTarget.EVENT,eventTitle)){
             //캐싱 시간 초기화
             refreshCacheTtl(CacheTarget.EVENT, eventTitle)
-            val value =  getCachedValue(CacheTarget.EVENT, eventTitle)
+            getCachedEvent(CacheTarget.EVENT, eventTitle)
                 ?.let{
                     incrementSearchCount(eventTitle)
                     return it
@@ -43,25 +45,10 @@ class RedisCacheService (
         }
     }
 
-//    fun searchEventList(keyword: String): List<EventResponse> {
-//
-//        // 캐시에 있으면 바로 반환
-//        if (chkCache(CacheTarget.EVENT,keyword)){
-//            //캐싱 시간 초기화
-//            refreshCacheTtl(CacheTarget.EVENT, keyword)
-//            val value =  getCachedValue(CacheTarget.EVENT, keyword)
-//                ?.let{
-//                    incrementSearchCount(keyword)
-//                    return it
-//                }
-//        }
-//
-//        // 캐시에 없으면 찾아서 반환
-//        return getEventListByTitle(keyword).also{// 없으면  throw, 종료
-//            incrementSearchCount(keyword)
-//            //최소 n점 부터 캐시에 저장
-//            putCache(CacheTarget.EVENT, keyword, it) // 캐시에 등록.
-//        }
+    // 프론트 홈에서 호출할 때 사용
+//    fun getCachedEventList(key: String): List<EventResponse> {
+//        val list = getCachedValue<List<EventResponse>>(CacheTarget.EVENT, key, )
+//        return list!!
 //    }
 
     fun getEventByTitle(eventTitle : String) : EventResponse{
@@ -70,36 +57,12 @@ class RedisCacheService (
             ?: throw ModelNotFoundException("Event", null)
     }
 
-//    fun getEventListByTitle(eventTitle : String) : List<EventResponse>{
-//
-////        pageable: Pageable,
-////        sortStatus: String?,
-////        searchStatus: String?,
-////        category: String?,
-////        keyword: String?
-//        val pageable:Pageable = {page = 0 , size = 0}
-//
-//        return eventRepository.findByPageable( eventTitle)
-//            ?.let { EventResponse.from(it) }
-//            ?: throw ModelNotFoundException("Event", null)
-//    }
-
-    //장소 검색
-//    fun getPlaceByTitle(eventTitle : String) : EventResponse{
-//        return eventRepository.findByTitle(eventTitle)
-//            ?.let { EventResponse.from(it) }
-//            ?: throw ModelNotFoundException("Event", null)
-//    }
-
-    fun getCachedValue(target: CacheTarget, key:String ): EventResponse? {
+    fun getCachedEvent(target: CacheTarget, key:String ): EventResponse? {
         logger.info("${target.name} 캐시 값 가져오기 시작")
         val cache = cacheManager.getCache(target.name)
         val value = cache?.get(key) // 캐시에서 가져온 값. LinkedHashMap 형태.
 
-        // 값이 존재하고, ValueWrapper가 null이 아닌 경우에만 실제 값을 얻어옴
-        val eventResponse: EventResponse? = value?.get() as? EventResponse
-
-        return eventResponse
+        return value?.get() as EventResponse
     }
 
     fun chkCache(target: CacheTarget, key:String ): Boolean {
@@ -129,6 +92,32 @@ class RedisCacheService (
         cache?.evict(key)
     }
 
+//    @Scheduled(cron = "0 0 * * * *") // 매 시간 0분 0초에 실행
+//    fun updateCachedEventList() : List<List<EventResponse>>
+//    {
+//        getCachedEventList("Popularity")
+//
+//        val listByPopularity = getPopularEventList(5)
+//        putCache(CacheTarget.EVENT, "rating", listByPopularity)
+//
+//        val listByRating =eventService.getPaginatedEventList(PageRequest.of(0, 5),
+//            "rating", "title", null, null )!!.toList()
+//        putCache(CacheTarget.EVENT, "rating", listByRating)
+//
+//        val listByReviews =eventService.getPaginatedEventList(PageRequest.of(0, 5),
+//            "reviews", "title", null, null )!!.toList()
+//        putCache(CacheTarget.EVENT, "reviews", listByReviews)
+//
+//        val listByLikes =eventService.getPaginatedEventList(PageRequest.of(0, 5),
+//            "likes", "title", null, null )!!.toList()
+//        putCache(CacheTarget.EVENT, "likes", listByLikes)
+//
+//        return listOf(listByPopularity, listByRating, listByReviews, listByLikes)
+//    }
+
+//  eventRepository.findByPageable(pageable, sortStatus, searchStatus, category, keyword)
+
+
     fun refreshCacheTtl(target: CacheTarget, key: String) {
         logger.info("캐시에 재등록 :  $key ")
         val cache = cacheManager.getCache(target.name)
@@ -154,8 +143,8 @@ class RedisCacheService (
         return popList
     }
 
-     fun getPopularResults(limit: Long): List<EventResponse> {
-        val popKeys = getPopularKeywords(5)
+     fun getPopularEventList(limit: Long): List<EventResponse> {
+        val popKeys = getPopularKeywords(limit)
          val popValues =
              popKeys.map {
                  getEventByTitle(it)

@@ -22,6 +22,7 @@
     <div style="width: 100%; margin: 10px">
       <div class="pagination" style="margin-left: 680px">
         <v-btn
+            v-if="type !== 'popularity'"
             @click="fetchEvents(currentPage - 1)"
             :disabled="currentPage === 0"
             style="background-color: #0a0925; color: white;"
@@ -29,6 +30,7 @@
           이전
         </v-btn>
         <v-btn
+            v-if="type !== 'popularity'"
             @click="fetchEvents(currentPage + 1)"
             :disabled="currentPage === totalPages - 1"
             style="margin-left: 20px; background-color: #0a0925; color: white;"

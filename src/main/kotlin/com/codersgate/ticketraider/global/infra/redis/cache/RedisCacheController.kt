@@ -34,8 +34,14 @@ class RedisCacheController(
     ) : ResponseEntity<List<EventResponse>>
     {
         val l = limit?:5
-        return ResponseEntity.status(HttpStatus.OK).body(redisCacheService.getPopularResults(l))
+        return ResponseEntity.status(HttpStatus.OK).body(redisCacheService.getPopularEventList(l))
     }
+
+//    @GetMapping("/updateCachedEventList")
+//    fun updateCachedEventList() : ResponseEntity< List<List<EventResponse>> >
+//    {
+//        return ResponseEntity.status(HttpStatus.OK).body(redisCacheService.updateCachedEventList())
+//    }
 
     @Scheduled(cron = "0 0 0 * * ?") // 매일 자정에 실행
     @PatchMapping("/decreaseScore")
