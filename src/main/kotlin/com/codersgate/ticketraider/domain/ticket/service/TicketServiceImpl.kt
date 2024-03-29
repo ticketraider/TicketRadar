@@ -173,7 +173,6 @@ class TicketServiceImpl(
                     it.decreaseSeat(ticket.grade)           // 좌석 수 줄임
                     availableSeatRepository.save(it)
                 }
-
                 ticketRepository.delete(ticket)
             }
             ?: throw ModelNotFoundException("Ticket", ticketId)

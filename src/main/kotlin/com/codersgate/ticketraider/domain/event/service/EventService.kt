@@ -12,9 +12,8 @@ import org.springframework.web.multipart.MultipartFile
 interface EventService {
 
     fun getPrice(eventId: Long): PriceResponse
-    fun createEvent(eventRequest: EventRequest, file: MultipartFile?)
-
-    fun updateEvent(eventId: Long, eventRequest: EventRequest, file: MultipartFile?)
+    fun createEvent(eventRequest: EventRequest)
+    fun updateEvent(eventId: Long, eventRequest: EventRequest)
 
     fun deleteEvent(eventId: Long)
 
@@ -28,4 +27,5 @@ interface EventService {
 
     fun getEvent(eventId: Long): EventResponse
 
+    fun uploadImage(file: MultipartFile?): String
 }

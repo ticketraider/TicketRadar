@@ -28,13 +28,27 @@ class RedisCacheController(
         return ResponseEntity.status(HttpStatus.OK).body(redisCacheService.getPopularKeywords(5))
     }
 
-    @GetMapping("/popularValues")
-    fun getPopularValues(
+    @GetMapping("/PopularEventList")
+    fun getPopularEventList(
         @RequestParam(required = false) limit: Long?,
     ) : ResponseEntity<List<EventResponse>>
     {
         val l = limit?:5
-        return ResponseEntity.status(HttpStatus.OK).body(redisCacheService.getPopularResults(l))
+        return ResponseEntity.status(HttpStatus.OK).body(redisCacheService.getPopularEventList(l))
+    }
+
+    @GetMapping("/getCachedEventList")
+    fun getCachedEventList(
+        @RequestParam(required = true) key:String
+    ) : ResponseEntity<List<EventResponse>>
+    {
+        return ResponseEntity.status(HttpStatus.OK).body(redisCacheService.getCachedEventList(key))
+    }
+
+    @GetMapping("/updateCachedEventList")
+    fun updateCachedEventList() : ResponseEntity< List<List<EventResponse>> >
+    {
+        return ResponseEntity.status(HttpStatus.OK).body(redisCacheService.updateCachedEventList())
     }
 
     @Scheduled(cron = "0 0 0 * * ?") // 매일 자정에 실행

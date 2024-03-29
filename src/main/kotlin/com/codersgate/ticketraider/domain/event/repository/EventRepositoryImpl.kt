@@ -39,7 +39,6 @@ class EventRepositoryImpl : QueryDslSupport(), CustomEventRepository {
         }
 
 
-
         val query = queryFactory.selectFrom(event)
             .leftJoin(event.price, price)
             .offset(pageable.offset)

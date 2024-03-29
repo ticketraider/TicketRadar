@@ -120,6 +120,7 @@ class TicketController(
     }
 
     // 멤버용
+    // 복사됨
     @Operation(summary = "티켓 취소")
     @DeleteMapping("/cancel/{ticketId}")
     fun cancelTicket(

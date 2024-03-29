@@ -17,6 +17,7 @@ import java.time.format.DateTimeFormatter
 data class EventRequest(
 
     val categoryId: Long,
+    val posterImage: String,
     @field: Size(min = 1, max = 100, message = "Title must be between 1 and 100 characters")
     @JsonProperty("title")
     val title: String,
@@ -67,7 +68,7 @@ data class EventRequest(
             "^2[0-9]{3}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])\$"
     }
 
-    fun toPriceAndEvent(category: Category, place: Place, posterImage: String): Pair<Price, Event> {
+    fun toPriceAndEvent(category: Category, place: Place): Pair<Price, Event> {
         val event = Event(
             posterImage = posterImage,
             title = title,

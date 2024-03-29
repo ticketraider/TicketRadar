@@ -1,19 +1,10 @@
 <template>
   <div class="event-list">
-    <div class="event-searchCorrect">
-      일치하는 이벤트
-
-    </div>
     <div class="event-grid">
       <v-card v-for="event in eventList" :key="event.id" class="event-card">
         <v-card class="mx-auto" style="width: 300px; background-color: white">
           <v-img height="400px" :src="event.posterImage" cover></v-img>
-
           <v-card-title>{{ event.title }}</v-card-title>
-          <div style="display:flex; margin-bottom: 10px;">
-            <v-card-subtitle>리뷰 {{ event.reviewCount }}</v-card-subtitle>
-            <v-card-subtitle>좋아요 {{ event.likeCount }}</v-card-subtitle>
-          </div>
           <v-card-subtitle>{{ event.eventInfo }}</v-card-subtitle>
           <v-card-actions>
             <v-btn @click="reserve(event.id)" color="#0a0925" variant="text">
@@ -27,6 +18,7 @@
     <div style="width: 100%; margin: 10px">
       <div class="pagination" style="margin-left: 680px">
         <v-btn
+            v-if="type === ''"
             @click="fetchEvents(currentPage - 1)"
             :disabled="currentPage === 0"
             style="background-color: #0a0925; color: white;"
@@ -34,6 +26,7 @@
           이전
         </v-btn>
         <v-btn
+            v-if="type === ''"
             @click="fetchEvents(currentPage + 1)"
             :disabled="currentPage === totalPages - 1"
             style="margin-left: 20px; background-color: #0a0925; color: white;"
@@ -46,9 +39,9 @@
 </template>
 
 <script setup>
-import {ref, onMounted, watch, defineProps} from 'vue';
+import { ref, onMounted, watch, defineProps } from 'vue';
 import axios from 'axios';
-import {useRoute, useRouter} from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 
 const eventList = ref([]);
 const currentPage = ref(0);
@@ -82,35 +75,37 @@ const fetchEvents = async (page = 0) => {
     let request = '';
 
     // type에 따라 다른 API 호출
-    if (props.type === 'popularity') {
-      apiUrl = 'http://localhost:8080/popularValues'
+    if(props.type === 'likes' || props.type === 'reviews' || props.type === 'rating'|| props.type === 'popularity'){
+      apiUrl = 'http://localhost:8080/getCachedEventList'
       request = {
         params: {
-          limit: 5,
+          key: props.type,
         },
       }
-    } else if (props.type === 'likes' || props.type === 'reviews' || props.type === 'rating') {
+    }
+    // else if( props.type === 'likes' || props.type === 'reviews' || props.type === 'rating'|| props.type === 'popularity') {
+    //   apiUrl = 'http://localhost:8080/events'
+    //   request = {
+    //     params: {
+    //       page: page,
+    //       size: pageSize,
+    //       category: selectedCategory.value,
+    //       keyword: searchKeyword.value,
+    //       sortStatus: props.type,              //  좋아요, 리뷰,
+    //       searchStatus: searchCriterion.value //  제목 or 장소
+    //     },
+    //   }
+    // }
+    else {
       apiUrl = 'http://localhost:8080/events'
       request = {
         params: {
           page: page,
-          size: pageSize,
-          category: selectedCategory.value,
-          keyword: searchKeyword.value,
-          sortStatus: props.type,              //  좋아요, 리뷰,
-          searchStatus: searchCriterion.value //  제목 or 장소
-        },
-      }
-    } else {
-      apiUrl = 'http://localhost:8080/events'
-      request = {
-        params: {
-          page: page,
-          size: pageSize,
-          category: selectedCategory.value,
-          keyword: searchKeyword.value,
-          sortStatus: sortStatus.value,       //  좋아요, 리뷰,
-          searchStatus: searchCriterion.value //  제목 or 장소
+              size: pageSize,
+              category: selectedCategory.value,
+              keyword: searchKeyword.value,
+              sortStatus: sortStatus.value,       //  좋아요, 리뷰,
+              searchStatus: searchCriterion.value //  제목 or 장소
         },
       }
       if (props.type === 'rating') {
@@ -124,9 +119,9 @@ const fetchEvents = async (page = 0) => {
     const response = await axios.get(apiUrl, request);
     console.log(`${props.type} Response : `, response)
 
-    if (props.type === 'popularity')
+    if(props.type === 'popularity')
       eventList.value = response.data;
-    else {
+    else{
       eventList.value = response.data.content;
       totalPages.value = response.data.totalPages;
       currentPage.value = page;
@@ -140,7 +135,7 @@ const fetchEvents = async (page = 0) => {
 // selectedCategory 변화 감지 및 해당 카테고리의 이벤트 목록 불러오기
 watch(() => route.query, () => {
   fetchEvents(currentPage.value);
-}, {deep: true});
+}, { deep: true });
 
 
 onMounted(() => {
@@ -148,7 +143,7 @@ onMounted(() => {
 });
 
 const reserve = (eventId) => {
-  router.push({name: 'EventDetail', params: {eventId: Number(eventId)}});
+  router.push({ name: 'EventDetail', params: { eventId: Number(eventId) } });
 };
 </script>
 
