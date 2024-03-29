@@ -10,7 +10,7 @@ import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
-import org.springframework.security.core.annotation.AuthenticationPrincipal
+import org.springframework.security.core.Authentication
 import org.springframework.web.bind.annotation.*
 
 
@@ -41,7 +41,7 @@ class MemberController(
     }
 
     @Operation(summary = "프로필 조회")
-    @GetMapping("/members/{memberId}")
+    @GetMapping("/{memberId}")
     fun getProfile(
         @PathVariable memberId: Long
     ): ResponseEntity<MemberResponse> {
@@ -55,8 +55,9 @@ class MemberController(
     @PutMapping("/update")
     fun updateProfile(
         @Valid @RequestBody updateProfileRequest: UpdateProfileRequest,
-        @AuthenticationPrincipal user: UserPrincipal
+        authentication: Authentication
     ): ResponseEntity<Unit> {
+        val user = authentication.principal as UserPrincipal
         return ResponseEntity
             .status(HttpStatus.OK)
             .body(memberService.updateProfile(updateProfileRequest, user))
@@ -64,10 +65,11 @@ class MemberController(
 
     @Operation(summary = "회원 탈퇴")
     @PreAuthorize("hasAnyRole('MEMBER', 'ADMIN')")
-    @DeleteMapping("/members/unregister")
+    @DeleteMapping("/unregister")
     fun unregister(
-        @AuthenticationPrincipal user: UserPrincipal
+        authentication: Authentication
     ): ResponseEntity<Unit> {
+        val user = authentication.principal as UserPrincipal
         return ResponseEntity
             .status(HttpStatus.OK)
             .body(memberService.unregister(user))

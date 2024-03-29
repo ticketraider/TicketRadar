@@ -4,6 +4,9 @@ import com.codersgate.ticketraider.domain.event.dto.EventResponse
 import io.lettuce.core.protocol.CommandKeyword
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.scheduling.annotation.Scheduled
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
@@ -17,5 +20,27 @@ class RedisCacheController(
         @RequestParam eventTitle: String,
     ) : ResponseEntity<EventResponse> {
         return ResponseEntity.status(HttpStatus.OK).body(redisCacheService.searchEvent(eventTitle))
+    }
+
+    @GetMapping("/popularKeywords")
+    fun getPopularKeywords(
+    ) : ResponseEntity<List<String>>
+    {
+        return ResponseEntity.status(HttpStatus.OK).body(redisCacheService.getPopularKeywords(5))
+    }
+
+    @GetMapping("/popularValues")
+    fun getPopularValues(
+        @RequestParam(required = false) limit: Long?,
+    ) : ResponseEntity<List<EventResponse>>
+    {
+        val l = limit?:5
+        return ResponseEntity.status(HttpStatus.OK).body(redisCacheService.getPopularValues(l))
+    }
+
+    @Scheduled(cron = "0 0 0 * * ?") // 매일 자정에 실행
+    @PatchMapping("/decreaseScore")
+    fun decreaseScoresAndRemoveExpired() {
+        redisCacheService.decreaseScoresAndRemoveExpired()
     }
 }

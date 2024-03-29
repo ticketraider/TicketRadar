@@ -3,7 +3,7 @@
     <div style="background-color: #392365; text-align: center; border-radius: 5px; margin-bottom: 20px">
       <h2>이벤트</h2>
     </div>
-    <div class="accordion" id="event">
+    <div class="accordion" id="accordionevent">
 <!--      이벤트 생성-->
       <EventCreateForm/>
 <!--      이벤트 수정-->

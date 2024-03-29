@@ -3,6 +3,7 @@ package com.codersgate.ticketraider.domain.event.service
 import com.codersgate.ticketraider.domain.category.repository.CategoryRepository
 import com.codersgate.ticketraider.domain.event.dto.EventRequest
 import com.codersgate.ticketraider.domain.event.dto.EventResponse
+import com.codersgate.ticketraider.domain.event.dto.price.PriceResponse
 import com.codersgate.ticketraider.domain.event.model.Event
 import com.codersgate.ticketraider.domain.event.repository.EventRepository
 import com.codersgate.ticketraider.domain.event.repository.price.PriceRepository
@@ -26,6 +27,12 @@ class EventServiceImpl(
     private val placeRepository: PlaceRepository,
     private val s3Service: S3Service
 ) : EventService {
+    override fun getPrice(eventId: Long): PriceResponse {
+        val event = eventRepository.findByIdOrNull(eventId)
+            ?: throw ModelNotFoundException("Event", eventId)
+        return PriceResponse.from(event.price!!)
+    }
+
     @Transactional
     override fun createEvent(eventRequest: EventRequest) {
         val category = categoryRepository.findByIdOrNull(eventRequest.categoryId)
@@ -39,6 +46,13 @@ class EventServiceImpl(
 
         val (price, event) = eventRequest.toPriceAndEvent(category, place)
         event.posterImage = "https://shorturl.at/kFIV0"
+        val posterImage =
+            if (file == null) {
+                ""
+            } else {
+                s3Service.putObject(file)
+            }
+        val (price, event) = eventRequest.toPriceAndEvent(category, place, posterImage)
         event.price = price
         eventRepository.save(event)
         priceRepository.save(price)
@@ -62,7 +76,9 @@ class EventServiceImpl(
             ?: throw ModelNotFoundException("category", eventRequest.categoryId)
         val place = placeRepository.findPlaceByName(eventRequest.place)
             ?: throw ModelNotFoundException("place", 0)
-
+        val posterImage =
+            if(file == null) { "" }
+            else { s3Service.putObject(file) }
         val orgStartDate = event.startDate
         val orgEndDate = event.endDate
         //시작일과 끝나는 일 비교후 false 시 예외처리
@@ -101,9 +117,15 @@ class EventServiceImpl(
         eventRepository.delete(event)
     }
 
-    override fun getPaginatedEventList(pageable: Pageable, status: String?, categoryId: Long?): Page<EventResponse>? {
+    override fun getPaginatedEventList(
+        pageable: Pageable,
+        sortStatus: String?,
+        searchStatus: String?,
+        category: String?,
+        keyword: String?
+    ): Page<EventResponse>? {
 
-        val eventList = eventRepository.findByPageable(pageable, categoryId, status)
+        val eventList = eventRepository.findByPageable(pageable, sortStatus, searchStatus, category, keyword)
         return eventList.map { EventResponse.from(it) }
     }
 

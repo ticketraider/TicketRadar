@@ -14,6 +14,7 @@ data class TicketResponse(
     val place: String,
     val ticketStatus: TicketStatus,
     val eventName: String,
+    val eventId: Long,
     val memberNickname: String,
 ) {
     companion object {
@@ -28,6 +29,7 @@ data class TicketResponse(
                 place = ticket.place,
                 ticketStatus = ticket.ticketStatus,
                 eventName = ticket.event.title,
+                eventId = ticket.event.id!!,
                 memberNickname = ticket.member.nickname,
             )
         }

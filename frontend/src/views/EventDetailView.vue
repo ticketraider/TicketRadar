@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <template>
+
   <html lang="ko">
   <head>
     <meta charset="UTF-8">
@@ -8,10 +9,11 @@
   </head>
   <body>
   <main>
-    <div style="height: 1300px; width: 100%; padding: 100px;">
-      <div style="width: 1600px; padding:10px; display: flex; margin: 0 auto;">
-        <MyTicketListBack/>
-      </div>
+    <div style="display: flex">
+      <EventDetailComponentFront/>
+      <!--   예매시 날짜 선택창과 예매버튼-->
+      <TicketingComponent/>
+
     </div>
   </main>
   </body>
@@ -21,16 +23,19 @@
 @import "../css/styles/TestStyle.css";
 </style>
 <script>
-import MyTicketList from "@/components/MyTicketListBack.vue";
+import TicketingComponent from "@/components/TicketingComponentVer5Front.vue";
+import EventDetailComponentFront from "@/components/EventDetailComponentFront.vue";
 export default {
   name: 'App',
 
   components: {
-    MyTicketListBack: MyTicketList,
+    EventDetailComponentFront,
+    TicketingComponent
   },
 
   data: () => ({
-    //
+    selectedItem: null,
+    seat : [1,2,3,4]
   }),
 }
 </script>

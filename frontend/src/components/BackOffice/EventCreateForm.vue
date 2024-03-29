@@ -6,7 +6,7 @@
         이벤트 생성
       </button>
     </h2>
-    <div id="createEvent" class="accordion-collapse collapse show" data-bs-parent="#event">
+    <div id="createEvent" class="accordion-collapse collapse" data-bs-parent="#event">
       <div class="accordion-body">
         <div class="mb-3">
           <input type="text" v-model="eventRequest.categoryId" placeholder="카테고리 ID" class="form-control" id="categoryIdInput"

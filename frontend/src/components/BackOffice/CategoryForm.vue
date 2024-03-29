@@ -4,7 +4,7 @@
       <h2>카테고리</h2>
     </div>
 
-    <div class="accordion" id="accordionExample">
+    <div class="accordion" id="accordionCategory">
       <!-- 카테고리 생성 -->
       <CategoryCreateForm/>
       <!-- 카테고리 수정 -->

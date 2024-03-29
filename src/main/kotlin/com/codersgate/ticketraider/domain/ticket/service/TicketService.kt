@@ -1,5 +1,6 @@
 package com.codersgate.ticketraider.domain.ticket.service
 
+import com.codersgate.ticketraider.domain.ticket.dto.BookedTicketResponse
 import com.codersgate.ticketraider.domain.ticket.dto.CheckTicketRequest
 import com.codersgate.ticketraider.domain.ticket.dto.CreateTicketRequest
 import com.codersgate.ticketraider.domain.ticket.dto.TicketResponse
@@ -15,10 +16,10 @@ interface TicketService {
 
     fun createTicket(memberId: Long, request: CreateTicketRequest)
     //fun chkTicketCache(eventId:Long, date: LocalDate, grade:TicketGrade, seatNo:Int) : Boolean?
-
+    fun getBookedTicket(eventId: Long, date: LocalDate) : BookedTicketResponse
     fun getAllTicketList(pageable:Pageable, memberId:Long?, eventId:Long?) : Page<TicketResponse>
     fun getTicketById(ticketId: Long): TicketResponse
-    fun getTicketListByUserId(userPrincipal: UserPrincipal , pageable: Pageable): Page<TicketResponse>
+    fun getTicketListByUserId(pageable: Pageable, memberId: Long,): Page<TicketResponse>
 
 //    fun updateTicketStatus(ticketId: Long, ticketStatus: TicketStatus)
     fun chkExpiredTickets()

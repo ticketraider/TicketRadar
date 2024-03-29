@@ -1,12 +1,45 @@
 <script setup>
-
-import { computed } from 'vue';
-// import jwtDecode from 'jwt-decode';
+import {computed, ref} from 'vue';
 import { useRouter } from 'vue-router';
 import {jwtDecode} from "jwt-decode";
 
 const router = useRouter();
+const searchText = ref(''); // 검색어
+const searchCriterion = ref(''); // 선택된 검색 기준의 실제 값 (예: 'title', 'location')
+const sortingCriterion = ref(''); // 선택된 정렬 기준의 실제 값 (예: 'likes', 'reviews')
+const searchCriterionDisplay = ref('검색 기준'); // 화면에 표시될 검색 기준 텍스트
+const sortingCriterionDisplay = ref('정렬 기준'); // 화면에 표시될 정렬 기준 텍스트
 
+
+// 드롭다운에서 항목을 선택했을 때 호출할 메서드
+function updateSearchCriterion(value, displayText) {
+  searchCriterion.value = value;
+  searchCriterionDisplay.value = displayText;
+}
+
+function updateSortingCriterion(value, displayText) {
+  sortingCriterion.value = value;
+  sortingCriterionDisplay.value = displayText;
+}
+
+// 검색 실행 메서드
+function executeSearch() {
+  router.push({
+    path: '/event-list',
+    query: {
+      search: searchText.value,
+      criterion: searchCriterion.value,
+      sort: sortingCriterion.value,
+    }
+  });
+}
+
+// 엔터 키가 눌렸을 때 검색을 실행하도록 하는 메서드
+function onEnterPress(event) {
+  if (event.key === "Enter") {
+    executeSearch();
+  }
+}
 // 가정: 로그인 상태와 토큰은 VueX, Pinia, 또는 localStorage 같은 곳에 저장되어 있다고 가정
 // 이 예시에서는 단순화를 위해 localStorage를 사용합니다.
 const token = localStorage.getItem('token');
@@ -58,24 +91,26 @@ const goHome = () => {
       <h1 style="font-size: 60px; font-weight: bold; color: #aa98ba" @click="goHome()">Ticket Radar</h1>
     </button>
     <v-spacer></v-spacer>
-    <div style="height: 50px; width: 600px; margin-right: 10px">
-      <div class="input-group" >
-        <button class="btn btn-outline-secondary dropdown-toggle" style="color:white;" type="button" data-bs-toggle="dropdown"
-                aria-expanded="false">검색 기준
+    <div style="height: 38px; width: 600px; margin-right: 30px; display: flex">
+      <div class="input-group">
+        <button class="btn btn-outline-secondary dropdown-toggle" style="color:white; width: 100px" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+          {{ searchCriterionDisplay }}
         </button>
         <ul class="dropdown-menu">
-          <li><a class="dropdown-item" href="#">제목</a></li>
-          <li><a class="dropdown-item" href="#">지역</a></li>
+          <li><a class="dropdown-item" href="#" @click="updateSearchCriterion('title', '제목')">제목</a></li>
+          <li><a class="dropdown-item" href="#" @click="updateSearchCriterion('location', '지역')">지역</a></li>
         </ul>
-        <input type="text" class="form-control" aria-label="Text input with 2 dropdown buttons">
-        <button class="btn btn-outline-secondary dropdown-toggle" style="color:white;" type="button" data-bs-toggle="dropdown"
-                aria-expanded="false">정렬 기준
+        <input type="text" v-model="searchText" @keypress="onEnterPress" class="form-control" aria-label="Text input with 2 dropdown buttons">
+        <button class="btn btn-outline-secondary dropdown-toggle" style="color:white; width: 100px" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+          {{ sortingCriterionDisplay }}
         </button>
         <ul class="dropdown-menu dropdown-menu-end">
-          <li><a class="dropdown-item" href="#">좋아요 순</a></li>
-          <li><a class="dropdown-item" href="#">리뷰 순</a></li>
+          <li><a class="dropdown-item" href="#" @click="updateSortingCriterion('likes', '좋아요 순')">좋아요 순</a></li>
+          <li><a class="dropdown-item" href="#" @click="updateSortingCriterion('reviews', '리뷰 순')">리뷰 순</a></li>
+          <li><a class="dropdown-item" href="#" @click="updateSortingCriterion('rating', '평점 순')">평점 순</a></li>
         </ul>
       </div>
+      <button type="button" class="btn btn-outline-info" @click="executeSearch" style="width: 130px">검색하기</button>
     </div>
 
     <nav>
