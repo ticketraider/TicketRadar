@@ -1,7 +1,6 @@
 package com.codersgate.ticketraider.global.infra.redis.cache
 
 import com.codersgate.ticketraider.domain.event.dto.EventResponse
-import io.lettuce.core.protocol.CommandKeyword
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.scheduling.annotation.Scheduled
@@ -29,13 +28,27 @@ class RedisCacheController(
         return ResponseEntity.status(HttpStatus.OK).body(redisCacheService.getPopularKeywords(5))
     }
 
-    @GetMapping("/popularValues")
-    fun getPopularValues(
+    @GetMapping("/PopularEventList")
+    fun getPopularEventList(
         @RequestParam(required = false) limit: Long?,
     ) : ResponseEntity<List<EventResponse>>
     {
         val l = limit?:5
-        return ResponseEntity.status(HttpStatus.OK).body(redisCacheService.getPopularValues(l))
+        return ResponseEntity.status(HttpStatus.OK).body(redisCacheService.getPopularEventList(l))
+    }
+
+    @GetMapping("/getCachedEventList")
+    fun getCachedEventList(
+        @RequestParam(required = true) key:String
+    ) : ResponseEntity<List<EventResponse>>
+    {
+        return ResponseEntity.status(HttpStatus.OK).body(redisCacheService.getCachedEventList(key))
+    }
+
+    @GetMapping("/updateCachedEventList")
+    fun updateCachedEventList() : ResponseEntity< List<List<EventResponse>> >
+    {
+        return ResponseEntity.status(HttpStatus.OK).body(redisCacheService.updateCachedEventList())
     }
 
     @Scheduled(cron = "0 0 0 * * ?") // 매일 자정에 실행

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <template>
   <header>
-    <HeaderViewVer2/>
+    <HeaderViewVer/>
   </header>
   <body>
   <router-view/>
@@ -14,13 +14,13 @@
 @import "./css/styles/TestStyle.css";
 </style>
 <script>
-import HeaderViewVer2 from "@/components/HeaderComponentVer3.vue";
+import HeaderViewVer from "@/components/HeaderComponent.vue";
 
 export default {
   name: 'App',
 
   components: {
-    HeaderViewVer2
+    HeaderViewVer
   },
 
   data: () => ({

@@ -26,5 +26,5 @@ interface TicketService {
     fun makePayment(userPrincipal: UserPrincipal, ticketIdList : MutableList<Long>) : MutableList<TicketResponse>
 
     fun cancelTicket(ticketId: Long, userPrincipal: UserPrincipal)
-    fun deleteTicket(ticketId: Long)
+//    fun deleteTicket(ticketId: Long)
 }

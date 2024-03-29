@@ -62,8 +62,10 @@ class RedisConfig {
         template.valueSerializer = serializer
 
         //Hash 자료구조를 위한 Serializer
-//        template.hashKeySerializer = StringRedisSerializer()
-//        template.hashValueSerializer = StringRedisSerializer()
+        template.hashKeySerializer = StringRedisSerializer()
+        template.hashValueSerializer = StringRedisSerializer()
+
+        template.setEnableTransactionSupport(true); // transaction 허용
 
         return template
     }
@@ -99,14 +101,14 @@ class RedisConfig {
             .entryTtl(Duration.ofMinutes(5))
 
         // "events" 라는 이름의 캐시에 대해 적용
-        val eventsCacheConfig = RedisCacheConfiguration.defaultCacheConfig()
-            .entryTtl(Duration.ofMinutes(10))
+        val eventsCacheConfig = defaultCacheConfig
+            .entryTtl(Duration.ofMinutes(60))
 
         return RedisCacheManager // RedisCacheManager를 생성하기 위한 빌더 패턴을 사용
             .builder(cf) // RedisConnectionFactory 를 받아 CacheManager를 빌드
             .cacheDefaults(defaultCacheConfig) // 캐시 매니저의 기본 캐시 구성 설정. 위에서 만든 RedisCache 구성 사용
             .withCacheConfiguration("TICKETS", ticketsCacheConfig) // "tickets" 라는 이름의 캐시에 대해 적용
-            .withCacheConfiguration("EVENTS", eventsCacheConfig) // "tickets" 라는 이름의 캐시에 대해 적용
+            .withCacheConfiguration("EVENT", eventsCacheConfig) // "tickets" 라는 이름의 캐시에 대해 적용
             .build() // 최종적으로 빌드하여 반환. 캐싱을 관리하고 사용할 수 있도록 함.
     }
 }

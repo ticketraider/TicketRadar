@@ -28,6 +28,8 @@
 
 <script>
 import axios from 'axios';
+import {useRouter} from "vue-router";
+import router from "@/router/router"; useRouter;
 
 export default {
   data() {
@@ -47,6 +49,10 @@ export default {
         });
         console.log(response.data);
         // 여기서 적절한 응답 처리를 수행합니다.
+
+        await router.push('/event-list');
+        location.reload();// 이벤트 목록 페이지로 이동
+
       } catch (error) {
         console.error(error);
         // 에러 처리 로직을 추가합니다.

@@ -18,6 +18,7 @@
     <div style="width: 100%; margin: 10px">
       <div class="pagination" style="margin-left: 680px">
         <v-btn
+            v-if="type === ''"
             @click="fetchEvents(currentPage - 1)"
             :disabled="currentPage === 0"
             style="background-color: #0a0925; color: white;"
@@ -25,6 +26,7 @@
           이전
         </v-btn>
         <v-btn
+            v-if="type === ''"
             @click="fetchEvents(currentPage + 1)"
             :disabled="currentPage === totalPages - 1"
             style="margin-left: 20px; background-color: #0a0925; color: white;"
@@ -67,37 +69,33 @@ const fetchEvents = async (page = 0) => {
   sortStatus.value = route.query.sort;
   searchCriterion.value = route.query.criterion;
 
-  console.log(searchKeyword.value)
-  console.log(searchCriterion.value)
-  console.log(sortStatus.value)
-  console.log(selectedCategory.value)
 
   try {
     let apiUrl = '';
     let request = '';
 
     // type에 따라 다른 API 호출
-    if( props.type === 'popularity'){
-      apiUrl = 'http://localhost:8080/popularValues'
+    if(props.type === 'likes' || props.type === 'reviews' || props.type === 'rating'|| props.type === 'popularity'){
+      apiUrl = 'http://localhost:8080/getCachedEventList'
       request = {
         params: {
-          limit: 5,
+          key: props.type,
         },
       }
     }
-    else if( props.type === 'likes' || props.type === 'reviews' || props.type === 'rating') {
-      apiUrl = 'http://localhost:8080/events'
-      request = {
-        params: {
-          page: page,
-          size: pageSize,
-          category: selectedCategory.value,
-          keyword: searchKeyword.value,
-          sortStatus: props.type,              //  좋아요, 리뷰,
-          searchStatus: searchCriterion.value //  제목 or 장소
-        },
-      }
-    }
+    // else if( props.type === 'likes' || props.type === 'reviews' || props.type === 'rating'|| props.type === 'popularity') {
+    //   apiUrl = 'http://localhost:8080/events'
+    //   request = {
+    //     params: {
+    //       page: page,
+    //       size: pageSize,
+    //       category: selectedCategory.value,
+    //       keyword: searchKeyword.value,
+    //       sortStatus: props.type,              //  좋아요, 리뷰,
+    //       searchStatus: searchCriterion.value //  제목 or 장소
+    //     },
+    //   }
+    // }
     else {
       apiUrl = 'http://localhost:8080/events'
       request = {
@@ -117,17 +115,18 @@ const fetchEvents = async (page = 0) => {
       }
     }
 
-    console.log(`${props.type} request : `, request)
     const response = await axios.get(apiUrl, request);
     console.log(`${props.type} Response : `, response)
 
-    if(props.type === 'popularity')
-      eventList.value = response.data;
-    else{
+
+    if(props.type ==='')
       eventList.value = response.data.content;
-      totalPages.value = response.data.totalPages;
-      currentPage.value = page;
-    }
+    else
+      eventList.value = response.data;
+
+    totalPages.value = response.data.totalPages;
+    currentPage.value = page;
+
     console.log(`type : ${props.type} : ${eventList.value}`)
   } catch (error) {
     console.error('이벤트 목록을 불러오는 동안 오류가 발생했습니다:', error);
