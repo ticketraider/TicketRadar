@@ -12,8 +12,13 @@
           <input type="text" v-model="eventRequest.categoryId" placeholder="카테고리 ID" class="form-control" id="categoryIdInput"
                  style="margin-bottom: 15px" aria-describedby="categoryIdHelp">
           <div class="input-group mb-3">
-            <label class="input-group-text" for="inputGroupFile01">이미지</label>
-            <input type="file" class="form-control" id="imageInput" @change="onFileChange">
+            <label class="input-group-text" for="imgForCreate">이미지</label>
+            <input type="file" class="form-control" id="imgForCreate">
+          </div>
+          <div style="text-align: right;">
+            <button @click="uploadImage" class="btn btn-primary" type="button"
+                    style="background-color: #392365; border-color: #392365; margin-left: 15px;"> 업로드
+            </button>
           </div>
           <input type="text" v-model="eventRequest.title" placeholder="타이틀" class="form-control" id="titleInput"
                  style="margin-bottom: 15px" aria-describedby="titleHelp">
@@ -48,33 +53,68 @@ import axios from 'axios';
 // 로컬 스토리지에서 JWT 토큰 가져오기
 const token = localStorage.getItem('token');
 
+
 export default {
   data() {
     return {
       eventRequest: {
-        categoryId: 0,
+        categoryId: null,
         title: '',
         eventInfo: '',
         startDate: '',
         endDate: '',
         place: '',
-        seatRPrice: 0,
-        seatSPrice: 0,
-        seatAPrice: 0,
+        seatRPrice: null,
+        seatSPrice: null,
+        seatAPrice: null,
         posterImage : ''
       },
-
+      imgUrl:''
     };
   },
   methods: {
+    async uploadImage() {
+      // 파일 인풋에서 선택한 파일 가져오기
+      console.log( document.getElementById('imgForCreate') )
+      let imageFile = document.getElementById('imgForCreate').files[0];
+      console.log(`ImageFile : ${imageFile}`)
+      // 파일이 선택되지 않았을 경우 처리
+      if (!imageFile) {
+        alert('이미지를 선택하세요.');
+        return;
+      }
+
+      try {
+        let formData = new FormData();
+        formData.append('file', imageFile);
+        console.log(`formData : ${formData.values}`)
+        let response = await axios.post('http://localhost:8080/events/imgUpload', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        });
+
+        // 서버에서 반환하는 응답 처리
+        alert(`이미지 업로드 성공: ${response.data}`);
+        this.imgUrl = response.data;
+        alert(`이미지 업로드 성공: ${this.imgUrl}`);
+      } catch (error) {
+        alert(`이미지 업로드 실패: ${error}`);
+      }
+    },
+
+
     async createEvent() {
       try {
         console.log(this.eventRequest)
+
+        this.eventRequest.posterImage = this.imgUrl
+
         // Axios를 사용하여 API에 POST 요청을 보냅니다.
         await axios.post('http://localhost:8080/events', this.eventRequest, {
           headers: {
             Authorization: `Bearer ${token}` // JWT 토큰을 포함한 Authorization 헤더 설정
-          }
+          },
         });
 
         console.log('이벤트가 성공적으로 생성되었습니다!');

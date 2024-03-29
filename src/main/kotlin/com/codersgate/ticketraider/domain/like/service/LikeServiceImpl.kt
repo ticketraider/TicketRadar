@@ -44,7 +44,7 @@ class LikeServiceImpl(
        likeRepository.findLikeByMemberIdAndEventId(memberId, eventId)
            ?.let{
                it.isDeleted = !it.isDeleted
-               event.likeCount += if(it.isDeleted) 1 else -1
+               event.likeCount += if(it.isDeleted) -1 else +1
                likeRepository.save(it)
 
            }
