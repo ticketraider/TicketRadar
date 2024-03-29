@@ -25,7 +25,7 @@ class LikeController(
     fun getLikeList(
         @PageableDefault(size = 5, sort = ["id"]) pageable: Pageable,
         @AuthenticationPrincipal userPrincipal: UserPrincipal?,
-        @RequestParam(required = false) eventId: Long,
+        @RequestParam(required = false) eventId: Long?,
     ) : ResponseEntity<Page<LikeResponse>>
     {
         return ResponseEntity.status(HttpStatus.OK).body(likeService.getLikeList(pageable, userPrincipal?.id , eventId))

@@ -57,6 +57,14 @@ const routes = [
                 path: 'tickets',
                 component: () => import('../components/mypage/MyTicketListComponentVer2.vue'),
             },
+            {
+                path: 'reviews',
+                component: () => import('../components/mypage/MyReviewListComponent.vue'),
+            },
+            {
+                path: 'likes',
+                component: () => import('../components/mypage/MyLikeListComponent.vue'),
+            },
         ],
         meta: { requiresAuth: true } // 로그인 필요
     },

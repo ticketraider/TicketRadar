@@ -25,7 +25,7 @@ class LikeServiceImpl(
         return if( memberId == null && eventId == null)
                 throw NotFoundException()
             else
-                likeRepository.getLikeList(pageable, memberId,eventId).map{ LikeResponse.from(it)}
+                likeRepository.getLikeList(pageable, memberId, eventId).map{ LikeResponse.from(it)}
     }
 
     override fun getLike(likeId: Long): LikeResponse {
@@ -44,13 +44,13 @@ class LikeServiceImpl(
        likeRepository.findLikeByMemberIdAndEventId(memberId, eventId)
            ?.let{
                it.isDeleted = !it.isDeleted
-               event.likeCount += if(it.isDeleted) 1 else -1
+               event.likeCount += if(it.isDeleted) -1 else 1
                likeRepository.save(it)
 
            }
            ?:run{
                event.likeCount++
-               likeRepository.save(Like(member,event))
+               likeRepository.save(Like(member,event, event.title))
            }
 
         eventRepository.save(event)

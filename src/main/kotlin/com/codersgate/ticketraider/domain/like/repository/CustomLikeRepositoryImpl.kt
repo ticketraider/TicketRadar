@@ -18,6 +18,7 @@ class CustomLikeRepositoryImpl : CustomLikeRepository, QueryDslSupport() {
 
         memberId?.let{whereClause.and(q_like.member.id.eq(memberId))}
         eventId?.let{whereClause.and(q_like.event.id.eq(eventId))}
+        whereClause.and(q_like.isDeleted.eq(false))
 
         val totalCounts = queryFactory
             .select(q_like.count())
