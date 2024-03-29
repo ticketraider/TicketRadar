@@ -45,15 +45,11 @@ class EventServiceImpl(
         }
 
         val (price, event) = eventRequest.toPriceAndEvent(category, place)
-        event.posterImage = "https://shorturl.at/kFIV0"
-        val posterImage =
-            if (file == null) {
-                ""
-            } else {
-                s3Service.putObject(file)
-            }
-        val (price, event) = eventRequest.toPriceAndEvent(category, place, posterImage)
-        event.price = price
+        event.posterImage =
+            if(eventRequest.posterImage=="")
+                "https://shorturl.at/kFIV0"
+            else
+                eventRequest.posterImage
         eventRepository.save(event)
         priceRepository.save(price)
 
@@ -76,25 +72,34 @@ class EventServiceImpl(
             ?: throw ModelNotFoundException("category", eventRequest.categoryId)
         val place = placeRepository.findPlaceByName(eventRequest.place)
             ?: throw ModelNotFoundException("place", 0)
-        val posterImage =
-            if(file == null) { "" }
-            else { s3Service.putObject(file) }
+
         val orgStartDate = event.startDate
         val orgEndDate = event.endDate
         //시작일과 끝나는 일 비교후 false 시 예외처리
         check(eventRequest.startDate < eventRequest.endDate) {
             "끝나는날짜는 시작날짜보다 빠를수 없습니다."
         }
+
+        //날짜 변동이 생겼는지 확인
+        if (orgStartDate != event.startDate || orgEndDate != event.endDate) {
+            checkSeatForUpdateAndCreate(event, eventRequest, availableSeatRepository)
+        }
+
         event.let {
-            it.posterImage = eventRequest.posterImage
             it.title = eventRequest.title
             it.eventInfo = eventRequest.eventInfo
             it.startDate = eventRequest.startDate
             it.endDate = eventRequest.endDate
             it.place = place
             it.category = category
+
         }
-        eventRepository.save(event)
+
+        if(eventRequest.posterImage!=event.posterImage && eventRequest.posterImage!="")
+            eventRequest.posterImage
+
+        event.posterImage = eventRequest.posterImage
+
         price.let {
             it.seatRPrice = eventRequest.seatRPrice
             it.seatSPrice = eventRequest.seatSPrice
@@ -102,12 +107,10 @@ class EventServiceImpl(
             it.event = event
         }
         event.price = price
-        priceRepository.save(price)
 
-        //날짜 변동이 생겼는지 확인
-        if (orgStartDate != event.startDate || orgEndDate != event.endDate) {
-            checkSeatForUpdateAndCreate(event, eventRequest, availableSeatRepository)
-        }
+        priceRepository.save(price)
+        eventRepository.save(event)
+
     }
 
     @Transactional
