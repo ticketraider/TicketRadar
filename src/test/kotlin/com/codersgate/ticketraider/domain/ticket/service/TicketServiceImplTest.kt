@@ -43,7 +43,6 @@ class TicketServiceImplTest(
     @Autowired val categoryRepository: CategoryRepository,
     @Autowired val ticketService: TicketService,
     @Autowired val eventService: EventService,
-    @Autowired val redissonLockService: RedissonLockService
 ) {
 
     @Test
@@ -72,7 +71,6 @@ class TicketServiceImplTest(
         val getCate = categoryRepository.save(category)
         val createEventReq = EventRequest(
             title = "오페라의 유령",
-            posterImage = "string",
             categoryId = getCate.id!!,
             eventInfo = "String",
             _startDate = "2024-03-10",
@@ -82,25 +80,25 @@ class TicketServiceImplTest(
             seatSPrice = 100000,
             seatAPrice = 50000
         )
-        eventService.createEvent(createEventReq)
+        eventService.createEvent(createEventReq, file = null)
         val getEvent = eventRepository.findByIdOrNull(1)
-
-
-        val threadCount = 50
-        val executorService = Executors.newFixedThreadPool(10)
-        val countDownLatch = CountDownLatch(threadCount)
 
         var success = 0
         var total = 0
+
+        //given 멀티스레드 환경에서
+        val threadCount = 100
+        val executorService = Executors.newFixedThreadPool(25)
+        val countDownLatch = CountDownLatch(threadCount)
         val createTicketReq = CreateTicketRequest(
             date = LocalDate.now(),
             eventId = getEvent!!.id!!,
         )
-        //when 10개의 스레드로 동시에 티켓을 구매했을때
+        //when 100개의 스레드로 동시에 티켓을 구매했을때
         repeat(threadCount) {
             executorService.submit {
                 try {
-                    createTicketReq.seatList.add(SeatInfo(TicketGrade.R, 1))
+                    createTicketReq.seatList.add(SeatInfo(TicketGrade.R, 1))//좌석선택
                     ticketService.createTicket(member.id!!, createTicketReq)
                     success++
                 }  finally {
@@ -110,14 +108,10 @@ class TicketServiceImplTest(
             }
         }
         countDownLatch.await()
-
-        // 시도한 횟수랑 = 실패 + 성공 횟수 같아야함.
-        // 성공 횟수가 10이 아닌거는 동시성 문제해결.
-        println("success : $success")
-        println("total : $total")
-
-        //then 성공1 실패9 이여야한다.
+        // 시도한 횟수 = 실패 + 성공 횟수
+        println("success : $success \"total : $total\"")
+        //then 성공1 실패99 이여야한다.
         Assertions.assertThat(success).isEqualTo(1)
-        Assertions.assertThat(total).isEqualTo(50)
+        Assertions.assertThat(total).isEqualTo(99)
     }
 }
