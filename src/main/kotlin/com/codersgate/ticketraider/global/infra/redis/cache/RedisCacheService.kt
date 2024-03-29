@@ -24,7 +24,7 @@ class RedisCacheService (
 ){
     companion object{
         val logger = LoggerFactory.getLogger(RedisCacheService::class.java)
-        val SEARCH_KEY = "Popularity:"
+        val SEARCH_KEY = "POPKEYWORDS"
     }
 
     fun searchEvent(eventTitle: String): EventResponse {
@@ -35,7 +35,7 @@ class RedisCacheService (
             refreshCacheTtl(CacheTarget.EVENT, eventTitle)
             getCachedEvent(CacheTarget.EVENT, eventTitle)
                 ?.let{
-                    incrementSearchCount(eventTitle)
+                    incrementSearchCount(eventTitle) // 검색어 등록 및 점수 추가
                     return it
                 }
         }
@@ -96,6 +96,33 @@ class RedisCacheService (
             )
         } ?: emptyList() // 만약 리스트가 null이면 빈 리스트를 반환합니다.
     }
+
+    fun getPopularKeywords(limit: Long): List<String> {
+        val popKeywords =
+            redisTemplate.opsForZSet().reverseRangeWithScores(SEARCH_KEY, 0, limit - 1)
+                ?.map{ it.value.toString()
+                }?: emptyList()
+
+        logger.info("$popKeywords")
+
+        return popKeywords
+    }
+
+    fun getPopularEventList(limit: Long): List<EventResponse> { // 인기검색어 리스트 가져와서 캐시에 등록된 내용 가져오기. 없으면 캐시에 등록
+        val popKeys = getPopularKeywords(limit)
+
+        val popList =
+            popKeys.map {keyword->
+                getCachedEvent(CacheTarget.EVENT, keyword)
+                    ?:let{
+                        getEventByTitle(keyword).also{event ->
+                            putCache(CacheTarget.EVENT, keyword, event) // 캐시에 등록.
+                        }
+                    }
+            }
+        return popList
+    }
+
     fun chkCache(target: CacheTarget, key:String ): Boolean {
         logger.info("${target.name} 캐시 확인 시작")
         val cache = cacheManager.getCache(target.name)
@@ -159,28 +186,6 @@ class RedisCacheService (
         // Sorted Set 생성, 키, 값 추가. 중복 시 해당 키의 값 증가
         redisTemplate.opsForZSet().incrementScore(SEARCH_KEY, keyword, 1.0)
     }
-
-    fun getPopularKeywords(limit: Long): List<String> {
-
-        val popList =
-            redisTemplate.opsForZSet().reverseRangeWithScores(SEARCH_KEY, 0, limit - 1)
-                ?.map{ it.value.toString()
-            }?: emptyList()
-
-        logger.info("$popList")
-
-        return popList
-    }
-
-     fun getPopularEventList(limit: Long): List<EventResponse> {
-        val popKeys = getPopularKeywords(limit)
-         val popValues =
-             popKeys.map {
-                 getEventByTitle(it)
-             }
-         return popValues
-     }
-
 
     @Scheduled(cron = "0 0 0 * * ?") // 매일 자정에 실행
     fun decreaseScoresAndRemoveExpired() {

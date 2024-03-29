@@ -28,8 +28,8 @@ class RedisCacheController(
         return ResponseEntity.status(HttpStatus.OK).body(redisCacheService.getPopularKeywords(5))
     }
 
-    @GetMapping("/popularValues")
-    fun getPopularValues(
+    @GetMapping("/PopularEventList")
+    fun getPopularEventList(
         @RequestParam(required = false) limit: Long?,
     ) : ResponseEntity<List<EventResponse>>
     {
