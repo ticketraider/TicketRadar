@@ -4,10 +4,23 @@ import ReviewList from "@/components/ReviewListComponent.vue";
 import {ref, onMounted} from 'vue';
 import axios from 'axios';
 import {useRoute} from "vue-router";
+import router from "@/router/router";
 
 const event = ref(null);
 const route = useRoute(); // useRoute()를 사용하여 현재 라우팅 정보를 가져옴
 
+const checkLoginStatus = () => {
+  const token = localStorage.getItem('token');
+  if (!token) {
+    alert("로그인이 필요한 기능입니다.");
+    router.push({path: "/login"})
+    // 로그인이 필요한 상황이므로, 로그인 페이지로 리다이렉트하는 로직도 추가할 수 있습니다.
+    // 예: router.push('/login');
+  } else {
+    likeEvent()
+    // 로그인 상태이므로, 필요한 로직을 수행합니다.
+  }
+}
 const fetchEventDetail = async () => {
   const eventId = Number(route.params.eventId); // 이벤트 ID를 Long으로 변환
   try {
@@ -109,7 +122,7 @@ onMounted(() => {
     <div style="; width: 100%; height: 80px; display: flex">
       <h3 style="color: white;text-align: center; width: 55px; height: 40px; margin-right: 10px; background-color: #392365; border-radius: 20px; ">{{event.likeCount}}</h3>
 
-      <button @click="likeEvent" type="button" class="btn btn-light" style="width: 110px; height: 40px; border-radius: 20px; ">
+      <button @click="checkLoginStatus" type="button" class="btn btn-light" style="width: 110px; height: 40px; border-radius: 20px; ">
         <h5 style="font-weight: bold">좋아요</h5>
       </button>
     </div>

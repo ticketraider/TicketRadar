@@ -15,6 +15,7 @@ import com.codersgate.ticketraider.domain.ticket.repository.TicketRepository
 import com.codersgate.ticketraider.global.error.exception.InvalidCredentialException
 import com.codersgate.ticketraider.global.error.exception.ModelNotFoundException
 import com.codersgate.ticketraider.global.error.exception.TicketReservationFailedException
+import com.codersgate.ticketraider.global.infra.redis.lock.RedissonLock
 import com.codersgate.ticketraider.global.infra.security.jwt.UserPrincipal
 import org.hibernate.Hibernate
 import org.slf4j.LoggerFactory
@@ -23,6 +24,7 @@ import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.Duration
 import java.time.LocalDate
 
 @Service
