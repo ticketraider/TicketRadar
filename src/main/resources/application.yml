@@ -126,9 +126,10 @@ spring:
       hibernate:
         format_sql: true
     open-in-view: false
+    database-platform: org.hibernate.dialect.H2Dialect
   datasource:
     driver-class-name: org.h2.Driver
-    url: jdbc:h2:~/test
+    url: jdbc:h2:tcp://localhost/~/test
     username: sa
     password:
   h2:

@@ -12,6 +12,7 @@ import com.codersgate.ticketraider.domain.ticket.entity.Ticket
 import com.codersgate.ticketraider.domain.ticket.entity.TicketGrade
 import com.codersgate.ticketraider.domain.ticket.entity.TicketStatus
 import com.codersgate.ticketraider.domain.ticket.repository.TicketRepository
+import com.codersgate.ticketraider.global.common.aop.redis.lock.PubSubLock
 import com.codersgate.ticketraider.global.error.exception.InvalidCredentialException
 import com.codersgate.ticketraider.global.error.exception.ModelNotFoundException
 import com.codersgate.ticketraider.global.error.exception.TicketReservationFailedException
@@ -38,7 +39,7 @@ class TicketServiceImpl(
         val logger = LoggerFactory.getLogger(TicketServiceImpl::class.java)
     }
 
-    //    @PubSubLock
+    @PubSubLock
     @Transactional
     override fun createTicket(memberId: Long, request: CreateTicketRequest) {
         val event = eventRepository.findByIdOrNull(request.eventId)

@@ -73,14 +73,15 @@ class TicketServiceImplTest(
             title = "오페라의 유령",
             categoryId = getCate.id!!,
             eventInfo = "String",
-            _startDate = "2024-03-10",
-            _endDate = "2024-03-17",
+            _startDate = "2024-03-28",
+            _endDate = "2024-03-30",
             place = "문화회관",
             seatRPrice = 150000,
             seatSPrice = 100000,
-            seatAPrice = 50000
+            seatAPrice = 50000,
+            posterImage = "String"
         )
-        eventService.createEvent(createEventReq, file = null)
+        eventService.createEvent(createEventReq)
         val getEvent = eventRepository.findByIdOrNull(1)
 
         var success = 0
@@ -94,11 +95,12 @@ class TicketServiceImplTest(
             date = LocalDate.now(),
             eventId = getEvent!!.id!!,
         )
+        createTicketReq.seatList.add(SeatInfo(TicketGrade.R, 1))
         //when 100개의 스레드로 동시에 티켓을 구매했을때
         repeat(threadCount) {
             executorService.submit {
                 try {
-                    createTicketReq.seatList.add(SeatInfo(TicketGrade.R, 1))//좌석선택
+                //좌석선택
                     ticketService.createTicket(member.id!!, createTicketReq)
                     success++
                 }  finally {
@@ -109,9 +111,9 @@ class TicketServiceImplTest(
         }
         countDownLatch.await()
         // 시도한 횟수 = 실패 + 성공 횟수
-        println("success : $success \"total : $total\"")
+        println("success : $success total : $total")
         //then 성공1 실패99 이여야한다.
         Assertions.assertThat(success).isEqualTo(1)
-        Assertions.assertThat(total).isEqualTo(99)
+        Assertions.assertThat(total).isEqualTo(100)
     }
 }
