@@ -15,6 +15,6 @@ interface CustomEventRepository {
         keyword: String?
     ): Page<Event>
 
-    fun findByPageableAndCount(pageable: Pageable): Page<Event?>
+//    fun findByPageableAndCount(pageable: Pageable): Page<Event?>
 
 }

@@ -115,18 +115,17 @@ const fetchEvents = async (page = 0) => {
       }
     }
 
+    console.log(`${props.type} request : `, request)
     const response = await axios.get(apiUrl, request);
     console.log(`${props.type} Response : `, response)
 
-
-    if(props.type ==='')
-      eventList.value = response.data.content;
-    else
+    if(props.type === 'popularity')
       eventList.value = response.data;
-
-    totalPages.value = response.data.totalPages;
-    currentPage.value = page;
-
+    else{
+      eventList.value = response.data.content;
+      totalPages.value = response.data.totalPages;
+      currentPage.value = page;
+    }
     console.log(`type : ${props.type} : ${eventList.value}`)
   } catch (error) {
     console.error('이벤트 목록을 불러오는 동안 오류가 발생했습니다:', error);

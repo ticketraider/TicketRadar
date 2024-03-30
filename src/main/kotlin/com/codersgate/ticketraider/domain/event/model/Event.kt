@@ -9,6 +9,7 @@ import jakarta.persistence.*
 import org.hibernate.annotations.SQLDelete
 import org.hibernate.annotations.SQLRestriction
 import java.time.LocalDate
+import kotlin.math.round
 
 @Entity
 @SQLDelete(sql = "UPDATE events SET is_deleted = true WHERE id = ?") // DELETE 쿼리 날아올 시 대신 실행
@@ -61,14 +62,15 @@ class Event(
         var totalRating = averageRating*reviewCount
         totalRating+= rating
         reviewCount++
-        averageRating = totalRating.toFloat() / reviewCount
+
+        averageRating = String.format("%.1f", (totalRating / reviewCount)).toFloat()
     }
 
     fun deleteRating(rating: Int){
         var totalRating = averageRating*reviewCount
         totalRating-= rating
         reviewCount--
-        averageRating = totalRating.toFloat() / reviewCount
+        averageRating = String.format("%.1f", (totalRating / reviewCount)).toFloat()
     }
 }
 

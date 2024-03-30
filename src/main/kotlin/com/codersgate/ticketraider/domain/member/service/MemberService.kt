@@ -13,8 +13,8 @@ interface MemberService {
     fun login(loginRequest: LoginRequest): LoginResponse
     fun socialLogin(userInfo: OAuth2UserInfo): LoginResponse
     fun getProfile(memberId: Long): MemberResponse
-
-    fun updateProfile(updateProfileRequest: UpdateProfileRequest, user: UserPrincipal)
+    fun verifyCurrentPassword(currentPassword: String, memberId: Long): VerifyCurrentPasswordResponse
+    fun updateProfile(updateProfileRequest: UpdateProfileRequest, memberId: Long)
 
     fun unregister(user: UserPrincipal)
     fun rejoin(loginRequest: LoginRequest)

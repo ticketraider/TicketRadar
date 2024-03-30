@@ -51,11 +51,19 @@ const routes = [
         children: [
             {
                 path: 'userinfo',
-                component: () => import('../components/mypage/UserInfoComponentFront.vue'),
+                component: () => import('../components/mypage/UserInfoComponent.vue'),
             },
             {
                 path: 'tickets',
                 component: () => import('../components/mypage/MyTicketListComponentVer2.vue'),
+            },
+            {
+                path: 'reviews',
+                component: () => import('../components/mypage/MyReviewListComponent.vue'),
+            },
+            {
+                path: 'likes',
+                component: () => import('../components/mypage/MyLikeListComponent.vue'),
             },
         ],
         meta: { requiresAuth: true } // 로그인 필요

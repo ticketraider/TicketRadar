@@ -13,7 +13,15 @@
               </button>
               <button type="button"
                       style="background-color: #392365; border-color: #392365; margin: auto 10px 10px 10px"
-                      @click="goTo('tickets')" class="btn btn-primary">내 티켓 목록
+                      @click="goTo('tickets')" class="btn btn-primary">티켓 목록
+              </button>
+              <button type="button"
+                      style="background-color: #392365; border-color: #392365; margin: auto 10px 10px 10px"
+                      @click="goTo('reviews')" class="btn btn-primary">리뷰 목록
+              </button>
+              <button type="button"
+                      style="background-color: #392365; border-color: #392365; margin: auto 10px 10px 10px"
+                      @click="goTo('likes')" class="btn btn-primary">좋아요 목록
               </button>
             </div>
           </aside>

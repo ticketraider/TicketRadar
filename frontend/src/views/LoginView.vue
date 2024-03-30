@@ -3,7 +3,7 @@
     <div
         style="background-color: #aa98ba; padding: 30px; margin: 30px auto; height: 600px; width: 60%; border-radius: 20px">
 
-      <form style="color: white; width: 500px; height: 400px; margin: 140px auto auto auto">
+      <form style="color: white; width: 500px; height: 400px; margin: 100px auto auto auto">
         <div style="background-color: #392365; text-align: center; border-radius: 5px; margin-bottom: 20px">
           <h2>로그인</h2>
         </div>
@@ -17,22 +17,35 @@
           <input type="password" placeholder="비밀번호를 입력해주세요" class="form-control" id="exampleInputPassword1"
                  v-model="password">
         </div>
-        <div style="text-align: right">
-          <button class="btn btn-primary" style="background-color: #263e5e; border-color: #263e5e"
-                  @click="signUp">회원 가입
-          </button>
-          <button type="button" class="btn btn-primary"
-                  style="background-color: #392365; border-color: #392365; margin-left: 15px;"
-                  @click="signIn">로그인
-          </button>
-<!--          <button type="button" class="btn btn-primary"-->
-<!--                  style="background-color: #392365; border-color: #392365; margin-left: 15px;"-->
-<!--                  @click="displayToken">토큰 출력-->
-<!--          </button>-->
-          <button type="button" class="btn btn-primary"
-                  style="background-color: #392365; border-color: #392365; margin-left: 15px;"
-                  @click="logOut">로그아웃
-          </button>
+        <div>
+          <div style="margin-top: 10px; margin-left: 10px; text-align: right">
+            <button class="btn btn-primary" style="font-weight:bold; width: 125px; height: 42px; background-color: #263e5e; border-color: #263e5e"
+                    @click="signUp">회원 가입
+            </button>
+            <button type="button" class="btn btn-primary"
+                    style="font-weight:bold; background-color: #392365; border-color: #392365; width: 105px; height: 42px; margin-left: 10px;"
+                    @click="signIn">로그인
+            </button>
+          </div>
+          <div style="display: flex; width: 100%; justify-content: center">
+            <button style="margin-top: 10px" @click="socialSignIn">
+              <v-img style="height: 50px; width: 240px;" :src="require('@/assets/web_neutral_sq_SU@2x.png')" cover></v-img>
+            </button>
+            <button style="margin-top: 10px; margin-left: 20px;" @click="socialSignIn">
+              <v-img style="height: 50px; width: 240px;" :src="require('@/assets/kakao_login_large_narrow.png')" cover></v-img>
+            </button>
+          </div>
+
+
+
+          <!--          <button type="button" class="btn btn-primary"-->
+          <!--                  style="background-color: #392365; border-color: #392365; margin-left: 15px;"-->
+          <!--                  @click="displayToken">토큰 출력-->
+          <!--          </button>-->
+          <!--          <button type="button" class="btn btn-primary"-->
+          <!--                  style="background-color: #392365; border-color: #392365; margin-left: 15px;"-->
+          <!--                  @click="logOut">로그아웃-->
+          <!--          </button>-->
         </div>
       </form>
     </div>
@@ -66,9 +79,10 @@ const signIn = async () => {
     // 이후에는 토큰을 사용하여 요청을 보낼 때마다 헤더에 포함하여 전송
     axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
-
-    await router.push('/event-list');
-    location.reload();// 이벤트 목록 페이지로 이동
+    await router.back()
+    location.reload()
+    // await router.push('/event-list');
+    // location.reload();// 이벤트 목록 페이지로 이동
 
   } catch (error) {
     // 로그인 실패 시 처리
@@ -76,14 +90,21 @@ const signIn = async () => {
     alert("로그인에 실패하였습니다.");
   }
 }
-const logOut = async () => {
-  if (localStorage.getItem('token')) {
-    localStorage.removeItem('token');
-    alert("로그아웃 되었습니다.");
-  } else {
-    alert("로그인 되어있지 않습니다.");
-  }
+const socialSignIn = async () => {
+  // 소셜 로그인 로직 구현
+  console.log("소셜 로그인 함수가 호출되었습니다.");
+
+  // 예: 구글 로그인 API를 사용하는 경우
+  // 여기에 API 호출 로직을 구현합니다.
 }
+// const logOut = async () => {
+//   if (localStorage.getItem('token')) {
+//     localStorage.removeItem('token');
+//     alert("로그아웃 되었습니다.");
+//   } else {
+//     alert("로그인 되어있지 않습니다.");
+//   }
+// }
 
 
 // const displayToken = () => {

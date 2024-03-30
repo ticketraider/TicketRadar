@@ -2,6 +2,8 @@
 import {ref, computed, onMounted} from 'vue';
 import axios from 'axios';
 import {useRoute} from 'vue-router';
+import router from "@/router/router";
+import * as Bootstrap from "bootstrap";
 
 const event = ref(null);
 let seats = ref([]);
@@ -16,7 +18,25 @@ function resetModal() {
   selectedSeats.value = [];
   // 모달이 닫힐 때 선택된 좌석 초기화
 }
+const checkLoginStatus = () => {
+  const token = localStorage.getItem('token');
+  if (!token) {
+    alert("로그인이 필요한 기능입니다.");
+    router.push({path: "/login"})
+    // 로그인이 필요한 상황이므로, 로그인 페이지로 리다이렉트하는 로직도 추가할 수 있습니다.
+    // 예: router.push('/login');
+  }else {
+    fetchBookedTicket()
+    openModal()
+  }
+}
 
+const openModal = () => {
+      const myModal = new Bootstrap.Modal(document.getElementById('staticBackdrop'), {
+        keyboard: false
+      });
+      myModal.show();
+}
 
 // fetchBookedTicket 함수는 이벤트 상세 정보 로드 로직에서 호출되어야 합니다.
 const fetchEventDetail = async () => {
@@ -105,6 +125,14 @@ const totalPrice = computed(() => {
   return selectedSeats.value.reduce((acc, seat) => acc + seat.price, 0);
 });
 
+function reservationFinished() {
+  // 현재 스텝이 2이고 선택된 좌석이 없을 경우
+  if (selectedSeats.value.length === 0) {
+    alert("좌석을 하나 이상 선택해주세요."); // 함수를 여기서 종료하여 스텝 변경 중단
+  } else {
+    submitTicketReservation()
+  }
+}
 const submitTicketReservation = async () => {
   const reservationDetails = {
     eventId: event.value.id,
@@ -159,8 +187,7 @@ function formatPrice(price) {
     <!-- Button trigger modal -->
     <button type="button"
             style="width: 100%; height: 50px; background-color: #392365; border-radius: 10px;"
-            data-bs-toggle="modal" data-bs-target="#staticBackdrop"
-            @click="fetchBookedTicket" >
+            @click="checkLoginStatus" >
       <h5 style="color: white">예매하기</h5>
     </button>
 
@@ -285,7 +312,7 @@ function formatPrice(price) {
                   </v-table>
                 </v-sheet>
                 <div>
-                  <button type="button" class="btn btn-primary" @click="submitTicketReservation">예매하기</button>
+                  <button type="button" class="btn btn-primary" @click="reservationFinished">예매하기</button>
                 </div>
               </template>
             </v-stepper>

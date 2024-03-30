@@ -44,7 +44,6 @@ class ReviewServiceImpl(
             )
         )
         review.event.addRating(request.rating)
-        reviewRepository.save(review)
     }
 
     override fun getReviewList_V2(pageable: Pageable, memberId : Long?, eventId : Long?) : Page<ReviewResponse>
@@ -71,6 +70,7 @@ class ReviewServiceImpl(
         )
     }
 
+    @Transactional
     override fun updateReview(reviewId: Long, request: UpdateReviewRequest) {
         val review = reviewRepository.findByIdOrNull(reviewId)
             ?: throw NotFoundException()
@@ -81,7 +81,6 @@ class ReviewServiceImpl(
         review.content = request.content
         review.rating = request.rating
 
-        reviewRepository.save(review)
     }
 
     override fun deleteReview(reviewId: Long) {
