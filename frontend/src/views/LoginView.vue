@@ -28,10 +28,7 @@
             </button>
           </div>
           <div style="display: flex; width: 100%; justify-content: center">
-            <button style="margin-top: 10px" @click="socialSignIn">
-              <v-img style="height: 50px; width: 240px;" :src="require('@/assets/web_neutral_sq_SU@2x.png')" cover></v-img>
-            </button>
-            <button style="margin-top: 10px; margin-left: 20px;" @click="socialSignIn">
+            <button style="margin-top: 10px; margin-left: 20px;" @click="kakaoSocialSignIn">
               <v-img style="height: 50px; width: 240px;" :src="require('@/assets/kakao_login_large_narrow.png')" cover></v-img>
             </button>
           </div>
@@ -90,12 +87,23 @@ const signIn = async () => {
     alert("로그인에 실패하였습니다.");
   }
 }
-const socialSignIn = async () => {
-  // 소셜 로그인 로직 구현
-  console.log("소셜 로그인 함수가 호출되었습니다.");
+const kakaoSocialSignIn = async () => {
+  const loginWindow = window.open(
+      "http://localhost:8080/oauth2/login/kakao"
+  );
+  await new Promise((resolve) => {
+    const checkWindowClosed = setInterval(() => {
+      if (loginWindow.closed) {
+        clearInterval(checkWindowClosed); // 타이머 해제
+        resolve(); // Promise를 성공(resolve) 상태로 변경
+      }
+    }, 1000); // 1초마다 창이 닫혔는지 확인
+  });
 
-  // 예: 구글 로그인 API를 사용하는 경우
-  // 여기에 API 호출 로직을 구현합니다.
+  const token = document.cookie.replace(/(?:^|.*;\s*)token\s*=\s*([^;]*).*$|^.*$/, "$1");
+  localStorage.setItem('token', token); // 로컬 스토리지에 토큰 저장
+  document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+  console.log("소셜 로그인 함수가 호출되었습니다.");
 }
 // const logOut = async () => {
 //   if (localStorage.getItem('token')) {
