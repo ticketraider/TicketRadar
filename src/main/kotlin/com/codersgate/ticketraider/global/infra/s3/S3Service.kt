@@ -14,14 +14,14 @@ import java.util.*
 class S3Service(
     @Value("\${cloud.aws.s3.bucket}")
     private val bucket: String,
-    private val s3Client: S3Client
+    private val s3Client: S3Client,
+    @Value("cloud.aws.s3.dir")
+    private val s3dir: String
 ) {
     fun putObject(file: MultipartFile): String {
-        val key = "${UUID.randomUUID()}${file.originalFilename}"
+        val key = "${s3dir}/${UUID.randomUUID()}${file.originalFilename}"
         val originName = file.originalFilename
         val ext = originName!!.substring(originName.lastIndexOf(".") + 1)
-        val metadata = ObjectMetadata()
-            .let{ it.contentType="image/$ext" }
         val request = PutObjectRequest.builder()
             .bucket(bucket)
             .key(key)
