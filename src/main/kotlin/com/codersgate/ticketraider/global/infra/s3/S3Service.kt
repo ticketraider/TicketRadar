@@ -22,8 +22,6 @@ class S3Service(
         val key = "${s3dir}/${UUID.randomUUID()}${file.originalFilename}"
         val originName = file.originalFilename
         val ext = originName!!.substring(originName.lastIndexOf(".") + 1)
-        val metadata = ObjectMetadata()
-            .let{ it.contentType="image/$ext" }
         val request = PutObjectRequest.builder()
             .bucket(bucket)
             .key(key)
