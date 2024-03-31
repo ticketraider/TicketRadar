@@ -15,10 +15,6 @@
       </div>
     </div>
   </main>
-
-  <footer>
-    <p>© 2024 티켓팅 웹사이트 티켓 레이더. 팀 코더스 게이트.</p>
-  </footer>
   </body>
   </html>
 </template>

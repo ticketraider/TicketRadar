@@ -1,7 +1,7 @@
 <template>
-  <main style="height: 750px">
+  <main style="height: 750px; background-color: #eeeaf1">
     <div
-        style="background-color: #aa98ba; padding: 30px; margin: 30px auto; height: 600px; width: 60%; border-radius: 20px">
+        style="background-color: #d4cbdc; padding: 30px; margin: 30px auto; height: 600px; width: 60%; border-radius: 20px">
 
       <form style="color: white; width: 500px; height: 400px; margin: 100px auto auto auto">
         <div style="background-color: #392365; text-align: center; border-radius: 5px; margin-bottom: 20px">
