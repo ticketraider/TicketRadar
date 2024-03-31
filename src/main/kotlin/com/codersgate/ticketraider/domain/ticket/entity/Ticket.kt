@@ -16,10 +16,15 @@ import org.springframework.format.annotation.DateTimeFormat
 import java.time.LocalDate
 import java.time.LocalDateTime
 
-@Table(name = "tickets")
+
+@Entity
 @SQLDelete(sql = "UPDATE tickets SET is_deleted = true WHERE id = ?") // DELETE 쿼리 날아올 시 대신 실행
 @SQLRestriction("is_deleted = false")
-@Entity
+
+@Table(name = "tickets", indexes = [
+    Index(name = "idx_event_id", columnList = "event_id"),
+    Index(name = "idx_id", columnList = "id")
+])
 class Ticket(
 
     // DTO 를 저장하기로 했기 때문에 안써도 됨
