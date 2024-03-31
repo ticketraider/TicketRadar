@@ -14,6 +14,7 @@ cloud:
       secret-key: ${AWS_SECRET_KEY}
     s3:
       bucket: ticketraider-event
+      dir: /ticketraider-event-image
 
 
 spring:
