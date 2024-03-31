@@ -1,28 +1,54 @@
 /* 기본 글로벌 스타일 */
+@font-face {
+  font-family: 'NanumBarunGothic';
+  font-style: normal;
+  font-weight: 400;
+  src: url('//cdn.jsdelivr.net/font-nanumlight/1.0/NanumBarunGothicWeb.eot');
+  src: url('//cdn.jsdelivr.net/font-nanumlight/1.0/NanumBarunGothicWeb.eot?#iefix') format('embedded-opentype'), url('//cdn.jsdelivr.net/font-nanumlight/1.0/NanumBarunGothicWeb.woff') format('woff'), url('//cdn.jsdelivr.net/font-nanumlight/1.0/NanumBarunGothicWeb.ttf') format('truetype');
+ }
+ 
+ @font-face {
+  font-family: 'NanumBarunGothic';
+  font-style: normal;
+  font-weight: 700;
+  src: url('//cdn.jsdelivr.net/font-nanumlight/1.0/NanumBarunGothicWebBold.eot');
+  src: url('//cdn.jsdelivr.net/font-nanumlight/1.0/NanumBarunGothicWebBold.eot?#iefix') format('embedded-opentype'), url('//cdn.jsdelivr.net/font-nanumlight/1.0/NanumBarunGothicWebBold.woff') format('woff'), url('//cdn.jsdelivr.net/font-nanumlight/1.0/NanumBarunGothicWebBold.ttf') format('truetype')
+ }
+ 
+ @font-face {
+  font-family: 'NanumBarunGothic';
+  font-style: normal;
+  font-weight: 300;
+  src: url('//cdn.jsdelivr.net/font-nanumlight/1.0/NanumBarunGothicWebLight.eot');
+  src: url('//cdn.jsdelivr.net/font-nanumlight/1.0/NanumBarunGothicWebLight.eot?#iefix') format('embedded-opentype'), url('//cdn.jsdelivr.net/font-nanumlight/1.0/NanumBarunGothicWebLight.woff') format('woff'), url('//cdn.jsdelivr.net/font-nanumlight/1.0/NanumBarunGothicWebLight.ttf') format('truetype');
+ }
+ 
+ .nanumbarungothic * {
+  font-family: 'NanumBarunGothic', sans-serif;
+ }
+
 main {
   height: 2300px;
-  background-color: #c6c9e7;
+  background-color: #ffffff;
+  font-family: NanumBarunGothic
 }
 
 /* 헤더 스타일 */
 header {
-  background-color: #0a0925;
-  color: white;
-  padding: 20px 40px;
-}
-
-header h1 {
-  margin: 0;
+    font-family: NanumBarunGothic;
+    background-color: #ffffff;
+    padding: 10px 30px;
+    border-bottom: 1px solid #C6C6C6;
 }
 
 nav ul {
   list-style: none;
-  padding: 0;
+  padding-left: 60px;
 }
 
 nav li {
   display: inline;
-  margin-right: 20px;
+  margin-right: 25px;
 }
 
 nav a {
@@ -55,13 +81,14 @@ article img {
 
 /* 푸터 스타일 */
 footer {
-  background-color: #333;
-  color: white;
-  text-align: center;
-  padding: 10px;
-  position: fixed;
-  left: 0;
-  bottom: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 10pt;
+  background-color: #f3f4f4;
+    border-top: 1px solid #C6C6C6;
+  font-family: NanumBarunGothic;
+  padding-top: 10px;
   width: 100%;
 }
 

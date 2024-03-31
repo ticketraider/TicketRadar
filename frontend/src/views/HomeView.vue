@@ -1,34 +1,31 @@
 <template>
   <div>
-    <main>
-      <div class="top5">
-        <h1>인기 검색어 순 TOP.5</h1>
-        <div style="width: 1600px; padding:10px; display: flex; margin: 0 auto;">
+    <main style="display: flex; flex-direction: column; gap: 30px; align-items: center">
+      <div style="width: 90%; display: flex; flex-direction: column; margin-top: 15px;">
+        <h3>✨인기 검색어 순 TOP.5</h3>
+        <div style="display: flex; flex-wrap: wrap; gap: 20px">
           <EventList :type="'popularity'"/>
         </div>
       </div>
-      <div class="top5">
-        <h1>평점 순 TOP.5</h1>
-        <div style="width: 1600px; padding:10px; display: flex; margin: 0 auto;">
+      <div style="width: 90%; display: flex; flex-direction: column">
+        <h3>👍평점 순 TOP.5</h3>
+        <div style="display: flex; flex-wrap: wrap; gap: 20px">
           <EventList :type="'rating'"/>
         </div>
       </div>
-      <div class="top5">
-        <h1>리뷰 순 TOP.5</h1>
-        <div style="width: 1600px; padding:10px; display: flex; margin: 0 auto;">
+      <div style="width: 90%; display: flex; flex-direction: column">
+        <h3>✏️리뷰 순 TOP.5</h3>
+        <div style="display: flex; flex-wrap: wrap; gap: 20px">
           <EventList :type="'reviews'"/>
         </div>
       </div>
-      <div class="top5">
-        <h1>좋아요 순 TOP.5</h1>
-        <div style="width: 1600px; padding:10px; display: flex; margin: 0 auto;">
+      <div style="width: 90%; display: flex; flex-direction: column">
+        <h3>❤️좋아요 순 TOP.5</h3>
+        <div style="display: flex; flex-wrap: wrap; gap: 20px">
           <EventList :type="'likes'"/>
         </div>
       </div>
     </main>
-    <footer>
-      <p>© 2024 티켓팅 웹사이트 티켓 레이더. 팀 코더스 게이트.</p>
-    </footer>
   </div>
 </template>
 
@@ -52,8 +49,8 @@ onMounted(() => {
 @import "../css/styles/TestStyle.css";
 
 .top5 {
-  height: 700px;
-  width: 100%;
-  padding: 100px;
+  display: flex;
+  width: 90%;
+  justify-content: center;
 }
 </style>

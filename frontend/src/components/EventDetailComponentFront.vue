@@ -140,10 +140,8 @@ onMounted(() => {
 .event-detail {
   background-color: #aa98ba;
   border-radius: 20px;
-  height: 2000px;
-  width: 1200px;
+  width: 70%;
   padding: 50px;
-  margin: 100px;
 }
 
 .img {

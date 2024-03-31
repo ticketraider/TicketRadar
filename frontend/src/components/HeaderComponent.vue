@@ -86,22 +86,36 @@ const goHome = () => {
 </script>
 
 <template>
-  <div style="display: flex;">
+  <div style="display: flex; flex-direction: column">
+    <div style="display: flex">
     <button>
-      <h1 style="font-size: 60px; font-weight: bold; color: #aa98ba" @click="goHome()">Ticket Radar</h1>
+      <h1 style="font-size: 30px; font-weight: bold; background: linear-gradient(to right, #53a7c7, #392365); -webkit-background-clip: text; background-clip: text; color: transparent;" @click="goHome()"><img :src="require('@/assets/ticketRadar_logo.png')" style="vertical-align: middle; width: 50px; margin-right: 10px">Ticket Radar</h1>
     </button>
-    <v-spacer></v-spacer>
-    <div style="height: 38px; width: 600px; margin-right: 30px; display: flex">
+    </div>
+  <div style="display: flex; flex-direction: row; justify-content: space-between; align-items: baseline">
+    <nav>
+      <ul>
+        <li><a href="#" class="category" @click="goEventList('뮤지컬')">뮤지컬</a></li>
+        <li><a href="#" class="category" @click="goEventList('콘서트')">콘서트</a></li>
+        <li><a href="#" class="category" @click="goEventList('스포츠')">스포츠</a></li>
+        <li><a href="#" class="category" @click="goEventList('전시/행사')">전시/행사</a></li>
+        <li><a href="#" class="category" @click="goEventList('클래식/무용')">클래식/무용</a></li>
+        <li><a href="#" class="category" @click="goEventList('아동/가족')">아동/가족</a></li>
+        <li><a href="#" class="category" @click="goEventList('연극')">연극</a></li>
+      </ul>
+    </nav>
+    <div style="display: flex; gap: 30px">
+    <div style="height: 38px; width: 500px; display: flex; gap: 10px">
       <div class="input-group">
-        <button class="btn btn-outline-secondary dropdown-toggle" style="color:white; width: 100px" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+        <button class="btn btn-outline-secondary dropdown-toggle" style="color:darkgray; width: 100px" type="button" data-bs-toggle="dropdown" aria-expanded="false">
           {{ searchCriterionDisplay }}
         </button>
         <ul class="dropdown-menu">
           <li><a class="dropdown-item" href="#" @click="updateSearchCriterion('title', '제목')">제목</a></li>
           <li><a class="dropdown-item" href="#" @click="updateSearchCriterion('location', '지역')">지역</a></li>
         </ul>
-        <input type="text" v-model="searchText" @keypress="onEnterPress" class="form-control" aria-label="Text input with 2 dropdown buttons">
-        <button class="btn btn-outline-secondary dropdown-toggle" style="color:white; width: 100px" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+        <input type="text" placeholder="검색어를 입력하세요." v-model="searchText" @keypress="onEnterPress" class="form-control" style="color:darkgray" aria-label="Text input with 2 dropdown buttons">
+        <button class="btn btn-outline-secondary dropdown-toggle" style="color:darkgray; width: 100px" type="button" data-bs-toggle="dropdown" aria-expanded="false">
           {{ sortingCriterionDisplay }}
         </button>
         <ul class="dropdown-menu dropdown-menu-end">
@@ -110,38 +124,27 @@ const goHome = () => {
           <li><a class="dropdown-item" href="#" @click="updateSortingCriterion('rating', '평점 순')">평점 순</a></li>
         </ul>
       </div>
-      <button type="button" class="btn btn-outline-info" @click="executeSearch" style="width: 130px">검색하기</button>
+      <button type="button" class="btn btn-primary" @click="executeSearch" style="width: 120px">검색하기</button>
     </div>
 
     <nav>
       <!-- 로그인되지 않았을 때 보여질 버튼들 -->
-      <button v-if="!isLoggedIn" class="btn btn-outline-light me-2" @click="login">로그인</button>
-      <button v-if="!isLoggedIn" class="btn btn-outline-info" @click="register">회원가입</button>
+      <button v-if="!isLoggedIn" class="btn btn-outline-secondary me-2" @click="login">로그인</button>
+      <button v-if="!isLoggedIn" class="btn btn-outline-secondary" @click="register">회원가입</button>
       <!-- 로그인되었을 때 보여질 버튼들 -->
       <button v-if="isLoggedIn" class="btn btn-outline-light me-2" @click="logout">로그아웃</button>
       <button v-if="isLoggedIn" class="btn btn-outline-info" @click="goToMyPage">마이페이지</button>
       <!-- 관리자 역할일 때 보여질 버튼 -->
       <button v-if="isAdmin" class="btn btn-danger" style="margin-left: 8px" @click="goToAdminMode">관리자모드</button>
     </nav>
-
-
+    </div>
   </div>
-  <nav>
-    <ul>
-      <li><a href="#" class="category" @click="goEventList('뮤지컬')">뮤지컬</a></li>
-      <li><a href="#" class="category" @click="goEventList('콘서트')">콘서트</a></li>
-      <li><a href="#" class="category" @click="goEventList('스포츠')">스포츠</a></li>
-      <li><a href="#" class="category" @click="goEventList('전시/행사')">전시/행사</a></li>
-      <li><a href="#" class="category" @click="goEventList('클래식/무용')">클래식/무용</a></li>
-      <li><a href="#" class="category" @click="goEventList('아동/가족')">아동/가족</a></li>
-      <li><a href="#" class="category" @click="goEventList('연극')">연극</a></li>
-    </ul>
-  </nav>
+  </div>
+
 </template>
 
 <style scoped>
 .category {
-  color: #53a7c7;
-  font-weight: bold;
+  color: gray;
 }
 </style>
