@@ -4,10 +4,23 @@ import ReviewList from "@/components/ReviewListComponent.vue";
 import {ref, onMounted} from 'vue';
 import axios from 'axios';
 import {useRoute} from "vue-router";
+import router from "@/router/router";
 
 const event = ref(null);
 const route = useRoute(); // useRoute()를 사용하여 현재 라우팅 정보를 가져옴
 
+const checkLoginStatus = () => {
+  const token = localStorage.getItem('token');
+  if (!token) {
+    alert("로그인이 필요한 기능입니다.");
+    router.push({path: "/login"})
+    // 로그인이 필요한 상황이므로, 로그인 페이지로 리다이렉트하는 로직도 추가할 수 있습니다.
+    // 예: router.push('/login');
+  } else {
+    likeEvent()
+    // 로그인 상태이므로, 필요한 로직을 수행합니다.
+  }
+}
 const fetchEventDetail = async () => {
   const eventId = Number(route.params.eventId); // 이벤트 ID를 Long으로 변환
   try {
@@ -15,6 +28,23 @@ const fetchEventDetail = async () => {
     event.value = response.data;
   } catch (error) {
     console.error('이벤트 상세 정보를 불러오는 동안 오류가 발생했습니다:', error);
+  }
+};
+const likeEvent = async () => {
+  const eventId = event.value.id; // 또는 Number(route.params.eventId) 로부터 이벤트 ID를 가져올 수 있습니다.
+  const token = localStorage.getItem('token'); // 실제로는 사용자 인증 토큰을 여기에 할당합니다.
+
+  try {
+    await axios.post(`http://localhost:8080/likes?eventId=${eventId}`, {}, {
+      headers: {
+        Authorization: `Bearer ${token}` // 인증 토큰을 Bearer 토큰으로 사용
+      }
+    });
+    console.log('좋아요 성공!');
+    window.location.reload()
+    // 필요하다면 여기에서 좋아요 카운트를 업데이트하는 로직을 추가할 수 있습니다.
+  } catch (error) {
+    console.error('좋아요 처리 중 오류가 발생했습니다:', error);
   }
 };
 
@@ -90,9 +120,10 @@ onMounted(() => {
       </div>
     </div>
     <div style="; width: 100%; height: 80px; display: flex">
-      <h3 style="color: white;text-align: center; width: 55px; height: 40px; margin-right: 10px; background-color: #392365; border-radius: 20px; ">0</h3>
-      <button type="button" style="width: 110px; height: 40px; background-color: #392365; border-radius: 20px; ">
-        <h5 style="color: white">좋아요</h5>
+      <h3 style="color: white;text-align: center; width: 55px; height: 40px; margin-right: 10px; background-color: #392365; border-radius: 20px; ">{{event.likeCount}}</h3>
+
+      <button @click="checkLoginStatus" type="button" class="btn btn-light" style="width: 110px; height: 40px; border-radius: 20px; ">
+        <h5 style="font-weight: bold">좋아요</h5>
       </button>
     </div>
 

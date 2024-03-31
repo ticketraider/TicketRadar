@@ -85,24 +85,24 @@ class EventRepositoryImpl : QueryDslSupport(), CustomEventRepository {
 //        }.toTypedArray()
 //    }
 
-    override fun findByPageableAndCount(pageable: Pageable): Page<Event?> {
-        val builder = BooleanBuilder()
-        val totalCount = queryFactory.select(event.count()).from(event).where(builder).fetchOne() ?: 0L
-        val query = queryFactory.selectFrom(event)
-            .where(builder)
-            .offset(pageable.offset)
-            .limit(pageable.pageSize.toLong())
-
-        if (pageable.sort.isSorted) {
-            when (pageable.sort.first()?.property) {
-                "likecount" -> query.orderBy(event.likeCount.asc())
-                "reviewcount" -> query.orderBy(event.reviewCount.asc())
-                else -> query.orderBy(event.createdAt.asc())
-            }
-        } else {
-            query.orderBy(event.createdAt.asc())
-        }
-        val events = query.fetch()
-        return PageImpl(events, pageable, totalCount)
-    }
+//    override fun findByPageableAndCount(pageable: Pageable): Page<Event?> {
+//        val builder = BooleanBuilder()
+//        val totalCount = queryFactory.select(event.count()).from(event).where(builder).fetchOne() ?: 0L
+//        val query = queryFactory.selectFrom(event)
+//            .where(builder)
+//            .offset(pageable.offset)
+//            .limit(pageable.pageSize.toLong())
+//
+//        if (pageable.sort.isSorted) {
+//            when (pageable.sort.first()?.property) {
+//                "likecount" -> query.orderBy(event.likeCount.asc())
+//                "reviewcount" -> query.orderBy(event.reviewCount.asc())
+//                else -> query.orderBy(event.createdAt.asc())
+//            }
+//        } else {
+//            query.orderBy(event.createdAt.asc())
+//        }
+//        val events = query.fetch()
+//        return PageImpl(events, pageable, totalCount)
+//    }
 }

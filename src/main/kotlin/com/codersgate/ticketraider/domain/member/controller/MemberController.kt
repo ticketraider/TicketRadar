@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.Authentication
+import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
 
 
@@ -50,17 +51,30 @@ class MemberController(
             .body(memberService.getProfile(memberId))
     }
 
+    @Operation(summary = "현재 비밀번호 확인")
+    @PostMapping("/verify-password")
+    fun verifyCurrentPassword(
+        @RequestParam currentPassword: String,
+//        authentication: Authentication
+        @AuthenticationPrincipal userPrincipal: UserPrincipal,
+    ): ResponseEntity<VerifyCurrentPasswordResponse> {
+        println("백엔드 도달함")
+//        val user = authentication.principal as UserPrincipal
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(memberService.verifyCurrentPassword(currentPassword, userPrincipal.id))
+    }
     @Operation(summary = "프로필 수정")
     @PreAuthorize("hasAnyRole('MEMBER', 'ADMIN')")
     @PutMapping("/update")
     fun updateProfile(
         @Valid @RequestBody updateProfileRequest: UpdateProfileRequest,
-        authentication: Authentication
+        @AuthenticationPrincipal userPrincipal: UserPrincipal
     ): ResponseEntity<Unit> {
-        val user = authentication.principal as UserPrincipal
+//        val user = authentication.principal as UserPrincipal
         return ResponseEntity
             .status(HttpStatus.OK)
-            .body(memberService.updateProfile(updateProfileRequest, user))
+            .body(memberService.updateProfile(updateProfileRequest, userPrincipal.id))
     }
 
     @Operation(summary = "회원 탈퇴")

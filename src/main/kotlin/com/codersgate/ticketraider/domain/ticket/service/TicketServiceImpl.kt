@@ -12,9 +12,11 @@ import com.codersgate.ticketraider.domain.ticket.entity.Ticket
 import com.codersgate.ticketraider.domain.ticket.entity.TicketGrade
 import com.codersgate.ticketraider.domain.ticket.entity.TicketStatus
 import com.codersgate.ticketraider.domain.ticket.repository.TicketRepository
+import com.codersgate.ticketraider.global.common.aop.redis.lock.PubSubLock
 import com.codersgate.ticketraider.global.error.exception.InvalidCredentialException
 import com.codersgate.ticketraider.global.error.exception.ModelNotFoundException
 import com.codersgate.ticketraider.global.error.exception.TicketReservationFailedException
+import com.codersgate.ticketraider.global.infra.redis.lock.RedissonLock
 import com.codersgate.ticketraider.global.infra.security.jwt.UserPrincipal
 import org.hibernate.Hibernate
 import org.slf4j.LoggerFactory
@@ -23,6 +25,7 @@ import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.Duration
 import java.time.LocalDate
 
 @Service
@@ -36,7 +39,7 @@ class TicketServiceImpl(
         val logger = LoggerFactory.getLogger(TicketServiceImpl::class.java)
     }
 
-    //    @PubSubLock
+    @PubSubLock
     @Transactional
     override fun createTicket(memberId: Long, request: CreateTicketRequest) {
         val event = eventRepository.findByIdOrNull(request.eventId)
@@ -102,6 +105,7 @@ class TicketServiceImpl(
             availableSeatRepository.save(availableSeat)
         }
         eventRepository.save(event)
+        //캐시 내 이벤트 항목 최신화 하지 않아도 됨. Response 에는 변동사항 없음
     }
 
     override fun getBookedTicket(eventId: Long, date: LocalDate): BookedTicketResponse {

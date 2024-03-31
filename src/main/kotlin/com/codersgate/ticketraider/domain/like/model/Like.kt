@@ -21,6 +21,9 @@ class Like (
     @JoinColumn(name = "event_id")
     val event : Event,
 
+    @Column(name = "event_title")
+    val eventTitle: String
+
 
     ) : BaseEntity() {
     @Id

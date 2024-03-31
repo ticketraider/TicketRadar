@@ -20,7 +20,7 @@
     <div style="text-align: right;">
       <button type="button" class="btn btn-primary"
               style="background-color: #392365; border-color: #392365; margin-left: 15px;"
-              @click="submitReview"
+              @click="checkLoginStatus"
       >리뷰 남기기
       </button>
     </div>
@@ -86,6 +86,7 @@
 import {ref, onMounted} from 'vue';
 import axios from 'axios';
 import {useRouter} from 'vue-router';
+import router from "@/router/router";
 
 export default {
   data() {
@@ -131,7 +132,6 @@ export default {
     return {eventId, reviewList, currentPage, totalPages, fetchReviews, displayRating};
   },
   methods: {
-
     async submitReview() {
       try {
         const reviewDetail = {
@@ -164,7 +164,18 @@ export default {
           alert("알수없는 에러가 발생 했습니다.")
         }
       }
-    }
+    },
+    checkLoginStatus() {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        alert("로그인이 필요한 기능입니다.");
+        router.push({path: "/login"})
+        // 로그인이 필요한 상황이므로, 로그인 페이지로 리다이렉트하는 로직도 추가할 수 있습니다.
+        // 예: router.push('/login');
+      }else {
+        this.submitReview()
+      }
+    },
   },
 }
 </script>

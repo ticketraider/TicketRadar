@@ -4,6 +4,8 @@ import com.codersgate.ticketraider.domain.review.model.Review
 import java.time.format.DateTimeFormatter
 
 data class ReviewResponse(
+    val id: Long,
+
     val modifiedAt : String,
 
     val title: String,
@@ -18,6 +20,8 @@ data class ReviewResponse(
 
     val eventId: Long,
 
+    val eventTitle: String,
+
 ) {
     companion object {
         fun from(review: Review): ReviewResponse {
@@ -25,6 +29,7 @@ data class ReviewResponse(
             val  FormattedDate = review.updatedAt!!.format(formatter)
 
             return ReviewResponse(
+                id = review.id!!,
                 modifiedAt = FormattedDate.toString(),
                 title = review.title,
                 content = review.content,
@@ -32,6 +37,7 @@ data class ReviewResponse(
                 rating = review.rating,
                 memberId = review.member.id!!,
                 eventId = review.event.id!!,
+                eventTitle = review.event.title
             )
         }
     }
