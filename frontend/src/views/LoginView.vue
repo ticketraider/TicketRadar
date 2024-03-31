@@ -1,11 +1,10 @@
 <template>
-  <main style="height: 750px; background-color: #eeeaf1">
+  <main style="height: 810px; background-color: #EEEAF1; display: flex; justify-content: center; align-items: center">
     <div
-        style="background-color: #d4cbdc; padding: 30px; margin: 30px auto; height: 600px; width: 60%; border-radius: 20px">
-
-      <form style="color: white; width: 500px; height: 400px; margin: 100px auto auto auto">
-        <div style="background-color: #392365; text-align: center; border-radius: 5px; margin-bottom: 20px">
-          <h2>로그인</h2>
+        style="background-color: #0B0722; border-radius: 12px; width: 40%; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+      <form style="color: white;">
+        <div style="display: flex; justify-content: center">
+          <img :src="require('@/assets/ticketRadar.png')" style="width: 400px">
         </div>
         <div class="mb-3">
           <label for="exampleInputEmail1" class="form-label">이메일</label>
@@ -18,16 +17,16 @@
                  v-model="password">
         </div>
         <div>
-          <div style="margin-top: 10px; margin-left: 10px; text-align: right">
-            <button class="btn btn-primary" style="font-weight:bold; width: 125px; height: 42px; background-color: #263e5e; border-color: #263e5e"
-                    @click="signUp">회원 가입
-            </button>
+          <div style="margin-top: 10px; width: 100%">
             <button type="button" class="btn btn-primary"
-                    style="font-weight:bold; background-color: #392365; border-color: #392365; width: 105px; height: 42px; margin-left: 10px;"
+                    style="font-weight:bold; background-color: #392365; border-color: #392365; width: 100%; height: 42px;"
                     @click="signIn">로그인
             </button>
+            <button style="width: 100%; color: #CABED4; height: 42px; margin-top: 30px;"
+                    @click="signUp">❗아직 회원이 아니신가요?
+            </button>
           </div>
-          <div style="display: flex; width: 100%; justify-content: center">
+          <div style="display: flex; width: 100%; justify-content: center; margin-top: 30px; margin-bottom: 40px">
             <button style="margin-top: 10px" @click="socialSignIn">
               <v-img style="height: 50px; width: 240px;" :src="require('@/assets/web_neutral_sq_SU@2x.png')" cover></v-img>
             </button>

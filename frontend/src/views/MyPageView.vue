@@ -1,7 +1,7 @@
 <template>
-  <main style="height: 1450px">
+  <main style="background-color:#EEEAF1; display: flex; justify-content: center">
     <div
-        style="background-color: #aa98ba; padding: 30px; margin: 30px auto; height: 1250px; width: 67%; border-radius: 20px">
+        style="background-color: #D4CBDC; padding: 30px; margin: 30px auto; width: 80%; border-radius: 20px">
       <div class="mypage">
         <div style="display:flex;">
 

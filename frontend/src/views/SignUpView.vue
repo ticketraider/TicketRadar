@@ -1,11 +1,10 @@
 <template>
-  <main style="height: 750px">
-    <div style="background-color: #aa98ba; padding: 30px; margin: 30px auto; height: 600px; width: 60%; border-radius: 20px">
-
-      <form @submit.prevent="submitForm" style="color: white; width: 500px; height: 400px; margin: 100px auto auto auto">
-        <div style="background-color: #392365; text-align: center; border-radius: 5px; margin-bottom: 20px">
-          <h2>회원 가입</h2>
-        </div>
+  <main style="height: 750px; background-color: #EEEAF1; display: flex; justify-content: center; align-items: center">
+    <div style="background-color: #0B0722; border-radius: 12px; width: 40%; padding: 35px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+      <div style="display: flex; justify-content: center">
+        <img :src="require('@/assets/ticketRadar.png')" style="width: 400px">
+      </div>
+      <form @submit.prevent="submitForm" style="color: white; width: 100%">
         <div class="mb-3">
           <label for="email" class="form-label">이메일</label>
           <input type="email" placeholder="이메일을 입력해주세요" class="form-control" id="email" v-model="email">
@@ -18,8 +17,8 @@
           <label for="nickname" class="form-label">닉네임</label>
           <input type="text" placeholder="닉네임을 입력해주세요" class="form-control" id="nickname" v-model="nickname">
         </div>
-        <div style="text-align: right;">
-          <button type="submit" class="btn btn-primary" style="background-color: #392365; border-color: #392365; margin-left: 15px;">회원 가입</button>
+        <div style="width: 100%">
+          <button type="submit" class="btn btn-primary" style="width: 100%; background-color: #392365; border-color: #392365;">회원 가입</button>
         </div>
       </form>
     </div>
