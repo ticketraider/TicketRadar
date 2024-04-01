@@ -7,19 +7,19 @@
           <EventList :type="'popularity'"/>
         </div>
       </div>
-      <div style="width: 90%; display: flex; flex-direction: column">
+      <div style="width: 90%; display: flex; flex-direction: column; margin-top: 15px;">
         <h3>👍평점 순 TOP.5</h3>
         <div style="display: flex; flex-wrap: wrap; gap: 20px">
           <EventList :type="'rating'"/>
         </div>
       </div>
-      <div style="width: 90%; display: flex; flex-direction: column">
+      <div style="width: 90%; display: flex; flex-direction: column; margin-top: 15px;">
         <h3>✏️리뷰 순 TOP.5</h3>
         <div style="display: flex; flex-wrap: wrap; gap: 20px">
           <EventList :type="'reviews'"/>
         </div>
       </div>
-      <div style="width: 90%; display: flex; flex-direction: column">
+      <div style="width: 90%; display: flex; flex-direction: column; margin-top: 15px;">
         <h3>❤️좋아요 순 TOP.5</h3>
         <div style="display: flex; flex-wrap: wrap; gap: 20px">
           <EventList :type="'likes'"/>
