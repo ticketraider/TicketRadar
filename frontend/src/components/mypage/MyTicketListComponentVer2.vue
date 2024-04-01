@@ -32,7 +32,7 @@
               <div>
                 <div>좌석 : {{ ticket.grade }}-{{ ticket.seatNo }}</div>
                 <div>가격 : {{ ticket.price }} 원</div>
-                <div>장소 : {{ ticket.place }}(장소의 주소)</div>
+                <div>장소 : {{ ticket.place }}({{ticket.address}})</div>
               </div>
               <v-divider></v-divider>
               <div style="width: 100%; height: 35px; display: flex">
