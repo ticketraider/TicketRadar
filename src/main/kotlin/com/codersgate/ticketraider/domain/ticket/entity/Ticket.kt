@@ -1,5 +1,6 @@
 package com.codersgate.ticketraider.domain.ticket.entity
 
+import com.amazonaws.services.ec2.model.Address
 import com.codersgate.ticketraider.domain.event.model.Event
 import com.codersgate.ticketraider.domain.member.entity.Member
 import com.codersgate.ticketraider.global.common.BaseEntity
@@ -20,11 +21,12 @@ import java.time.LocalDateTime
 @Entity
 @SQLDelete(sql = "UPDATE tickets SET is_deleted = true WHERE id = ?") // DELETE 쿼리 날아올 시 대신 실행
 @SQLRestriction("is_deleted = false")
-
-@Table(name = "tickets", indexes = [
-    Index(name = "idx_event_id", columnList = "event_id"),
-    Index(name = "idx_id", columnList = "id")
-])
+@Table(name = "tickets"
+//    , indexes = [
+//    Index(name = "idx_event_id", columnList = "event_id"),
+//    Index(name = "idx_id", columnList = "id")
+//]
+)
 class Ticket(
 
     // DTO 를 저장하기로 했기 때문에 안써도 됨
@@ -42,14 +44,6 @@ class Ticket(
     @Column(name = "seatNo", nullable = false)
     val seatNo: Int,
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "event_id", nullable = false)
-    val event: Event,
-
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "member_id", nullable = false)
-    val member: Member,
-
     @Enumerated(EnumType.STRING)
     @Column(name = "ticket_status", nullable = false)
     var ticketStatus: TicketStatus= TicketStatus.UNPAID,
@@ -58,7 +52,18 @@ class Ticket(
     val price: Int,
 
     @Column(name = "place", nullable = false)
-    var place: String
+    var place: String,
+
+    @Column(name = "address", nullable = false)
+    var address: String,
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "event_id", nullable = false)
+    val event: Event,
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "member_id", nullable = false)
+    val member: Member,
 
 ): BaseEntity() {
     @Id

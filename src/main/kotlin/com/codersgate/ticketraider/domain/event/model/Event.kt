@@ -4,6 +4,7 @@ import com.codersgate.ticketraider.domain.category.model.Category
 import com.codersgate.ticketraider.domain.event.model.price.Price
 import com.codersgate.ticketraider.domain.event.model.seat.AvailableSeat
 import com.codersgate.ticketraider.domain.place.model.Place
+import com.codersgate.ticketraider.domain.ticket.entity.Ticket
 import com.codersgate.ticketraider.global.common.BaseEntity
 import jakarta.persistence.*
 import org.hibernate.annotations.SQLDelete
@@ -53,6 +54,9 @@ class Event(
 
     @OneToOne(mappedBy = "event", fetch = FetchType.EAGER, cascade = [CascadeType.ALL], orphanRemoval = true)
     var price: Price? = null,
+
+    @OneToMany(mappedBy = "event", fetch = FetchType.EAGER, orphanRemoval = true)
+    var tickets: MutableList<Ticket> = mutableListOf(),
 
     @OneToMany(mappedBy = "event", fetch = FetchType.EAGER, cascade = [CascadeType.ALL], orphanRemoval = true)
     var availableSeats: MutableList<AvailableSeat> = mutableListOf()

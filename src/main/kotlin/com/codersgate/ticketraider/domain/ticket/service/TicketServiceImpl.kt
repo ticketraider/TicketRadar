@@ -90,7 +90,8 @@ class TicketServiceImpl(
                     TicketGrade.S -> event.price!!.seatSPrice
                     TicketGrade.A -> event.price!!.seatAPrice
                 },
-                place = event.place.name
+                place = event.place.name,
+                address = event.place.address
             )
 
             ticketRepository.save(ticket)
@@ -155,7 +156,10 @@ class TicketServiceImpl(
         return paidTicketList
     }
 
+    @Transactional
     override fun cancelTicket(ticketId: Long, userPrincipal: UserPrincipal) {
+//        val ticket = ticketRepository.findByIdOrNull(ticketId)
+//        ticketRepository.delete(ticket!!)
         if (userPrincipal.authorities.toString() != "ROLE_ADMIN") { // ADMIN 아닐 시
             ticketRepository.findByIdOrNull(ticketId)
                 ?.let { ticket ->
