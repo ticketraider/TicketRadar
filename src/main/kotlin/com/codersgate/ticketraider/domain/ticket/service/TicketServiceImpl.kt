@@ -40,7 +40,6 @@ class TicketServiceImpl(
     }
 
     @PubSubLock
-    @Transactional
     override fun createTicket(memberId: Long, request: CreateTicketRequest) {
         val event = eventRepository.findByIdOrNull(request.eventId)
             ?: throw ModelNotFoundException("event", request.eventId)

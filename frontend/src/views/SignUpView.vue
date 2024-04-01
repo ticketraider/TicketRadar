@@ -49,7 +49,7 @@ export default {
         console.log(response.data);
         // 여기서 적절한 응답 처리를 수행합니다.
 
-        await router.push('/event-list');
+        await router.push('/login');
         location.reload();// 이벤트 목록 페이지로 이동
 
       } catch (error) {
