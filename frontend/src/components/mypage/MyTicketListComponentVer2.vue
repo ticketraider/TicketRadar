@@ -1,7 +1,7 @@
 <template>
   <div>
     <div
-        style="background-color: #392365; width: 980px; text-align: center; border-radius: 5px; margin-bottom: 20px; color: white">
+        style="width: 100%; text-align: center; border-radius: 5px; margin-bottom: 20px; color: white">
       <h2>내 티켓 목록</h2>
     </div>
 

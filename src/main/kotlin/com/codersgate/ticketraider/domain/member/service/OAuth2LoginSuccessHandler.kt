@@ -2,6 +2,7 @@ package com.codersgate.ticketraider.domain.member.service
 
 import com.codersgate.ticketraider.domain.member.dto.OAuth2UserInfo
 import com.codersgate.ticketraider.global.infra.security.jwt.JwtPlugin
+import jakarta.servlet.http.Cookie
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.springframework.http.MediaType
@@ -21,8 +22,10 @@ class OAuth2LoginSuccessHandler(
         authentication: Authentication
     ) {
         val userInfo = authentication.principal as OAuth2UserInfo
-        val accessToken = memberService.socialLogin(userInfo)
-        response.contentType = MediaType.APPLICATION_JSON_VALUE
-        response.writer.write(accessToken.toString())
+        val accessToken = memberService.socialLogin(userInfo).token
+        val cookie = Cookie("token", accessToken)
+        cookie.path = "/"
+        cookie.maxAge = 3600
+        response.addCookie(cookie)
     }
 }

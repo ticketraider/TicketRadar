@@ -14,7 +14,10 @@ import kotlin.math.round
 @Entity
 @SQLDelete(sql = "UPDATE events SET is_deleted = true WHERE id = ?") // DELETE 쿼리 날아올 시 대신 실행
 @SQLRestriction("is_deleted = false")
-@Table(name = "events")
+@Table(name = "events", indexes = [
+    Index(name = "idx_title", columnList = "title"), // 인덱스 설정
+    Index(name = "idx_id", columnList = "id")
+])
 class Event(
     @Column(name = "title")
     var title: String,
