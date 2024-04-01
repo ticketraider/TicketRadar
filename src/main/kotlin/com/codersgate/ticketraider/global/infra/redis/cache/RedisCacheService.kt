@@ -150,7 +150,7 @@ class RedisCacheService (
         cache?.evict(key)
     }
 
-    @Scheduled(fixedRate = 1800000) // 30분 마다 실행됨
+    @Scheduled(initialDelay = 0, fixedRate = 1800000) // 서버 실행시, 30분 마다 실행됨
     fun updateCachedEventList() : List<List<EventResponse>>
     {
         val listByPopularity = getPopularEventList(5)
