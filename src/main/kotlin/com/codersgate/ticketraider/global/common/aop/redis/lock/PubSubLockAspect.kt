@@ -2,6 +2,7 @@ package com.codersgate.ticketraider.global.common.aop.redis.lock
 
 import com.codersgate.ticketraider.domain.ticket.dto.CreateTicketRequest
 import com.codersgate.ticketraider.domain.ticket.entity.TicketGrade
+import jakarta.transaction.Transactional
 import org.aspectj.lang.ProceedingJoinPoint
 import org.aspectj.lang.annotation.Around
 import org.aspectj.lang.annotation.Aspect
@@ -18,10 +19,9 @@ class PubSubLockAspect(
     private val redissonClient: RedissonClient,
 ) {
 
+    @Transactional
     @Around("@annotation(com.codersgate.ticketraider.global.common.aop.redis.lock.PubSubLock) && args(..,createTicketRequest)")
     fun runPubSubLock(joinPoint: ProceedingJoinPoint, createTicketRequest: CreateTicketRequest) {
-        val methodSignature = joinPoint.signature as MethodSignature
-        val annotation = methodSignature.method.getAnnotation(PubSubLock::class.java)
 
         val lockList = mutableListOf<RLock>()
         try {
@@ -38,7 +38,7 @@ class PubSubLockAspect(
                 lockList.add(lock)
 
                 if (!available) {
-                    println("lock 획득 실패")
+//                    println("lock 획득 실패")
                     return
                 }
             }

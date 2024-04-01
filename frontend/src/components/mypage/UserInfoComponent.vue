@@ -5,7 +5,6 @@
       <h2>유저 정보</h2>
     </div>
     <ul>
-
       <div v-if="!isPasswordVerified" style="display: flex; justify-content: center; width: 100%">
         <div class="mb-3" style="width: 400px;">
           <input type="password" v-model="currentPassword" placeholder="현재 비밀번호를 입력해주세요" class="form-control"
