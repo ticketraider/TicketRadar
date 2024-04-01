@@ -97,5 +97,15 @@ class MemberController(
             .status(HttpStatus.OK)
             .body(memberService.rejoin(loginRequest))
     }
+
+    @Operation(summary = "소셜유저인지 체크")
+    @GetMapping("/isSocial")
+    fun isSocial(
+        @AuthenticationPrincipal userPrincipal: UserPrincipal
+    ): ResponseEntity<Boolean> {
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(memberService.isSocial(userPrincipal))
+    }
 }
 
