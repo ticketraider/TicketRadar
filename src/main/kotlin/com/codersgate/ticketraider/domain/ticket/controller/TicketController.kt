@@ -92,17 +92,18 @@ class TicketController(
             .build()
     }
 
-    @PatchMapping("/makePayment")
+    @PostMapping("/makePayment")
     @Operation(summary = "티켓 결제하기")
     fun makePayment(
         @AuthenticationPrincipal userPrincipal: UserPrincipal,
-        @RequestParam ticketIdList: MutableList<Long>,
-    ): ResponseEntity<List<TicketResponse>> {
-
+        @RequestParam ticketId: Long,
+    ): ResponseEntity<TicketResponse> {
+        println(ticketId)
         return ResponseEntity
             .status(HttpStatus.OK)
-            .body(ticketService.makePayment(userPrincipal, ticketIdList))
+            .body(ticketService.makePayment(userPrincipal, ticketId))
     }
+
 
     // 멤버용
     // 복사됨

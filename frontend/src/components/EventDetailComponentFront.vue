@@ -66,7 +66,7 @@ onMounted(() => {
       </v-img>
       </div>
       <!-- 공연 정보를 담는 디브-->
-      <div style="width: 100%; height: 500px; margin-left:10px; background-color: #EEEAF1; border-radius: 10px; ">
+      <div style="width: 100%; height: 500px; margin-left:10px; background-color: #EEEAF1; border-radius: 10px; justify-content: center; align-items: center">
         <div style="text-align: right;">
           <button @click="checkLoginStatus" type="button" class="btn btn-light"
                   style="background-color: #ffffff; border-radius: 20px; margin-top:30px; margin-right:30px">

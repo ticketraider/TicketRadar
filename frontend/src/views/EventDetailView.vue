@@ -13,7 +13,7 @@
 @import "../css/styles/TestStyle.css";
 </style>
 <script>
-import TicketingComponent from "@/components/TicketingComponentVer5Front.vue";
+import TicketingComponent from "@/components/TicketingComponent.vue";
 import EventDetailComponentFront from "@/components/EventDetailComponentFront.vue";
 export default {
   name: 'App',

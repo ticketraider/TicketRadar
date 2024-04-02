@@ -41,8 +41,8 @@
               <div class="info-row" style="display: flex; justify-content: space-between; align-items: center;">
                 <h6 style="margin: 0;">티켓 상태: {{ ticket.ticketStatus }}</h6>
                 <div>
-                  <button class="cancel-btn" style="margin-right: 20px;" @click="cancelTicket(ticket.id)">예매 결제하기</button>
-                  <button class="cancel-btn" @click="cancelTicket(ticket.id)">예매 취소하기</button>
+                  <button  class="cancel-btn" @click="makePayment(ticket.id)" style="margin-right: 20px;">결제하기</button>
+                  <button  class="cancel-btn" @click="cancelTicket(ticket.id)">예매 취소하기</button>
                 </div>
               </div>
             </div>
@@ -102,18 +102,21 @@ export default {
         this.loading = false;
       }
     },
+
     nextPage() {
       if (this.page < this.totalPages - 1) {
         this.page++;
         this.fetchTickets();
       }
     },
+
     prevPage() {
       if (this.page > 0) {
         this.page--;
         this.fetchTickets();
       }
     },
+
     async cancelTicket(ticketId) {
       try {
         const token = localStorage.getItem('token');
@@ -130,18 +133,40 @@ export default {
         alert('티켓 취소에 실패했습니다.');
       }
     },
+
     navigateToEventDetail(eventId) {
       // 여기서는 Vue Router를 사용하여 이벤트 상세 페이지로 이동한다고 가정
       // 실제 경로는 프로젝트의 라우팅 구조에 따라 달라질 수 있습니다.
-      router.push({ name: 'EventDetail', params: { eventId: Number(eventId) } });
+      router.push({name: 'EventDetail', params: {eventId: Number(eventId)}});
     },
-  }
+
+    async makePayment(ticketId) {
+      try {
+        const token = localStorage.getItem('token');
+
+        await axios.post(
+            'http://localhost:8080/tickets/makePayment',
+            null,
+            {
+              params: {
+                ticketId: ticketId
+              },
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+        );
+
+        alert('티켓이 성공적으로 결제되었습니다.');
+        // 요청 성공 후 티켓 목록 갱신
+        this.fetchTickets();
+      } catch (error) {
+        alert('티켓 결제에 실패했습니다.');
+      }
+    }
+  },
 }
 </script>
-
-
-
-
 
 <style scoped>
 .highlight {
