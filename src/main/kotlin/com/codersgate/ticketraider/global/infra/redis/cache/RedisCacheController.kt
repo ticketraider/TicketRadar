@@ -4,17 +4,13 @@ import com.codersgate.ticketraider.domain.event.dto.EventResponse
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.scheduling.annotation.Scheduled
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PatchMapping
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestParam
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 
 @RestController
 class RedisCacheController(
     private val redisCacheService: RedisCacheService
 ) {
-    @PostMapping("/search")
+    @GetMapping("/search")
     fun search(
         @RequestParam eventTitle: String,
     ) : ResponseEntity<EventResponse> {
@@ -28,7 +24,7 @@ class RedisCacheController(
         return ResponseEntity.status(HttpStatus.OK).body(redisCacheService.getPopularKeywords(5))
     }
 
-    @GetMapping("/PopularEventList")
+    @GetMapping("/popularEventList")
     fun getPopularEventList(
         @RequestParam(required = false) limit: Long?,
     ) : ResponseEntity<List<EventResponse>>
