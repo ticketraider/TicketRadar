@@ -71,16 +71,16 @@ class PlaceController(
             .body(placeService.getPlace(placeId))
     }
 
-    @Operation(summary = "장소별 이벤트 조회")
-    @GetMapping("/getEventList/{placeId}")
-    @PreAuthorize("hasAnyRole('ADMIN')")
-    fun getEventList(
-        @PathVariable placeId: Long
-    ): ResponseEntity<List<EventResponse>>? {
-        return ResponseEntity
-            .status(HttpStatus.OK)
-            .body(placeService.getEventList(placeId))
-    }
+//    @Operation(summary = "장소별 이벤트 조회")
+//    @GetMapping("/getEventList/{placeId}")
+//    @PreAuthorize("hasAnyRole('ADMIN')")
+//    fun getEventList(
+//        @PathVariable placeId: Long
+//    ): ResponseEntity<List<EventResponse>>? {
+//        return ResponseEntity
+//            .status(HttpStatus.OK)
+//            .body(placeService.getEventList(placeId))
+//    }
 
 
 }

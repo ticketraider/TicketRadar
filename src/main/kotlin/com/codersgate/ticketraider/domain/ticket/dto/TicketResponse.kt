@@ -1,5 +1,7 @@
 package com.codersgate.ticketraider.domain.ticket.dto
 
+import com.codersgate.ticketraider.domain.event.model.Event
+import com.codersgate.ticketraider.domain.member.entity.Member
 import com.codersgate.ticketraider.domain.ticket.entity.Ticket
 import com.codersgate.ticketraider.domain.ticket.entity.TicketGrade
 import com.codersgate.ticketraider.domain.ticket.entity.TicketStatus
@@ -19,7 +21,7 @@ data class TicketResponse(
     val memberNickname: String,
 ) {
     companion object {
-        fun from(ticket: Ticket): TicketResponse {
+        fun from(ticket: Ticket, event: Event,  member: Member): TicketResponse {
 
             return TicketResponse(
                 id = ticket.id!!,
@@ -30,9 +32,9 @@ data class TicketResponse(
                 place = ticket.place,
                 address = ticket.address,
                 ticketStatus = ticket.ticketStatus,
-                eventName = ticket.event.title,
-                eventId = ticket.event.id!!,
-                memberNickname = ticket.member.nickname,
+                eventName = event.title,
+                eventId = event.id!!,
+                memberNickname = member.nickname,
             )
         }
     }

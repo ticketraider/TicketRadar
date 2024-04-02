@@ -8,6 +8,7 @@ import com.codersgate.ticketraider.domain.review.dto.UpdateReviewRequest
 import com.codersgate.ticketraider.domain.review.model.Review
 import com.codersgate.ticketraider.domain.review.repository.ReviewRepository
 import com.codersgate.ticketraider.domain.ticket.entity.TicketStatus
+import com.codersgate.ticketraider.global.error.exception.ModelNotFoundException
 import jakarta.transaction.Transactional
 import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException
 import org.springframework.data.domain.Page
@@ -48,26 +49,50 @@ class ReviewServiceImpl(
 
     override fun getReviewList_V2(pageable: Pageable, memberId : Long?, eventId : Long?) : Page<ReviewResponse>
     {
-        return reviewRepository.getReviewList_V2(pageable, memberId, eventId).map{ ReviewResponse.from(it) }
+        return reviewRepository.getReviewList_V2(pageable, memberId, eventId).map{
+            val event = eventRepository.findByIdOrNull(it.event.id)
+                ?: throw ModelNotFoundException("review", it.event.id)
+            val member = memberRepository.findByIdOrNull(it.member.id)
+                ?: throw ModelNotFoundException("review", it.member.id)
+            ReviewResponse.from(it, event, member) }
     }
 
     override fun getReviewList(pageable : Pageable): Page<ReviewResponse> {
-        return reviewRepository.getReviewList(pageable).map{ ReviewResponse.from(it) }
+        return reviewRepository.getReviewList(pageable).map{
+            val event = eventRepository.findByIdOrNull(it.event.id)
+                ?: throw ModelNotFoundException("review", it.event.id)
+            val member = memberRepository.findByIdOrNull(it.member.id)
+                ?: throw ModelNotFoundException("review", it.member.id)
+            ReviewResponse.from(it, event, member) }
     }
 
     override fun getReviewListByEvent(pageable : Pageable, eventId: Long): Page<ReviewResponse> {
-        return reviewRepository.getReviewListByEventId(pageable, eventId).map{ ReviewResponse.from(it) }
+        return reviewRepository.getReviewListByEventId(pageable, eventId).map{
+            val event = eventRepository.findByIdOrNull(it.event.id)
+                ?: throw ModelNotFoundException("review", it.event.id)
+            val member = memberRepository.findByIdOrNull(it.member.id)
+                ?: throw ModelNotFoundException("review", it.member.id)
+            ReviewResponse.from(it, event, member) }
     }
 
     override fun getReviewListByUser(pageable : Pageable, memberId: Long): Page<ReviewResponse> {
-        return reviewRepository.getReviewListByUserId(pageable, memberId).map{ ReviewResponse.from(it) }
+        return reviewRepository.getReviewListByUserId(pageable, memberId).map{
+            val event = eventRepository.findByIdOrNull(it.event.id)
+                ?: throw ModelNotFoundException("review", it.event.id)
+            val member = memberRepository.findByIdOrNull(it.member.id)
+                ?: throw ModelNotFoundException("review", it.member.id)
+            ReviewResponse.from(it, event, member) }
     }
 
     override fun getReview(reviewId: Long): ReviewResponse {
-        return ReviewResponse.from(
-            reviewRepository.findByIdOrNull(reviewId)
-            ?:throw NotFoundException()
-        )
+        val review = reviewRepository.findByIdOrNull(reviewId)
+            ?: throw ModelNotFoundException("review", reviewId)
+        val event = eventRepository.findByIdOrNull(review.event.id)
+            ?: throw ModelNotFoundException("review", review.event.id)
+        val member = memberRepository.findByIdOrNull(review.member.id)
+            ?: throw ModelNotFoundException("review", review.member.id)
+
+        return ReviewResponse.from(review, event, member)
     }
 
     @Transactional

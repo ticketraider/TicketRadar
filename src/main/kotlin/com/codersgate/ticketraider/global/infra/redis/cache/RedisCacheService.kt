@@ -3,13 +3,16 @@ package com.codersgate.ticketraider.global.infra.redis.cache
 import com.codersgate.ticketraider.domain.event.dto.EventResponse
 import com.codersgate.ticketraider.domain.event.dto.price.PriceResponse
 import com.codersgate.ticketraider.domain.event.repository.EventRepository
+import com.codersgate.ticketraider.domain.event.repository.price.PriceRepository
 import com.codersgate.ticketraider.domain.event.service.EventService
 import com.codersgate.ticketraider.domain.place.dto.PlaceResponse
+import com.codersgate.ticketraider.domain.place.repository.PlaceRepository
 import com.codersgate.ticketraider.global.error.exception.ModelNotFoundException
 import org.slf4j.LoggerFactory
 import org.springframework.cache.CacheManager
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.redis.core.RedisTemplate
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import java.time.LocalDate
@@ -19,6 +22,8 @@ import java.time.LocalDate
 class RedisCacheService (
     private val redisTemplate: RedisTemplate<String, Any>,
     private val eventRepository: EventRepository,
+    private val placeRepository: PlaceRepository,
+    private val priceRepository: PriceRepository,
     private val cacheManager: CacheManager,
     private val eventService: EventService,
 ){
@@ -50,7 +55,13 @@ class RedisCacheService (
 
     fun getEventByTitle(eventTitle : String) : EventResponse{
         return eventRepository.findByTitle(eventTitle)
-            ?.let { EventResponse.from(it) }
+            ?.let {
+                val place = placeRepository.findByIdOrNull(it.place.id)
+                    ?: throw ModelNotFoundException("place", it.place.id)
+                val price = priceRepository.findByIdOrNull(it.price!!.id)
+                    ?: throw ModelNotFoundException("price", it.price!!.id)
+                EventResponse.from(it, PlaceResponse.from(place), PriceResponse.from(price))
+      }
             ?: throw ModelNotFoundException("Event", null)
     }
 

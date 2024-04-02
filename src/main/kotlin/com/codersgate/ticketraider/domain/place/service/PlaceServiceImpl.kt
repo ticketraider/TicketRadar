@@ -68,10 +68,10 @@ class PlaceServiceImpl(
         return PlaceResponse.from(place)
     }
 
-    override fun getEventList(placeId: Long): List<EventResponse>? {
-        return placeRepository.findByIdOrNull(placeId)
-            ?.let {
-                it.eventList.map { e -> EventResponse.from(e) }
-            }
-    }
+//    override fun getEventList(placeId: Long): List<EventResponse>? {
+//        return placeRepository.findByIdOrNull(placeId)
+//            ?.let {
+//                it.eventList.map { e -> EventResponse.from(e) }
+//            }
+//    }
 }
