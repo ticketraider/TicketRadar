@@ -1,52 +1,39 @@
 <template>
   <div>
-    <div
-        style="background-color: #392365; width: 980px; text-align: center; border-radius: 5px; margin-bottom: 20px; color: white">
+    <div class="header">
       <h2>유저 정보</h2>
     </div>
-    <ul>
-      <div v-if="!isPasswordVerified" style="display: flex; justify-content: center; width: 100%">
-        <div class="mb-3" style="width: 400px;">
-          <input type="password" v-model="currentPassword" placeholder="현재 비밀번호를 입력해주세요" class="form-control"
-                 id="exampleInputPassword1" @keyup.enter="verifyCurrentPassword">
-        </div>
-        <button type="button" class="btn btn-primary"
-                style="background-color: #392365; border-color: #392365; margin-left: 15px; height: 40px;" @click="verifyCurrentPassword">
-          비밀번호 확인
-        </button>
+
+    <div v-if="!isPasswordVerified" class="loading" style="text-align: center;">
+      <div style="width: 400px; margin: 0 auto;">
+        <input type="password" v-model="currentPassword" placeholder="현재 비밀번호를 입력해주세요" class="form-control">
+        <button type="button" class="btn btn-primary" style="margin-top: 10px; background-color: #392365;" @click="verifyCurrentPassword">비밀번호 확인</button>
       </div>
+    </div>
 
-      <form v-if="isPasswordVerified" style="color: white; width: 910px; height: 400px; justify-content: center">
-
-
-
-        <label for="exampleInputEmail1" class="form-label">유저 정보 변경</label>
+    <form v-if="isPasswordVerified" style="margin-top: 20px;">
+      <div class="card-content">
+        <label class="form-label">유저 정보 변경</label>
         <div class="mb-3">
           <p>현재 닉네임: {{ currentUserNickname }}</p>
           <p>현재 이메일: {{ currentUserEmail }}</p>
         </div>
         <div class="mb-3">
-          <label for="exampleInputPassword1" class="form-label">비밀번호</label>
-          <input type="password" v-model="password" placeholder="비밀번호를 입력해주세요" class="form-control"
-                 id="exampleInputPassword1">
+          <label class="form-label">비밀번호</label>
+          <input type="password" v-model="password" placeholder="비밀번호를 입력해주세요" class="form-control">
         </div>
         <div class="mb-3">
-          <label for="exampleInputEmail1" class="form-label">닉네임</label>
-          <input type="text" v-model="nickname" placeholder="닉네임을 입력해주세요" class="form-control" id="exampleInputEmail1"
-                 aria-describedby="emailHelp">
+          <label class="form-label">닉네임</label>
+          <input type="text" v-model="nickname" placeholder="닉네임을 입력해주세요" class="form-control">
         </div>
-        <div style="text-align: right">
-          <button type="button" class="btn btn-primary"
-                  style="background-color: #392365; border-color: #392365; margin-left: 15px;" @click="updateUserInfo">
-            변경
-          </button>
+        <div style="text-align: right;">
+          <button type="button" class="btn btn-primary" style="background-color: #392365;" @click="updateUserInfo">변경</button>
         </div>
-        <div style="text-align: end; margin-top: 200px">
-          <button type="button" class="btn btn-danger" @click="deleteAccount">계정 탈퇴
-          </button>
+        <div style="text-align: end; margin-top: 20px;">
+          <button type="button" class="btn btn-danger" @click="deleteAccount">계정 탈퇴</button>
         </div>
-      </form>
-    </ul>
+      </div>
+    </form>
   </div>
 </template>
 

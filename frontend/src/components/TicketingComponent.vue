@@ -1,176 +1,3 @@
-<script setup>
-import {ref, computed, onMounted} from 'vue';
-import axios from 'axios';
-import {useRoute} from 'vue-router';
-import router from "@/router/router";
-import * as Bootstrap from "bootstrap";
-
-const event = ref(null);
-let seats = ref([]);
-let date = ref(new Date());
-const selectedSeats = ref([]);
-const route = useRoute();
-let bookedSeatsIds = [`R1`, `S2`, `A3`]
-
-const currentStep = ref(1);
-function resetModal() {
-  currentStep.value = 1;
-  selectedSeats.value = [];
-  // 모달이 닫힐 때 선택된 좌석 초기화
-}
-const checkLoginStatus = () => {
-  const token = localStorage.getItem('token');
-  if (!token) {
-    alert("로그인이 필요한 기능입니다.");
-    router.push({path: "/login"})
-    // 로그인이 필요한 상황이므로, 로그인 페이지로 리다이렉트하는 로직도 추가할 수 있습니다.
-    // 예: router.push('/login');
-  }else {
-    fetchBookedTicket()
-    openModal()
-  }
-}
-
-const openModal = () => {
-      const myModal = new Bootstrap.Modal(document.getElementById('staticBackdrop'), {
-        keyboard: false
-      });
-      myModal.show();
-}
-
-// fetchBookedTicket 함수는 이벤트 상세 정보 로드 로직에서 호출되어야 합니다.
-const fetchEventDetail = async () => {
-  const eventId = Number(route.params.eventId);
-  try {
-    const response = await axios.get(`http://localhost:8080/events/${eventId}`);
-    event.value = response.data;
-    // 이벤트 정보가 로드되면 해당 이벤트의 날짜로 date ref를 업데이트합니다.
-    date.value = new Date(event.value.startDate);
-    await fetchBookedTicket(); // 여기서 fetchBookedTicket 호출
-  } catch (error) {
-    console.error('이벤트 상세 정보를 불러오는 동안 오류가 발생했습니다:', error);
-  }
-};
-
-const fetchBookedTicket = async () => {
-  const eventId = Number(route.params.eventId);
-  // date.value를 복사하여 사용
-  const selectedDate = new Date(date.value);
-  // 필요한 경우, selectedDate를 조작
-  selectedDate.setHours(selectedDate.getHours()+9);
-  const formattedDate = selectedDate.toISOString().split('T')[0];
-  console.log(formattedDate);
-  console.log(date.value); // 현재 상태 확인을 위해 로그 출력
-
-
-  try {
-    const response = await axios.get(`http://localhost:8080/tickets/ticket-list/${eventId}`, {
-      params: {date: formattedDate}
-    });
-    bookedSeatsIds.value = Array.isArray(response.data) ? response.data : [response.data];
-    // 데이터 구조에 따라 적절히 수정
-    bookedSeatsIds = bookedSeatsIds.value[0].bookedTicketList;
-    seats.value = generateSeats();
- // bookedSeatsIds가 갱신된 후 좌석을 다시 생성
-  } catch (error) {
-    console.error('티켓 정보를 불러오는 동안 오류가 발생했습니다:', error);
-  }
-};
-
-
-onMounted(async () => {
-  // onMounted에서는 초기 이벤트 정보만 가져옵니다. 좌석 정보는 예매하기 버튼을 클릭할 때 로드합니다.
-  await fetchEventDetail();
-});
-
-function generateSeats() {
-
-  // event.value.availableSeats 객체에서 각 좌석 등급별 최대 좌석 수를 가져옴
-  const grades = {
-    R: {price: event.value.price.seatRPrice, count: event.value.place.seatR},
-    S: {price: event.value.price.seatSPrice, count: event.value.place.seatS},
-    A: {price: event.value.price.seatAPrice, count: event.value.place.seatA},
-  };
-  let seatsArray = [];
-  let id = 1;
-  // 예시로 사용된 예약된 좌석 ID들
-  for (const [grade, info] of Object.entries(grades)) {
-    for (let i = 1; i <= info.count; i++) {
-      seatsArray.push({
-        id: id,
-        number: i,
-        grade,
-        price: info.price,
-        selected: false,
-        booked: bookedSeatsIds.includes(`${grade}${i}`),
-      });
-      id++;
-    }
-  }
-  return seatsArray;
-}
-
-function selectSeat(id) {
-  const seat = seats.value.find(seat => seat.id === id);
-  if (!seat.booked && !seat.selected && selectedSeats.value.length < 4) {
-    seat.selected = true;
-    selectedSeats.value.push(seat);
-  } else if (seat.selected) {
-    seat.selected = false;
-    selectedSeats.value = selectedSeats.value.filter(s => s.id !== id);
-  }
-}
-
-const totalPrice = computed(() => {
-  return selectedSeats.value.reduce((acc, seat) => acc + seat.price, 0);
-});
-
-function reservationFinished() {
-  // 현재 스텝이 2이고 선택된 좌석이 없을 경우
-  if (selectedSeats.value.length === 0) {
-    alert("좌석을 하나 이상 선택해주세요."); // 함수를 여기서 종료하여 스텝 변경 중단
-  } else {
-    submitTicketReservation()
-  }
-}
-const submitTicketReservation = async () => {
-  const reservationDetails = {
-    eventId: event.value.id,
-    date: date.value.toJSON(),
-    seatList: selectedSeats.value.map(seat => ({
-      ticketGrade: seat.grade,
-      seatNumber: seat.number,
-    })),
-  };
-  const token = localStorage.getItem('token');
-
-  try {
-    await axios.post(`http://localhost:8080/tickets/create`, reservationDetails
-        ,
-        {
-          headers: {
-            Authorization: `Bearer ${token}` // JWT 토큰을 포함한 Authorization 헤더 설정
-          }
-        });
-    // 예매 성공 처리
-    alert('예매가 성공적으로 완료되었습니다.');
-    window.location.reload()
-  } catch (error) {
-    // 예매 실패 처리
-    console.error('예매 실패:', error);
-    alert('예매에 실패하였습니다.');
-    resetModal()
-    await fetchBookedTicket()
-  }
-
-};
-
-function formatPrice(price) {
-  return `${price.toLocaleString()}원`;
-}
-
-</script>
-
 <template>
   <div style="margin: 150px 10px auto 1px; background-color: #aa98ba; border-radius: 5px" v-if="event">
     <v-container>
@@ -316,8 +143,6 @@ function formatPrice(price) {
                 </div>
               </template>
             </v-stepper>
-
-
           </div>
           <div class="modal-footer" style="background-color: #392365">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="resetModal">닫기</button>
@@ -325,10 +150,181 @@ function formatPrice(price) {
         </div>
       </div>
     </div>
-
-
   </div>
 </template>
+
+<script setup>
+import {ref, computed, onMounted} from 'vue';
+import axios from 'axios';
+import {useRoute} from 'vue-router';
+import router from "@/router/router";
+import * as Bootstrap from "bootstrap";
+
+const event = ref(null);
+let seats = ref([]);
+let date = ref(new Date());
+const selectedSeats = ref([]);
+const route = useRoute();
+let bookedSeatsIds = [`R1`, `S2`, `A3`]
+
+const currentStep = ref(1);
+function resetModal() {
+  currentStep.value = 1;
+  selectedSeats.value = [];
+  // 모달이 닫힐 때 선택된 좌석 초기화
+}
+const checkLoginStatus = () => {
+  const token = localStorage.getItem('token');
+  if (!token) {
+    alert("로그인이 필요한 기능입니다.");
+    router.push({path: "/login"})
+    // 로그인이 필요한 상황이므로, 로그인 페이지로 리다이렉트하는 로직도 추가할 수 있습니다.
+    // 예: router.push('/login');
+  }else {
+    fetchBookedTicket()
+    openModal()
+  }
+}
+
+const openModal = () => {
+  const myModal = new Bootstrap.Modal(document.getElementById('staticBackdrop'), {
+    keyboard: false
+  });
+  myModal.show();
+}
+
+// fetchBookedTicket 함수는 이벤트 상세 정보 로드 로직에서 호출되어야 합니다.
+const fetchEventDetail = async () => {
+  const eventId = Number(route.params.eventId);
+  try {
+    const response = await axios.get(`http://localhost:8080/events/${eventId}`);
+    event.value = response.data;
+    // 이벤트 정보가 로드되면 해당 이벤트의 날짜로 date ref를 업데이트합니다.
+    date.value = new Date(event.value.startDate);
+    await fetchBookedTicket(); // 여기서 fetchBookedTicket 호출
+  } catch (error) {
+    console.error('이벤트 상세 정보를 불러오는 동안 오류가 발생했습니다:', error);
+  }
+};
+
+const fetchBookedTicket = async () => {
+  const eventId = Number(route.params.eventId);
+  // date.value를 복사하여 사용
+  const selectedDate = new Date(date.value);
+  // 필요한 경우, selectedDate를 조작
+  selectedDate.setHours(selectedDate.getHours()+9);
+  const formattedDate = selectedDate.toISOString().split('T')[0];
+  console.log(formattedDate);
+  console.log(date.value); // 현재 상태 확인을 위해 로그 출력
+
+
+  try {
+    const response = await axios.get(`http://localhost:8080/tickets/ticket-list/${eventId}`, {
+      params: {date: formattedDate}
+    });
+    bookedSeatsIds.value = Array.isArray(response.data) ? response.data : [response.data];
+    // 데이터 구조에 따라 적절히 수정
+    bookedSeatsIds = bookedSeatsIds.value[0].bookedTicketList;
+    seats.value = generateSeats();
+    // bookedSeatsIds가 갱신된 후 좌석을 다시 생성
+  } catch (error) {
+    console.error('티켓 정보를 불러오는 동안 오류가 발생했습니다:', error);
+  }
+};
+
+
+onMounted(async () => {
+  // onMounted에서는 초기 이벤트 정보만 가져옵니다. 좌석 정보는 예매하기 버튼을 클릭할 때 로드합니다.
+  await fetchEventDetail();
+});
+
+function generateSeats() {
+
+  // event.value.availableSeats 객체에서 각 좌석 등급별 최대 좌석 수를 가져옴
+  const grades = {
+    R: {price: event.value.price.seatRPrice, count: event.value.place.seatR},
+    S: {price: event.value.price.seatSPrice, count: event.value.place.seatS},
+    A: {price: event.value.price.seatAPrice, count: event.value.place.seatA},
+  };
+  let seatsArray = [];
+  let id = 1;
+  // 예시로 사용된 예약된 좌석 ID들
+  for (const [grade, info] of Object.entries(grades)) {
+    for (let i = 1; i <= info.count; i++) {
+      seatsArray.push({
+        id: id,
+        number: i,
+        grade,
+        price: info.price,
+        selected: false,
+        booked: bookedSeatsIds.includes(`${grade}${i}`),
+      });
+      id++;
+    }
+  }
+  return seatsArray;
+}
+
+function selectSeat(id) {
+  const seat = seats.value.find(seat => seat.id === id);
+  if (!seat.booked && !seat.selected && selectedSeats.value.length < 4) {
+    seat.selected = true;
+    selectedSeats.value.push(seat);
+  } else if (seat.selected) {
+    seat.selected = false;
+    selectedSeats.value = selectedSeats.value.filter(s => s.id !== id);
+  }
+}
+
+const totalPrice = computed(() => {
+  return selectedSeats.value.reduce((acc, seat) => acc + seat.price, 0);
+});
+
+function reservationFinished() {
+  // 현재 스텝이 2이고 선택된 좌석이 없을 경우
+  if (selectedSeats.value.length === 0) {
+    alert("좌석을 하나 이상 선택해주세요."); // 함수를 여기서 종료하여 스텝 변경 중단
+  } else {
+    submitTicketReservation()
+  }
+}
+const submitTicketReservation = async () => {
+  const reservationDetails = {
+    eventId: event.value.id,
+    date: date.value.toJSON(),
+    seatList: selectedSeats.value.map(seat => ({
+      ticketGrade: seat.grade,
+      seatNumber: seat.number,
+    })),
+  };
+  const token = localStorage.getItem('token');
+
+  try {
+    await axios.post(`http://localhost:8080/tickets/create`, reservationDetails
+        ,
+        {
+          headers: {
+            Authorization: `Bearer ${token}` // JWT 토큰을 포함한 Authorization 헤더 설정
+          }
+        });
+    // 예매 성공 처리
+    alert('예매가 성공적으로 완료되었습니다.');
+    window.location.reload()
+  } catch (error) {
+    // 예매 실패 처리
+    console.error('예매 실패:', error);
+    alert('예매에 실패하였습니다.');
+    resetModal()
+    await fetchBookedTicket()
+  }
+
+};
+
+function formatPrice(price) {
+  return `${price.toLocaleString()}원`;
+}
+
+</script>
 
 <style scoped>
 .screen {

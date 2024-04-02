@@ -79,24 +79,23 @@ function onEnterPress(event) {
     executeSearch();
   }
 }
-// 가정: 로그인 상태와 토큰은 VueX, Pinia, 또는 localStorage 같은 곳에 저장되어 있다고 가정
-// 이 예시에서는 단순화를 위해 localStorage를 사용합니다.
+
 const token = localStorage.getItem('token');
 
 const isLoggedIn = computed(() => !!token);
 const userRole = computed(() => {
   if (!token) return null;
   const decoded = jwtDecode(token);
-  return decoded.role // 'role'은 토큰 내에 담겨있는 사용자 역할을 나타내는 속성입니다.
+  return decoded.role // 'role'은 토큰 내에 담겨있는 사용자 역할
 });
 const isAdmin = computed(() => userRole.value === 'ADMIN');
 
 function login() {
-  router.push({path: "/login"}); // 'login'은 로그인 페이지의 라우터 이름입니다.
+  router.push({path: "/login"});
 }
 
 function register() {
-  router.push({ path: "/sign-up" }); // 'register'는 회원가입 페이지의 라우터 이름입니다.
+  router.push({ path: "/sign-up" });
 }
 
 function logout() {
@@ -106,7 +105,7 @@ function logout() {
 }
 
 function goToMyPage() {
-  router.push({ path: "/my-page" }); // 'mypage'는 마이페이지의 라우터 이름입니다.
+  router.push({ path: "/my-page/tickets" });
 }
 function goEventList(categoryName) {
   router.push({
@@ -137,9 +136,7 @@ const goHome = () => {
         <li><a href="#" class="category" @click="goEventList('뮤지컬')">뮤지컬</a></li>
         <li><a href="#" class="category" @click="goEventList('콘서트')">콘서트</a></li>
         <li><a href="#" class="category" @click="goEventList('스포츠')">스포츠</a></li>
-        <li><a href="#" class="category" @click="goEventList('전시/행사')">전시/행사</a></li>
         <li><a href="#" class="category" @click="goEventList('클래식/무용')">클래식/무용</a></li>
-        <li><a href="#" class="category" @click="goEventList('아동/가족')">아동/가족</a></li>
         <li><a href="#" class="category" @click="goEventList('연극')">연극</a></li>
       </ul>
     </nav>
@@ -171,7 +168,7 @@ const goHome = () => {
       <button v-if="!isLoggedIn" class="btn btn-outline-secondary me-2" @click="login">로그인</button>
       <button v-if="!isLoggedIn" class="btn btn-outline-secondary" @click="register">회원가입</button>
       <!-- 로그인되었을 때 보여질 버튼들 -->
-      <button v-if="isLoggedIn" class="btn btn-outline-light me-2" @click="logout">로그아웃</button>
+      <button v-if="isLoggedIn" class="btn  btn-outline-secondary me-2" @click="logout">로그아웃</button>
       <button v-if="isLoggedIn" class="btn btn-outline-info" @click="goToMyPage">마이페이지</button>
       <!-- 관리자 역할일 때 보여질 버튼 -->
       <button v-if="isAdmin" class="btn btn-danger" style="margin-left: 8px" @click="goToAdminMode">관리자모드</button>

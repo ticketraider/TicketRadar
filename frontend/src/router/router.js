@@ -55,7 +55,7 @@ const routes = [
             },
             {
                 path: 'tickets',
-                component: () => import('../components/mypage/MyTicketListComponentVer2.vue'),
+                component: () => import('../components/mypage/MyTicketListComponent.vue'),
             },
             {
                 path: 'reviews',

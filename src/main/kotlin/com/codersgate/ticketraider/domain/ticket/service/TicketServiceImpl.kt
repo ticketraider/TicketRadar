@@ -32,9 +32,6 @@ class TicketServiceImpl(
     private val eventRepository: EventRepository,
     private val availableSeatRepository: AvailableSeatRepository,
 ) : TicketService {
-    companion object {
-        val logger = LoggerFactory.getLogger(TicketServiceImpl::class.java)
-    }
 
     @PubSubLock
     override fun createTicket(memberId: Long, request: CreateTicketRequest) {
@@ -149,24 +146,25 @@ class TicketServiceImpl(
 
     override fun makePayment(
         userPrincipal: UserPrincipal,
-        ticketIdList: MutableList<Long>
-    ): MutableList<TicketResponse> {
+        ticketId: Long
+    ):TicketResponse? {
 
-        val paidTicketList: MutableList<TicketResponse> = mutableListOf()
+        val paidTicket : Ticket  = ticketRepository.findByIdOrNull(ticketId)
+            ?: throw ModelNotFoundException("Ticket", ticketId)
 
-        ticketRepository.findAllByMemberId(userPrincipal.id).map {
-            if (it.id in ticketIdList && it.ticketStatus == TicketStatus.UNPAID) {
+        val event = eventRepository.findByIdOrNull(paidTicket.event.id!!)
+        val member = memberRepository.findByIdOrNull(paidTicket.member.id!!)
 
-                // TODO() 결제로직
 
-                it.ticketStatus = TicketStatus.PAID
-                ticketRepository.save(it)
-                val event = eventRepository.findByIdOrNull(it.event.id!!)
-                val member = memberRepository.findByIdOrNull(it.member.id!!)
-                TicketResponse.from(it, event!!, member!!)
-            }
+        if (userPrincipal.id == paidTicket.member.id && paidTicket.ticketStatus == TicketStatus.UNPAID) {
+
+            // TODO() 결제로직
+
+            paidTicket.ticketStatus = TicketStatus.PAID
+            ticketRepository.save(paidTicket)
         }
-        return paidTicketList
+
+        return TicketResponse.from( paidTicket, event!!, member!!)
     }
 
     @Transactional

@@ -1,5 +1,5 @@
 <template>
-  <form style="color: white; width: 100%; height: 180px; margin: 50px auto auto auto">
+  <form style=" width: 100%; height: 180px; margin: 50px auto auto auto">
     <div style="display: flex">
       <div class="mb-3">
         <input type="text" placeholder="리뷰 제목" v-model="reviewTitle" class="form-control" id="exampleInputEmail1"
@@ -58,22 +58,6 @@
         </v-btn>
       </div>
     </div>
-
-  <div class="text-center">
-    <v-container>
-      <v-row justify="center">
-        <v-col cols="8">
-          <v-container class="max-width">
-            <v-pagination
-                v-model="page"
-                :length="totalPages"
-                class="my-4"
-            ></v-pagination>
-          </v-container>
-        </v-col>
-      </v-row>
-    </v-container>
-  </div>
 
 </template>
 
@@ -186,6 +170,8 @@ export default {
 }
 
 .review-card {
+
+  background-color : #EEEAF1;
   width: 100%;
 }
 

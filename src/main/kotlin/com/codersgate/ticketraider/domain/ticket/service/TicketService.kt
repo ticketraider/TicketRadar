@@ -20,6 +20,6 @@ interface TicketService {
     fun getTicketById(ticketId: Long): TicketResponse
     fun getTicketListByUserId(pageable: Pageable, memberId: Long,): Page<TicketResponse>
     fun chkExpiredTickets()
-    fun makePayment(userPrincipal: UserPrincipal, ticketIdList : MutableList<Long>) : MutableList<TicketResponse>
+    fun makePayment(userPrincipal: UserPrincipal, ticketId : Long) : TicketResponse?
     fun cancelTicket(ticketId: Long, userPrincipal: UserPrincipal)
 }

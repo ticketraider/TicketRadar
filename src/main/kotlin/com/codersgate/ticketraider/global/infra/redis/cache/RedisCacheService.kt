@@ -225,13 +225,13 @@ class RedisCacheService(
                 val searchKeyword = typedTuple.value as String
                 val currentScore = typedTuple.score!!.toInt()
 
-                // 현재 점수가 1 이상인 경우에만 점수를 1씩 감소
+                // 현재 점수가 1 이상인 경우에만 점수를 감소
                 if (currentScore > 0) {
-                    val newScore = currentScore - 1
-                    redisTemplate.opsForZSet().incrementScore(SEARCH_KEY, searchKeyword, -1.0)
+                    val newScore = currentScore - 5
+                    redisTemplate.opsForZSet().incrementScore(SEARCH_KEY, searchKeyword, -5.0)
 
                     // 점수가 0이 되면 해당 검색어를 삭제
-                    if (newScore == 0) {
+                    if (newScore <= 0) {
                         redisTemplate.opsForZSet().remove(SEARCH_KEY, searchKeyword)
                     }
                 }

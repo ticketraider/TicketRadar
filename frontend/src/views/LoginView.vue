@@ -1,7 +1,7 @@
 <template>
-  <main style="height: 810px; background-color: #EEEAF1; display: flex; justify-content: center; align-items: center">
+  <main style="height: 1000px; background-color: #EEEAF1; display: flex; justify-content: center; align-items: center">
     <div
-        style="background-color: #0B0722; border-radius: 12px; width: 40%; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+        style="background-color: #0B0722; border-radius: 12px; height: 80%; width: 40%; display: flex; flex-direction: column; align-items: center; justify-content: center;">
       <form style="color: white;">
         <div style="display: flex; justify-content: center">
           <img :src="require('@/assets/ticketRadar.png')" style="width: 400px">
@@ -22,29 +22,18 @@
                     style="font-weight:bold; background-color: #392365; border-color: #392365; width: 100%; height: 42px;"
                     @click="signIn">로그인
             </button>
-            <button style="width: 100%; color: #CABED4; height: 42px; margin-top: 30px;"
+            <button type="button" style="width: 100%; color: #CABED4; height: 42px; margin-top: 30px;"
                     @click="signUp">❗아직 회원이 아니신가요?
             </button>
           </div>
-          <div style="display: flex; width: 100%; justify-content: center">
-            <button style="margin-top: 10px; margin-left: 20px;" @click="kakaoSocialSignIn">
+          <div style="display: flex; width: 100%; justify-content: space-between;">
+            <button style="margin-top: 30px; " @click="kakaoSocialSignIn">
               <v-img style="height: 50px; width: 240px;" :src="require('@/assets/kakao_login_large_narrow.png')" cover></v-img>
             </button>
-            <button style="margin-top: 10px" @click="googleSocialSignIn">
+            <button style="margin-top: 30px" @click="googleSocialSignIn">
               <v-img style="height: 50px; width: 240px;" :src="require('@/assets/web_neutral_sq_SU@2x.png')" cover></v-img>
             </button>
           </div>
-
-
-
-          <!--          <button type="button" class="btn btn-primary"-->
-          <!--                  style="background-color: #392365; border-color: #392365; margin-left: 15px;"-->
-          <!--                  @click="displayToken">토큰 출력-->
-          <!--          </button>-->
-          <!--          <button type="button" class="btn btn-primary"-->
-          <!--                  style="background-color: #392365; border-color: #392365; margin-left: 15px;"-->
-          <!--                  @click="logOut">로그아웃-->
-          <!--          </button>-->
         </div>
       </form>
     </div>
@@ -59,8 +48,8 @@ const router = useRouter();
 let email = ''; // 사용자 입력을 저장할 변수
 let password = ''; // 사용자 입력을 저장할 변수
 
-const signUp = () => {
-  router.push({path: "/sign-up"})
+const signUp = async () => {
+  await router.push({path: "/sign-up"})
 }
 
 const signIn = async () => {
@@ -103,24 +92,6 @@ const googleSocialSignIn = async () => {
   document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
   console.log("소셜 로그인 함수가 호출되었습니다.");
 }
-// const logOut = async () => {
-//   if (localStorage.getItem('token')) {
-//     localStorage.removeItem('token');
-//     alert("로그아웃 되었습니다.");
-//   } else {
-//     alert("로그인 되어있지 않습니다.");
-//   }
-// }
-
-
-// const displayToken = () => {
-//   for (let i = 0; i < localStorage.length; i++) {
-//     const key = localStorage.key(i);
-//     const value = localStorage.getItem(key);
-//     console.log(`Key: ${key}, Value: ${value}`);
-//     console.log('요청 헤더:', axios.defaults.headers);
-//   }
-// }
 
 </script>
 
