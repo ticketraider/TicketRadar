@@ -21,7 +21,7 @@ data class TicketResponse(
     val memberNickname: String,
 ) {
     companion object {
-        fun from(ticket: Ticket, event: Event,  member: Member): TicketResponse {
+        fun from(ticket: Ticket, event: Event, member: Member): TicketResponse {
 
             return TicketResponse(
                 id = ticket.id!!,

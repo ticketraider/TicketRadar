@@ -4,15 +4,15 @@ import org.springframework.stereotype.Service
 
 @Service
 class PopKeywordService {
-    fun getFromCache(){
+    fun getFromCache() {
 
     }
 
-    fun getFromDB(){
+    fun getFromDB() {
 
     }
 
-    fun cacheToDB(){
+    fun cacheToDB() {
 
     }
 }

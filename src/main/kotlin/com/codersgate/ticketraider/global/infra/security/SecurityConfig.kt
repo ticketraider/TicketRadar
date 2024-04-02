@@ -33,7 +33,7 @@ class SecurityConfig(
             .formLogin { it.disable() }
             .csrf { it.disable() }
             .cors { it.disable() }
-            .headers { it.frameOptions { options -> options.sameOrigin() }}
+            .headers { it.frameOptions { options -> options.sameOrigin() } }
             .sessionManagement {
                 it.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             }.authorizeHttpRequests {

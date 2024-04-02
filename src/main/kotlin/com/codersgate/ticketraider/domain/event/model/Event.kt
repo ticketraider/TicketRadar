@@ -10,15 +10,16 @@ import jakarta.persistence.*
 import org.hibernate.annotations.SQLDelete
 import org.hibernate.annotations.SQLRestriction
 import java.time.LocalDate
-import kotlin.math.round
 
 @Entity
 @SQLDelete(sql = "UPDATE events SET is_deleted = true WHERE id = ?") // DELETE 쿼리 날아올 시 대신 실행
 @SQLRestriction("is_deleted = false")
-@Table(name = "events", indexes = [
-    Index(name = "idx_title", columnList = "title"), // 인덱스 설정
-    Index(name = "idx_id", columnList = "id")
-])
+@Table(
+    name = "events", indexes = [
+        Index(name = "idx_title", columnList = "title"), // 인덱스 설정
+        Index(name = "idx_id", columnList = "id")
+    ]
+)
 class Event(
     @Column(name = "title")
     var title: String,
@@ -30,7 +31,7 @@ class Event(
     var likeCount: Int = 0,
 
     @Column(name = "review_count")
-    var reviewCount:Int = 0,
+    var reviewCount: Int = 0,
 
     @Column(name = "average_rating")
     var averageRating: Float = 0F,
@@ -65,17 +66,17 @@ class Event(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null
 
-    fun addRating(rating:Int){
-        var totalRating = averageRating*reviewCount
-        totalRating+= rating
+    fun addRating(rating: Int) {
+        var totalRating = averageRating * reviewCount
+        totalRating += rating
         reviewCount++
 
         averageRating = String.format("%.1f", (totalRating / reviewCount)).toFloat()
     }
 
-    fun deleteRating(rating: Int){
-        var totalRating = averageRating*reviewCount
-        totalRating-= rating
+    fun deleteRating(rating: Int) {
+        var totalRating = averageRating * reviewCount
+        totalRating -= rating
         reviewCount--
         averageRating = String.format("%.1f", (totalRating / reviewCount)).toFloat()
     }

@@ -29,11 +29,6 @@ import java.time.LocalDateTime
 )
 class Ticket(
 
-    // DTO 를 저장하기로 했기 때문에 안써도 됨
-//    @JsonProperty("date")
-//    @JsonFormat(pattern = "yyyy-MM-dd")
-//    @JsonDeserialize(using = LocalDateDeserializer::class)
-//    @JsonSerialize(using = LocalDateSerializer::class)
     @Column(name = "date")
     val date: LocalDate,
 
