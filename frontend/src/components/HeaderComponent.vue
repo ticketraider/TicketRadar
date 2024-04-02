@@ -2,6 +2,7 @@
 import {computed, ref} from 'vue';
 import { useRouter } from 'vue-router';
 import {jwtDecode} from "jwt-decode";
+import axios from "axios";
 
 const router = useRouter();
 const searchText = ref(''); // 검색어
@@ -9,6 +10,41 @@ const searchCriterion = ref(''); // 선택된 검색 기준의 실제 값 (예: 
 const sortingCriterion = ref(''); // 선택된 정렬 기준의 실제 값 (예: 'likes', 'reviews')
 const searchCriterionDisplay = ref('검색 기준'); // 화면에 표시될 검색 기준 텍스트
 const sortingCriterionDisplay = ref('정렬 기준'); // 화면에 표시될 정렬 기준 텍스트
+
+const searchResult = ref('');
+
+
+const searchEvent = async () => {
+  try {
+    console.log("요청 : ", searchText.value);
+    const response = await axios.get('http://localhost:8080/search', {
+      params: {
+        eventTitle: searchText.value
+      }
+    });
+
+    console.log("응답 : ", response);
+  } catch (error) {
+    console.error('Error:', error);
+    searchResult.value = 'Error occurred while searching.';
+  }
+};
+
+const cachingKeywords = async () => {
+  try {
+    console.log("요청 : ", searchText.value);
+    const response = await axios.get('http://localhost:8080/popularEventList', {
+      params: {
+        limit: 5
+      }
+    });
+
+    console.log("응답 : ", response);
+  } catch (error) {
+    console.error('Error:', error);
+    searchResult.value = 'Error occurred while searching.';
+  }
+};
 
 
 // 드롭다운에서 항목을 선택했을 때 호출할 메서드
@@ -23,7 +59,7 @@ function updateSortingCriterion(value, displayText) {
 }
 
 // 검색 실행 메서드
-function executeSearch() {
+async function executeSearch() {
   router.push({
     path: '/event-list',
     query: {
@@ -32,6 +68,9 @@ function executeSearch() {
       sort: sortingCriterion.value,
     }
   });
+  await searchEvent()
+  await cachingKeywords()
+
 }
 
 // 엔터 키가 눌렸을 때 검색을 실행하도록 하는 메서드

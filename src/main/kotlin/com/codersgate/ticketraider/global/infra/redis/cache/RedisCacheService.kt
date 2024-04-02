@@ -28,7 +28,7 @@ class RedisCacheService (
     }
 
     fun searchEvent(eventTitle: String): EventResponse {
-
+        logger.info("eventTitle : $eventTitle")
         // 캐시에 있으면 바로 반환
         if (chkCache(CacheTarget.EVENT,eventTitle)){
             //캐싱 시간 초기화
@@ -108,18 +108,29 @@ class RedisCacheService (
         return popKeywords
     }
 
+    fun getPopularScores(limit: Long): List<Int>? {
+        val popScoreList =
+            redisTemplate.opsForZSet().reverseRangeWithScores(SEARCH_KEY, 0, limit - 1)
+                ?.map{ it.score!!.toInt()
+                }?: emptyList()
+
+        logger.info("$popScoreList")
+
+        return popScoreList
+    }
+
     fun getPopularEventList(limit: Long): List<EventResponse> { // 인기검색어 리스트 가져와서 캐시에 등록된 내용 가져오기. 없으면 캐시에 등록
         val popKeys = getPopularKeywords(limit)
-
         val popList =
             popKeys.map {keyword->
                 getCachedEvent(CacheTarget.EVENT, keyword)
                     ?:let{
                         getEventByTitle(keyword).also{event ->
-                            putCache(CacheTarget.EVENT, keyword, event) // 캐시에 등록.
+                            putCache(CacheTarget.EVENT, keyword, event) // 인기 키워드 캐시에 단건 등록.
                         }
                     }
             }
+        putCache(CacheTarget.EVENT, "popularity", popList) // 캐시에 리스트 등록
         return popList
     }
 
@@ -150,7 +161,7 @@ class RedisCacheService (
         cache?.evict(key)
     }
 
-    @Scheduled(initialDelay = 0, fixedRate = 1800000) // 서버 실행시, 30분 마다 실행됨
+    @Scheduled(initialDelay = 0, fixedRate = 600000) // 서버 실행시, 10분 마다 실행됨
     fun updateCachedEventList() : List<List<EventResponse>>
     {
         val listByPopularity = getPopularEventList(5)
