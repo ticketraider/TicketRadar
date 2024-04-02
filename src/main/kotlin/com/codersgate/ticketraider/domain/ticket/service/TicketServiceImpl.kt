@@ -114,17 +114,28 @@ class TicketServiceImpl(
         return BookedTicketResponse(bookedTicketArray)
     }
     override fun getAllTicketList(pageable: Pageable, memberId: Long?, eventId: Long?): Page<TicketResponse> {
-        return ticketRepository.getAllTicketList(pageable, memberId, eventId).map { TicketResponse.from(it) }
+        return ticketRepository.getAllTicketList(pageable, memberId, eventId).map {
+            val event = eventRepository.findByIdOrNull(it.event.id!!)
+            val member = memberRepository.findByIdOrNull(it.member.id!!)
+            TicketResponse.from(it, event!!, member!!) }
     }
 
     override fun getTicketById(ticketId: Long): TicketResponse {
         val ticket = ticketRepository.findByIdOrNull(ticketId)
             ?: throw ModelNotFoundException("Ticket", ticketId)
-        return TicketResponse.from(ticket)
+        val event = eventRepository.findByIdOrNull(ticket.event.id!!)
+        val member = memberRepository.findByIdOrNull(ticket.member.id!!)
+        return TicketResponse.from(ticket, event!!, member!!)
     }
 
     override fun getTicketListByUserId(pageable: Pageable, memberId: Long): Page<TicketResponse> {
-        return ticketRepository.getListByUserId(pageable, memberId).map{ TicketResponse.from(it) }
+        val ticketList = ticketRepository.getListByUserId(pageable, memberId)
+        val ticketListResponse = ticketList.map{
+            val event = eventRepository.findByIdOrNull(it.event.id!!)
+            val member = memberRepository.findByIdOrNull(it.member.id!!)
+            TicketResponse.from(it, event!!, member!!) }
+        return ticketListResponse
+//        return ticketRepository.getListByUserId(pageable, memberId).map{ TicketResponse.from(it, it.event, it.member) }
     }
 
     override fun chkExpiredTickets() {
@@ -150,7 +161,9 @@ class TicketServiceImpl(
 
                 it.ticketStatus = TicketStatus.PAID
                 ticketRepository.save(it)
-                paidTicketList.add(TicketResponse.from(it))
+                val event = eventRepository.findByIdOrNull(it.event.id!!)
+                val member = memberRepository.findByIdOrNull(it.member.id!!)
+                TicketResponse.from(it, event!!, member!!)
             }
         }
         return paidTicketList

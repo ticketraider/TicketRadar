@@ -8,6 +8,7 @@ import com.codersgate.ticketraider.domain.event.model.Event
 import com.codersgate.ticketraider.domain.event.repository.EventRepository
 import com.codersgate.ticketraider.domain.event.repository.price.PriceRepository
 import com.codersgate.ticketraider.domain.event.repository.seat.AvailableSeatRepository
+import com.codersgate.ticketraider.domain.place.dto.PlaceResponse
 import com.codersgate.ticketraider.domain.place.repository.PlaceRepository
 import com.codersgate.ticketraider.global.error.exception.ModelNotFoundException
 import com.codersgate.ticketraider.global.infra.s3.S3Service
@@ -129,13 +130,22 @@ class EventServiceImpl(
     ): Page<EventResponse>? {
 
         val eventList = eventRepository.findByPageable(pageable, sortStatus, searchStatus, category, keyword)
-        return eventList.map { EventResponse.from(it) }
+        return eventList.map {
+            val place = placeRepository.findByIdOrNull(it.place.id)
+                ?: throw ModelNotFoundException("place", it.place.id)
+            val price = priceRepository.findByIdOrNull(it.price!!.id)
+                ?: throw ModelNotFoundException("price", it.price!!.id)
+            EventResponse.from(it, PlaceResponse.from(place), PriceResponse.from(price)) }
     }
 
     override fun getEvent(eventId: Long): EventResponse {
         val event = eventRepository.findByIdOrNull(eventId)
             ?: throw ModelNotFoundException("Event", eventId)
-        return EventResponse.from(event)
+        val place = placeRepository.findByIdOrNull(event.place.id)
+            ?: throw ModelNotFoundException("place", event.place.id)
+        val price = priceRepository.findByIdOrNull(event.price!!.id)
+            ?: throw ModelNotFoundException("price", event.price!!.id)
+        return EventResponse.from(event, PlaceResponse.from(place), PriceResponse.from(price))
     }
 }
 
