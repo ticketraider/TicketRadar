@@ -1,60 +1,41 @@
 <template>
   <div>
-    <div
-        style="background-color: #392365; width: 980px; text-align: center; border-radius: 5px; margin-bottom: 20px; color: white">
+    <div class="header" style="margin-bottom: 20px;">
       <h2>내 리뷰 모아보기</h2>
     </div>
 
-    <div v-if="loading">로딩 중...</div>
-    <div v-else style="display: flex; justify-content: center">
+    <div v-if="loading" class="loading" style="text-align: center;">로딩 중...</div>
+    <div v-else style="display: flex; justify-content: center;">
 
-      <div v-if="reviews.length === 0" style="color: white; text-align: center;">
+      <div v-if="reviews.length === 0" class="no-tickets" style="text-align: center;">
         <h4>리뷰가 없습니다.</h4>
       </div>
 
       <div v-else>
-
-        <div v-for="review in reviews" :key="review.id" class="review-card">
-          <div
-              style="width: 900px; background-color: white; padding: 10px; margin-bottom: 10px; border-radius: 10px; height: 250px">
-            <div>
+        <div v-for="review in reviews" :key="review.id" class="ticket-card" style="width: 900px; margin-bottom: 20px;">
+          <div class="card-content" style="background-color: #eeeaf1; padding: 20px; border-radius: 10px; overflow: hidden;">
+            <h5 style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">
               <button
                   @mouseover="highlightEvent = review.id"
                   @mouseleave="highlightEvent = null"
                   @click="navigateToEventDetail(review.eventId)"
                   :class="{ highlight: highlightEvent === review.id }"
+                  class="event-name"
+                  style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis;"
               >
-                <h5>{{ review.eventTitle }}</h5>
+                {{ review.eventTitle }}
               </button>
-              <v-divider></v-divider>
+            </h5>
+            <v-divider></v-divider>
+            <div class="info" style="overflow: hidden;">
               <v-row>
                 <v-col>
-                  <v-card class="review-card" style="height: 150px">
-                    <div style="display: flex;">
-                      <v-card-title>{{ review.title }}</v-card-title>
-                      <div style="margin-top: 13px">
-                        <v-card-subtitle>{{ displayRating(review.rating) }}</v-card-subtitle>
-                      </div>
-                      <v-card-text>{{ review.nickname }}</v-card-text>
-                      <div style="margin-left: 50px">
-                        <v-card-text>{{ review.modifiedAt }}</v-card-text>
-                      </div>
-                    </div>
-                    <v-card-text>{{ review.content }}</v-card-text>
-
-                    <div style="width: 100%; height: 35px; display: flex; justify-content: right">
-<!--                      <a style="background-color: #392365; margin-left: 15px; border-color: #392365;" class="btn btn-primary"-->
-<!--                         @click="updateReview(review.id)">리뷰 수정하기</a>-->
-
-                      <!-- Button trigger modal -->
-                      <button style="background-color: #392365; margin-left: 15px; border-color: #392365;"
-                              type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
-                        리뷰 수정하기
-                      </button>
-
-                      <a style="background-color: #392365; margin-left: 15px; border-color: #392365;" class="btn btn-primary"
-                         @click="deleteReview(review.id)">리뷰 삭제하기</a>
-                    </div>
+                  <v-card>
+                    <v-card-title style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">{{ review.title }}</v-card-title>
+                    <v-card-subtitle>{{ displayRating(review.rating) }}</v-card-subtitle>
+                    <!--                    <v-card-text style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">{{ review.nickname }}</v-card-text>-->
+                    <v-card-text style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">{{ review.modifiedAt }}</v-card-text>
+                    <v-card-text style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">{{ review.content }}</v-card-text>
                   </v-card>
                 </v-col>
               </v-row>
@@ -68,11 +49,9 @@
                       <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-
                       <div style="display: flex">
                         <div class="mb-3">
-                          <input type="text" placeholder="리뷰 제목" v-model="updateReviewTitle" class="form-control" id="exampleInputEmail1"
-                                 aria-describedby="emailHelp">
+                          <input type="text" placeholder="리뷰 제목" v-model="updateReviewTitle" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
                         </div>
                         <div style="margin-bottom: 10px">
                           <v-rating
@@ -81,7 +60,6 @@
                               density="comfortable"
                           ></v-rating>
                         </div>
-
                       </div>
                       <div class="mb-3">
                         <input type="text" placeholder="리뷰 내용" v-model="updateReviewContent" class="form-control" id="exampleInputPassword1">
@@ -95,37 +73,21 @@
                 </div>
               </div>
 
-
+              <div style="display: flex; justify-content: flex-end; margin-top: 12px;">
+                <button class="cancel-btn" style="background-color: #392365; margin-left: 15px;" data-bs-toggle="modal" data-bs-target="#staticBackdrop">리뷰 수정하기</button>
+                <button class="cancel-btn" style="background-color: #392365; margin-left: 15px;" @click="deleteReview(review.id)">리뷰 삭제하기</button>
+              </div>
             </div>
-          </div>
-
-        </div>
-        <div style="width: 100%; margin: 10px; height: 100px">
-          <div class="pagination" style="margin-left: 580px">
-            <v-btn
-                style="background-color: #0a0925; color: white;"
-                @click="prevPage"
-            >
-              이전
-            </v-btn>
-            <div>
-              <h5 style="font-weight: bold; color: white; margin-left: 15px">현재 페이지 : {{ page + 1 }}</h5>
-            </div>
-            <v-btn
-                style="margin-left: 20px; background-color: #0a0925; color: white;"
-                @click="nextPage"
-            >
-              다음
-            </v-btn>
-
           </div>
         </div>
 
+        <div class="pagination" style="width: 100%; margin-top: 20px; display: flex; justify-content: center;">
+          <button @click="prevPage" :disabled="page === 0" class="btn btn-primary" style="background-color: #392365; margin-right: 20px;">이전</button>
+          <div class="current-page" style="color: white; font-weight: bold;">현재 페이지: {{ page + 1 }}</div>
+          <button @click="nextPage" :disabled="page === totalPages - 1" class="btn btn-primary" style="background-color: #392365; margin-left: 20px;">다음</button>
+        </div>
       </div>
     </div>
-    <ul>
-
-    </ul>
   </div>
 </template>
 
