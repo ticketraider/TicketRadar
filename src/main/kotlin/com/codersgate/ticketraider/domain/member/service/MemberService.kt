@@ -7,7 +7,7 @@ import com.codersgate.ticketraider.domain.member.entity.Provider
 import com.codersgate.ticketraider.global.infra.security.jwt.UserPrincipal
 
 interface MemberService {
-    fun signUp(memberRequest: MemberRequest, role:MemberRole)
+    fun signUp(memberRequest: MemberRequest, role: MemberRole)
     fun socialSignUpOrLogin(userInfo: OAuth2UserInfo): Any?
     fun socialSignUpAndRegister(id: String, nickname: String, email: String, provider: Provider): Member
     fun login(loginRequest: LoginRequest): LoginResponse
@@ -15,7 +15,6 @@ interface MemberService {
     fun getProfile(memberId: Long): MemberResponse
     fun verifyCurrentPassword(currentPassword: String, memberId: Long): VerifyCurrentPasswordResponse
     fun updateProfile(updateProfileRequest: UpdateProfileRequest, memberId: Long)
-
     fun unregister(user: UserPrincipal)
     fun rejoin(loginRequest: LoginRequest)
     fun isSocial(userPrincipal: UserPrincipal): Boolean

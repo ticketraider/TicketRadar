@@ -89,11 +89,14 @@ class RedisConfig {
             RedisCacheConfiguration.defaultCacheConfig() // 기본 캐시 구성 사용.
                 .serializeKeysWith(  // 키를 직렬화 - StringRedisSerializer 사용
                     RedisSerializationContext.SerializationPair.fromSerializer(
-                        StringRedisSerializer()))
+                        StringRedisSerializer()
+                    )
+                )
                 .serializeValuesWith( // 값을 직렬화 - GenericJackson2JsonRedisSerializer 사용
                     RedisSerializationContext.SerializationPair.fromSerializer(
                         GenericJackson2JsonRedisSerializer(objectMapper)
-                    ))
+                    )
+                )
                 .entryTtl(Duration.ofMinutes(3L)) // 캐시 만료시간  3분으로 설정
 
         // "tickets" 라는 이름의 캐시에 대해 적용

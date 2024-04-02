@@ -50,31 +50,35 @@ class AvailableSeat(
     @JoinColumn(name = "place_id")
     val place: Place,
 
-) : BaseEntity() {
+    ) : BaseEntity() {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null
     fun isFull(): Boolean {
         return (seatR >= maxSeatR && seatS >= maxSeatS && seatA >= maxSeatA)
     }
+
     fun isClosed(): Boolean {
         return bookable == Bookable.CLOSED
     }
+
     fun close() {
         bookable = Bookable.CLOSED
     }
+
     fun decreaseSeat(grade: TicketGrade) {
-        when(grade){
-            TicketGrade.R -> seatR --
-            TicketGrade.S -> seatS --
-            TicketGrade.A -> seatA --
+        when (grade) {
+            TicketGrade.R -> seatR--
+            TicketGrade.S -> seatS--
+            TicketGrade.A -> seatA--
         }
     }
+
     fun increaseSeat(grade: TicketGrade) {
-        when(grade){
-            TicketGrade.R -> seatR ++
-            TicketGrade.S -> seatS ++
-            TicketGrade.A -> seatA ++
+        when (grade) {
+            TicketGrade.R -> seatR++
+            TicketGrade.S -> seatS++
+            TicketGrade.A -> seatA++
         }
     }
 }

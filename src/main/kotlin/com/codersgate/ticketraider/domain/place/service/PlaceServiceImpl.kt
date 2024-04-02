@@ -1,6 +1,5 @@
 package com.codersgate.ticketraider.domain.place.service
 
-import com.codersgate.ticketraider.domain.event.dto.EventResponse
 import com.codersgate.ticketraider.domain.event.repository.seat.AvailableSeatRepository
 import com.codersgate.ticketraider.domain.place.dto.PlaceRequest
 import com.codersgate.ticketraider.domain.place.dto.PlaceResponse
@@ -67,11 +66,4 @@ class PlaceServiceImpl(
             ?: throw ModelNotFoundException("place", placeId)
         return PlaceResponse.from(place)
     }
-
-//    override fun getEventList(placeId: Long): List<EventResponse>? {
-//        return placeRepository.findByIdOrNull(placeId)
-//            ?.let {
-//                it.eventList.map { e -> EventResponse.from(e) }
-//            }
-//    }
 }

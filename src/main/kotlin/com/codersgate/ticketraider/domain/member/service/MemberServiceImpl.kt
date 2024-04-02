@@ -67,10 +67,12 @@ class MemberServiceImpl(
             )
         )
     }
+
     override fun socialLogin(userInfo: OAuth2UserInfo): LoginResponse {
         val member = memberRepository.findByEmail(userInfo.email)
             ?: throw InvalidCredentialException("")
-        return LoginResponse(jwtPlugin.generateAccessToken(
+        return LoginResponse(
+            jwtPlugin.generateAccessToken(
                 subject = member.id.toString(),
                 email = member.email,
                 role = member.role.name
@@ -115,7 +117,7 @@ class MemberServiceImpl(
         val member = memberRepository.findByIdOrNull(memberId)
             ?: throw ModelNotFoundException("Member", memberId)
 
-        if (!passwordEncoder.matches(currentPassword, member.password)){
+        if (!passwordEncoder.matches(currentPassword, member.password)) {
             throw InvalidCredentialException("")
         }
         return VerifyCurrentPasswordResponse(success = true, "비밀번호가 확인되었습니다.")

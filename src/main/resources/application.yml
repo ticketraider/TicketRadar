@@ -22,8 +22,8 @@ spring:
     redis:
       host: 127.0.0.1
       port: 6379
-#      repositories:
-#        enabled: false
+  #      repositories:
+  #        enabled: false
   #      password: ${REDIS_PASSWORD}
   servlet:
     multipart:

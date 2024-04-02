@@ -44,8 +44,6 @@ class EventRepositoryImpl : QueryDslSupport(), CustomEventRepository {
             .offset(pageable.offset)
             .limit(pageable.pageSize.toLong())
             .where(builder)
-//            .orderBy(*getOrderSpecifier(pageable, event, sortStatus))
-//            .fetch()
 
         if (sortStatus == "likes") {
             query.orderBy(event.likeCount.desc())
@@ -55,8 +53,7 @@ class EventRepositoryImpl : QueryDslSupport(), CustomEventRepository {
         }
         if (sortStatus == "rating") {
             query.orderBy(event.averageRating.desc())
-        }
-        else {
+        } else {
             query.orderBy(event.averageRating.desc())
         }
 
@@ -64,45 +61,4 @@ class EventRepositoryImpl : QueryDslSupport(), CustomEventRepository {
         val contents = query.fetch()
         return PageImpl(contents, pageable, totalCount)
     }
-
-//    private fun getOrderSpecifier(
-//        pageable: Pageable,
-//        path: EntityPathBase<*>,
-//        sortDir: String?
-//    ): Array<OrderSpecifier<*>> {
-//
-//        val pathBuilder = PathBuilder(path.type, path.metadata)
-//        return pageable.sort.toList().map { order ->
-//
-//
-//            OrderSpecifier(
-//                if (sortDir == "좋아요 순") {
-//                    Order.ASC
-//                }
-//                else Order.DESC, pathBuilder.get(order.property) as Expression<Comparable<*>>
-//            )
-//
-//        }.toTypedArray()
-//    }
-
-//    override fun findByPageableAndCount(pageable: Pageable): Page<Event?> {
-//        val builder = BooleanBuilder()
-//        val totalCount = queryFactory.select(event.count()).from(event).where(builder).fetchOne() ?: 0L
-//        val query = queryFactory.selectFrom(event)
-//            .where(builder)
-//            .offset(pageable.offset)
-//            .limit(pageable.pageSize.toLong())
-//
-//        if (pageable.sort.isSorted) {
-//            when (pageable.sort.first()?.property) {
-//                "likecount" -> query.orderBy(event.likeCount.asc())
-//                "reviewcount" -> query.orderBy(event.reviewCount.asc())
-//                else -> query.orderBy(event.createdAt.asc())
-//            }
-//        } else {
-//            query.orderBy(event.createdAt.asc())
-//        }
-//        val events = query.fetch()
-//        return PageImpl(events, pageable, totalCount)
-//    }
 }

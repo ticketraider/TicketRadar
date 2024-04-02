@@ -3,7 +3,6 @@ package com.codersgate.ticketraider.domain.ticket.service
 import com.codersgate.ticketraider.domain.event.model.seat.Bookable
 import com.codersgate.ticketraider.domain.event.repository.EventRepository
 import com.codersgate.ticketraider.domain.event.repository.seat.AvailableSeatRepository
-import com.codersgate.ticketraider.domain.member.entity.MemberRole
 import com.codersgate.ticketraider.domain.member.repository.MemberRepository
 import com.codersgate.ticketraider.domain.ticket.dto.BookedTicketResponse
 import com.codersgate.ticketraider.domain.ticket.dto.CreateTicketRequest
@@ -16,7 +15,6 @@ import com.codersgate.ticketraider.global.common.aop.redis.lock.PubSubLock
 import com.codersgate.ticketraider.global.error.exception.InvalidCredentialException
 import com.codersgate.ticketraider.global.error.exception.ModelNotFoundException
 import com.codersgate.ticketraider.global.error.exception.TicketReservationFailedException
-import com.codersgate.ticketraider.global.infra.redis.lock.RedissonLock
 import com.codersgate.ticketraider.global.infra.security.jwt.UserPrincipal
 import org.hibernate.Hibernate
 import org.slf4j.LoggerFactory
@@ -25,7 +23,6 @@ import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.time.Duration
 import java.time.LocalDate
 
 @Service
@@ -113,11 +110,13 @@ class TicketServiceImpl(
         val bookedTicketArray: Array<String> = ticketList.map { "${it!!.grade}${it.seatNo}" }.toTypedArray()
         return BookedTicketResponse(bookedTicketArray)
     }
+
     override fun getAllTicketList(pageable: Pageable, memberId: Long?, eventId: Long?): Page<TicketResponse> {
         return ticketRepository.getAllTicketList(pageable, memberId, eventId).map {
             val event = eventRepository.findByIdOrNull(it.event.id!!)
             val member = memberRepository.findByIdOrNull(it.member.id!!)
-            TicketResponse.from(it, event!!, member!!) }
+            TicketResponse.from(it, event!!, member!!)
+        }
     }
 
     override fun getTicketById(ticketId: Long): TicketResponse {
@@ -130,10 +129,11 @@ class TicketServiceImpl(
 
     override fun getTicketListByUserId(pageable: Pageable, memberId: Long): Page<TicketResponse> {
         val ticketList = ticketRepository.getListByUserId(pageable, memberId)
-        val ticketListResponse = ticketList.map{
+        val ticketListResponse = ticketList.map {
             val event = eventRepository.findByIdOrNull(it.event.id!!)
             val member = memberRepository.findByIdOrNull(it.member.id!!)
-            TicketResponse.from(it, event!!, member!!) }
+            TicketResponse.from(it, event!!, member!!)
+        }
         return ticketListResponse
 //        return ticketRepository.getListByUserId(pageable, memberId).map{ TicketResponse.from(it, it.event, it.member) }
     }
@@ -187,9 +187,9 @@ class TicketServiceImpl(
                         (seat.date == ticket.date) && (seat.event!!.id == ticket.event.id)  // 날짜, 이벤트 확인
                     }[0]
                     .let {
-                    it.decreaseSeat(ticket.grade)           // 좌석 수 줄임
-                    availableSeatRepository.save(it)
-                }
+                        it.decreaseSeat(ticket.grade)           // 좌석 수 줄임
+                        availableSeatRepository.save(it)
+                    }
                 ticketRepository.delete(ticket)
             }
             ?: throw ModelNotFoundException("Ticket", ticketId)

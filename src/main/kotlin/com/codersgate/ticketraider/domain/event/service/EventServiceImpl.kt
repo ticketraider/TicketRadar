@@ -47,7 +47,7 @@ class EventServiceImpl(
 
         val (price, event) = eventRequest.toPriceAndEvent(category, place)
         event.posterImage =
-            if(eventRequest.posterImage=="")
+            if (eventRequest.posterImage == "")
                 "https://shorturl.at/kFIV0"
             else
                 eventRequest.posterImage
@@ -58,8 +58,11 @@ class EventServiceImpl(
     }
 
     override fun uploadImage(file: MultipartFile?): String {
-        return  if(file == null) { "" }
-        else { s3Service.putObject(file) }
+        return if (file == null) {
+            ""
+        } else {
+            s3Service.putObject(file)
+        }
     }
 
 
@@ -96,7 +99,7 @@ class EventServiceImpl(
 
         }
 
-        if(eventRequest.posterImage!=event.posterImage && eventRequest.posterImage!="")
+        if (eventRequest.posterImage != event.posterImage && eventRequest.posterImage != "")
             eventRequest.posterImage
 
         event.posterImage = eventRequest.posterImage
@@ -135,7 +138,8 @@ class EventServiceImpl(
                 ?: throw ModelNotFoundException("place", it.place.id)
             val price = priceRepository.findByIdOrNull(it.price!!.id)
                 ?: throw ModelNotFoundException("price", it.price!!.id)
-            EventResponse.from(it, PlaceResponse.from(place), PriceResponse.from(price)) }
+            EventResponse.from(it, PlaceResponse.from(place), PriceResponse.from(price))
+        }
     }
 
     override fun getEvent(eventId: Long): EventResponse {

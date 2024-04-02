@@ -6,7 +6,6 @@ import jakarta.transaction.Transactional
 import org.aspectj.lang.ProceedingJoinPoint
 import org.aspectj.lang.annotation.Around
 import org.aspectj.lang.annotation.Aspect
-import org.aspectj.lang.reflect.MethodSignature
 import org.redisson.api.RLock
 import org.redisson.api.RedissonClient
 import org.springframework.stereotype.Component
@@ -47,6 +46,7 @@ class PubSubLockAspect(
             lockList.map { it.unlock() }
         }
     }
+
     private fun generateKey(eventId: Long, date: LocalDate, grade: TicketGrade, seatNo: Int): String {
         val key = "ID : ${eventId}, $date : ${grade}-${seatNo}"
         return key
