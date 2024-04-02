@@ -19,7 +19,8 @@ class ProviderMap(
     val memberId: Long,
     var isDeleted: Boolean = false,
 ) {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null
 
     fun registerSocialInfo(socialInfo: Provider) {

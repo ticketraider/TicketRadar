@@ -15,8 +15,6 @@ import org.springframework.stereotype.Service
 class CategoryServiceImpl(
     private val categoryRepository: CategoryRepository
 ) : CategoryService {
-
-    //생성, 수정, 삭제는 역할 ADMIN만 가능(Controller에서 역할 확인)
     override fun createCategory(request: CreateCategoryRequest) {
         val category = Category(
             title = request.title

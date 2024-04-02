@@ -8,7 +8,7 @@ import java.time.format.DateTimeFormatter
 data class ReviewResponse(
     val id: Long,
 
-    val modifiedAt : String,
+    val modifiedAt: String,
 
     val title: String,
 
@@ -24,11 +24,11 @@ data class ReviewResponse(
 
     val eventTitle: String,
 
-) {
+    ) {
     companion object {
         fun from(review: Review, event: Event, member: Member): ReviewResponse {
             val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
-            val  FormattedDate = review.updatedAt!!.format(formatter)
+            val FormattedDate = review.updatedAt!!.format(formatter)
 
             return ReviewResponse(
                 id = review.id!!,

@@ -1,14 +1,8 @@
 package com.codersgate.ticketraider.global.infra.redis.lock
 
-import com.codersgate.ticketraider.domain.ticket.dto.CreateTicketRequest
-import com.codersgate.ticketraider.domain.ticket.entity.TicketGrade
 import com.codersgate.ticketraider.domain.ticket.service.TicketService
-import com.codersgate.ticketraider.global.error.exception.TicketReservationFailedException
-import org.redisson.api.RLock
 import org.redisson.api.RedissonClient
 import org.springframework.stereotype.Component
-import java.time.LocalDate
-import java.util.concurrent.TimeUnit
 
 @Component
 class RedissonLockService(

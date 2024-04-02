@@ -1,12 +1,5 @@
 package com.codersgate.ticketraider.global.infra.redis.cache
 
-import com.codersgate.ticketraider.domain.event.repository.EventRepository
-import com.codersgate.ticketraider.domain.event.service.EventService
-import org.aspectj.lang.ProceedingJoinPoint
-import org.aspectj.lang.annotation.AfterReturning
-import org.aspectj.lang.annotation.Aspect
-import org.springframework.stereotype.Component
-
 //@Aspect
 //@Component
 //class SearchEventAspect(

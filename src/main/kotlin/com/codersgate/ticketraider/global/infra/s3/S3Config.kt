@@ -11,7 +11,7 @@ import software.amazon.awssdk.services.s3.S3Client
 
 
 @Configuration
-class S3Config (
+class S3Config(
     @Value("\${cloud.aws.credentials.access-key}")
     private val accessKey: String,
 
@@ -21,7 +21,7 @@ class S3Config (
     @Value("\${cloud.aws.region.static}")
     private val region: String,
 
-) {
+    ) {
     @Bean
     fun amazonS3Client(): S3Client {
         val awsCredentials = AwsBasicCredentials.create(accessKey, secretKey)

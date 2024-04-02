@@ -41,7 +41,7 @@ class RedissonLock(
 
         // 자동호출 함수
         operator fun <T> invoke(key: String, timeout: Duration = Duration.ofSeconds(60), func: () -> T): T {
-            return when(this::advice.isInitialized) {
+            return when (this::advice.isInitialized) {
                 true -> advice(key, timeout, func) // LockAdvice 로 넘어감
                 false -> func()  // 이 함수 재호출
             }

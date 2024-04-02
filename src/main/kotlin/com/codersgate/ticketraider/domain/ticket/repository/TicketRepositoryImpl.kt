@@ -24,15 +24,15 @@ class TicketRepositoryImpl : QueryDslSupport(), CustomTicketRepository {
     override fun getAllTicketList(pageable: Pageable, memberId: Long?, eventId: Long?): Page<Ticket> {
         val whereClause = BooleanBuilder()
 
-        memberId?.let{whereClause.and(ticket.member.id.eq(memberId))}
-        eventId?.let{whereClause.and(ticket.event.id.eq(eventId))}
+        memberId?.let { whereClause.and(ticket.member.id.eq(memberId)) }
+        eventId?.let { whereClause.and(ticket.event.id.eq(eventId)) }
 
         val totalCounts = queryFactory
             .select(ticket.count())
             .from(ticket)
             .where(whereClause)
             .fetchOne()
-            ?:0L
+            ?: 0L
 
         val contents = queryFactory.selectFrom(ticket)
             .where(whereClause)
@@ -66,10 +66,10 @@ class TicketRepositoryImpl : QueryDslSupport(), CustomTicketRepository {
         return PageImpl(contents, pageable, totalCounts)
     }
 
-    override fun chkTicket(eventId:Long, date: LocalDate, grade: TicketGrade, seatNo:Int): Ticket? {
+    override fun chkTicket(eventId: Long, date: LocalDate, grade: TicketGrade, seatNo: Int): Ticket? {
         val whereClause = BooleanBuilder()
         whereClause.and(ticket.event.id.eq(eventId))
-        whereClause.and(ticket.date.eq(date ))
+        whereClause.and(ticket.date.eq(date))
         whereClause.and(ticket.grade.eq(grade))
         whereClause.and(ticket.seatNo.eq(seatNo))
 

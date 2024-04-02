@@ -16,7 +16,7 @@ data class EventResponse(
     val posterImage: String,
     val place: PlaceResponse,
     val price: PriceResponse,
-    val reviewCount : Int,
+    val reviewCount: Int,
 ) {
     companion object {
         fun from(event: Event, place: PlaceResponse, price: PriceResponse): EventResponse {

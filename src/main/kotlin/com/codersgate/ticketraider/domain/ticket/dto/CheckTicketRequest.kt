@@ -4,7 +4,7 @@ import com.codersgate.ticketraider.domain.ticket.entity.TicketGrade
 import jakarta.validation.constraints.NotNull
 import java.time.LocalDate
 
-class CheckTicketRequest  (
+class CheckTicketRequest(
     @field:NotNull
     val date: LocalDate,
     @field:NotNull

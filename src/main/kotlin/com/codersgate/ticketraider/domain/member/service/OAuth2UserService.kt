@@ -9,12 +9,12 @@ import org.springframework.stereotype.Service
 @Service
 class OAuth2UserService(
     private val memberService: MemberService
-): DefaultOAuth2UserService() {
+) : DefaultOAuth2UserService() {
 
     override fun loadUser(userRequest: OAuth2UserRequest): OAuth2User {
         val originUser = super.loadUser(userRequest)
         val provider = userRequest.clientRegistration.clientName
         return OAuth2UserInfo.of(provider, userRequest, originUser)
-            .also{ memberService.socialSignUpOrLogin(it) }
+            .also { memberService.socialSignUpOrLogin(it) }
     }
 }
