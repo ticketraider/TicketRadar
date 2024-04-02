@@ -22,7 +22,7 @@ class Review (
     @Column(name = "rating")
     var rating : Int,
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     val member: Member,
 

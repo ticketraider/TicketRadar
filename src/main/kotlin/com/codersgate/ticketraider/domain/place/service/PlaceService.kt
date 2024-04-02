@@ -16,5 +16,5 @@ interface PlaceService {
 
     fun getPlace(placeId: Long): PlaceResponse
 
-    fun getEventList(placeId: Long) : List<EventResponse>?
+//    fun getEventList(placeId: Long) : List<EventResponse>?
 }

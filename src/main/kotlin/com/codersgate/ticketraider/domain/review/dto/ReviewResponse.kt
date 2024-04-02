@@ -1,5 +1,7 @@
 package com.codersgate.ticketraider.domain.review.dto
 
+import com.codersgate.ticketraider.domain.event.model.Event
+import com.codersgate.ticketraider.domain.member.entity.Member
 import com.codersgate.ticketraider.domain.review.model.Review
 import java.time.format.DateTimeFormatter
 
@@ -24,7 +26,7 @@ data class ReviewResponse(
 
 ) {
     companion object {
-        fun from(review: Review): ReviewResponse {
+        fun from(review: Review, event: Event, member: Member): ReviewResponse {
             val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
             val  FormattedDate = review.updatedAt!!.format(formatter)
 
@@ -33,11 +35,11 @@ data class ReviewResponse(
                 modifiedAt = FormattedDate.toString(),
                 title = review.title,
                 content = review.content,
-                nickname = review.member.nickname,
+                nickname = member.nickname,
                 rating = review.rating,
-                memberId = review.member.id!!,
-                eventId = review.event.id!!,
-                eventTitle = review.event.title
+                memberId = member.id!!,
+                eventId = event.id!!,
+                eventTitle = event.title
             )
         }
     }

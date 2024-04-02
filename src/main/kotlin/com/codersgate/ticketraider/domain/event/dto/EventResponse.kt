@@ -19,7 +19,7 @@ data class EventResponse(
     val reviewCount : Int,
 ) {
     companion object {
-        fun from(event: Event): EventResponse {
+        fun from(event: Event, place: PlaceResponse, price: PriceResponse): EventResponse {
             return EventResponse(
                 id = event.id!!,
                 title = event.title,
@@ -29,9 +29,9 @@ data class EventResponse(
                 eventInfo = event.eventInfo,
                 averageRating = event.averageRating,
                 posterImage = event.posterImage,
-                place = PlaceResponse.from(event.place),
+                place = place,
                 reviewCount = event.reviewCount,
-                price = PriceResponse.from(event.price!!)
+                price = price
             )
         }
     }
