@@ -130,6 +130,12 @@ class MemberServiceImpl(
         member.updateProfile(changedPassword, updateProfileRequest.nickname)
     }
 
+    override fun isSocial(userPrincipal: UserPrincipal): Boolean {
+        val member = memberRepository.findByIdOrNull(userPrincipal.id)
+            ?: throw InvalidCredentialException("")
+        return member.password == ""
+    }
+
     @Transactional
     override fun unregister(user: UserPrincipal) {
         val member = memberRepository.findByEmail(user.email)

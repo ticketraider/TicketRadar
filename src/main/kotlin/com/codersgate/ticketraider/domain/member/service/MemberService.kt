@@ -18,4 +18,5 @@ interface MemberService {
 
     fun unregister(user: UserPrincipal)
     fun rejoin(loginRequest: LoginRequest)
+    fun isSocial(userPrincipal: UserPrincipal): Boolean
 }
