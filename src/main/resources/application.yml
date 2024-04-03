@@ -104,16 +104,16 @@ spring:
 #    url: jdbc:h2:mem:test
 #    username: sa
 #    password:
-logging:
-  level:
-    org:
-      hibernate:
-        SQL: debug
-        orm:
-          jdbc:
-            bind: trace
-      springframework:
-        security: debug
+#logging:
+#  level:
+#    org:
+#      hibernate:
+#        SQL: debug
+#        orm:
+#          jdbc:
+#            bind: trace
+#      springframework:
+#        security: debug
 
 #server:
 #  port: 8081
