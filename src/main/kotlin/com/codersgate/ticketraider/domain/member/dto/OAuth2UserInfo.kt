@@ -9,16 +9,19 @@ data class OAuth2UserInfo(
     val provider: String,
     val nickname: String,
     val email: String
-): OAuth2User {
+) : OAuth2User {
     override fun getName(): String {
         return "$provider:$id"
     }
+
     override fun getAttributes(): MutableMap<String, Any> {
         return mutableMapOf()
     }
+
     override fun getAuthorities(): MutableCollection<out GrantedAuthority> {
         return mutableListOf()
     }
+
     companion object {
         fun of(provider: String, userRequest: OAuth2UserRequest, originUser: OAuth2User): OAuth2UserInfo {
             return when (provider) {
@@ -31,7 +34,8 @@ data class OAuth2UserInfo(
 
         private fun ofKakao(provider: String, userRequest: OAuth2UserRequest, originUser: OAuth2User): OAuth2UserInfo {
             val profile = originUser.attributes["properties"] as Map<*, *>
-            val userNameAttributeName = userRequest.clientRegistration.providerDetails.userInfoEndpoint.userNameAttributeName
+            val userNameAttributeName =
+                userRequest.clientRegistration.providerDetails.userInfoEndpoint.userNameAttributeName
             val nickname = profile["nickname"] ?: ""
             val account = originUser.attributes["kakao_account"] as Map<*, *>
             val email = account["email"] ?: ""
@@ -43,6 +47,7 @@ data class OAuth2UserInfo(
                 email = email as String
             )
         }
+
         private fun ofNaver(provider: String, userRequest: OAuth2UserRequest, originUser: OAuth2User): OAuth2UserInfo {
             val profile = originUser.attributes["response"] as Map<*, *>
             val nickname = profile["nickname"] ?: ""
@@ -55,8 +60,10 @@ data class OAuth2UserInfo(
                 email = email as String
             )
         }
+
         private fun ofGoogle(provider: String, userRequest: OAuth2UserRequest, originUser: OAuth2User): OAuth2UserInfo {
-            val userNameAttributeName = userRequest.clientRegistration.providerDetails.userInfoEndpoint.userNameAttributeName
+            val userNameAttributeName =
+                userRequest.clientRegistration.providerDetails.userInfoEndpoint.userNameAttributeName
             val nickname = originUser.attributes["name"] ?: ""
             val email = originUser.attributes["email"] ?: ""
 

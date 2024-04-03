@@ -1,5 +1,5 @@
 <template>
-  <form style="color: white; width: 90%; height: 180px; margin: 50px auto auto auto">
+  <form style=" width: 100%; height: 180px; margin: 50px auto auto auto">
     <div style="display: flex">
       <div class="mb-3">
         <input type="text" placeholder="리뷰 제목" v-model="reviewTitle" class="form-control" id="exampleInputEmail1"
@@ -24,16 +24,12 @@
       >리뷰 남기기
       </button>
     </div>
-
   </form>
-  <div class="review-list">
-    <div class="review-grid">
-      <div>
 
-      </div>
+  <div class="review-list">
       <v-row>
         <v-col v-for="review in reviewList" :key="review.id" cols="12">
-          <v-card class="review-card" style="width: 1050px; height: 150px">
+          <v-card class="review-card" style="width: 100%; height: 150px">
             <div style="display: flex;">
               <v-card-title>{{ review.title }}</v-card-title>
               <div style="margin-top: 13px">
@@ -50,8 +46,8 @@
       </v-row>
     </div>
     <!-- 페이지 네이션 -->
-    <div style="width: 100%; margin: 10px">
-      <div class="pagination" style="margin-left: 447px ">
+    <div style="width: 100%; margin-top: 10px; display: flex; justify-content: flex-end">
+      <div class="pagination">
         <v-btn @click="fetchReviews(currentPage - 1)" :disabled="currentPage === 0"
                style="background-color: #0a0925; color: white;">
           이전
@@ -62,23 +58,6 @@
         </v-btn>
       </div>
     </div>
-  </div>
-
-  <div class="text-center">
-    <v-container>
-      <v-row justify="center">
-        <v-col cols="8">
-          <v-container class="max-width">
-            <v-pagination
-                v-model="page"
-                :length="totalPages"
-                class="my-4"
-            ></v-pagination>
-          </v-container>
-        </v-col>
-      </v-row>
-    </v-container>
-  </div>
 
 </template>
 
@@ -182,7 +161,6 @@ export default {
 
 <style scoped>
 .review-list {
-  padding: 20px;
 }
 
 .review-grid {
@@ -192,6 +170,8 @@ export default {
 }
 
 .review-card {
+
+  background-color : #EEEAF1;
   width: 100%;
 }
 

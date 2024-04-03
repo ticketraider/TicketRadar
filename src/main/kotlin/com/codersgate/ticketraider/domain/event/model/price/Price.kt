@@ -10,7 +10,7 @@ import org.hibernate.annotations.SQLRestriction
 @SQLDelete(sql = "UPDATE prices SET is_deleted = true WHERE id = ?") // DELETE 쿼리 날아올 시 대신 실행
 @SQLRestriction("is_deleted = false")
 @Table(name = "prices")
-class Price (
+class Price(
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "event_id")
     var event: Event,
@@ -24,7 +24,7 @@ class Price (
     @Column(name = "seat_a_price")
     var seatAPrice: Int,
 
-): BaseEntity(){
+    ) : BaseEntity() {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null

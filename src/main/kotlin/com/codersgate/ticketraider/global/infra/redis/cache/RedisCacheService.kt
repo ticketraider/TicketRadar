@@ -3,58 +3,69 @@ package com.codersgate.ticketraider.global.infra.redis.cache
 import com.codersgate.ticketraider.domain.event.dto.EventResponse
 import com.codersgate.ticketraider.domain.event.dto.price.PriceResponse
 import com.codersgate.ticketraider.domain.event.repository.EventRepository
+import com.codersgate.ticketraider.domain.event.repository.price.PriceRepository
 import com.codersgate.ticketraider.domain.event.service.EventService
 import com.codersgate.ticketraider.domain.place.dto.PlaceResponse
+import com.codersgate.ticketraider.domain.place.repository.PlaceRepository
 import com.codersgate.ticketraider.global.error.exception.ModelNotFoundException
 import org.slf4j.LoggerFactory
 import org.springframework.cache.CacheManager
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.redis.core.RedisTemplate
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 
 
 @Service
-class RedisCacheService (
+class RedisCacheService(
     private val redisTemplate: RedisTemplate<String, Any>,
     private val eventRepository: EventRepository,
+    private val placeRepository: PlaceRepository,
+    private val priceRepository: PriceRepository,
     private val cacheManager: CacheManager,
     private val eventService: EventService,
-){
-    companion object{
+) {
+    companion object {
         val logger = LoggerFactory.getLogger(RedisCacheService::class.java)
         val SEARCH_KEY = "POPKEYWORDS"
     }
 
     fun searchEvent(eventTitle: String): EventResponse {
-
+        logger.info("eventTitle : $eventTitle")
         // 캐시에 있으면 바로 반환
-        if (chkCache(CacheTarget.EVENT,eventTitle)){
+        if (chkCache(CacheTarget.EVENT, eventTitle)) {
             //캐싱 시간 초기화
             refreshCacheTtl(CacheTarget.EVENT, eventTitle)
             getCachedEvent(CacheTarget.EVENT, eventTitle)
-                ?.let{
+                ?.let {
                     incrementSearchCount(eventTitle) // 검색어 등록 및 점수 추가
                     return it
                 }
         }
 
         // 캐시에 없으면 찾아서 반환
-        return getEventByTitle(eventTitle).also{// 없으면  throw, 종료
+        return getEventByTitle(eventTitle).also {// 없으면  throw, 종료
             incrementSearchCount(eventTitle)
             //최소 n점 부터 캐시에 저장
             putCache(CacheTarget.EVENT, eventTitle, it) // 캐시에 등록.
         }
     }
 
-    fun getEventByTitle(eventTitle : String) : EventResponse{
+    fun getEventByTitle(eventTitle: String): EventResponse {
         return eventRepository.findByTitle(eventTitle)
-            ?.let { EventResponse.from(it) }
+            ?.let {
+                val place = placeRepository.findByIdOrNull(it.place.id)
+                    ?: throw ModelNotFoundException("place", it.place.id)
+                val price = priceRepository.findByIdOrNull(it.price!!.id)
+                    ?: throw ModelNotFoundException("price", it.price!!.id)
+                EventResponse.from(it, PlaceResponse.from(place), PriceResponse.from(price))
+            }
             ?: throw ModelNotFoundException("Event", null)
     }
 
-    fun getCachedEvent(target: CacheTarget, key:String ): EventResponse? {
+    fun getCachedEvent(target: CacheTarget, key: String): EventResponse? {
         logger.info("${target.name} 캐시 값 가져오기 시작")
         val cache = cacheManager.getCache(target.name)
         val value = cache?.get(key) // 캐시에서 가져온 값. LinkedHashMap 형태.
@@ -100,30 +111,43 @@ class RedisCacheService (
     fun getPopularKeywords(limit: Long): List<String> {
         val popKeywords =
             redisTemplate.opsForZSet().reverseRangeWithScores(SEARCH_KEY, 0, limit - 1)
-                ?.map{ it.value.toString()
-                }?: emptyList()
+                ?.map {
+                    it.value.toString()
+                } ?: emptyList()
 
         logger.info("$popKeywords")
 
         return popKeywords
     }
 
+    fun getPopularScores(limit: Long): List<Int>? {
+        val popScoreList =
+            redisTemplate.opsForZSet().reverseRangeWithScores(SEARCH_KEY, 0, limit - 1)
+                ?.map {
+                    it.score!!.toInt()
+                } ?: emptyList()
+
+        logger.info("$popScoreList")
+
+        return popScoreList
+    }
+
     fun getPopularEventList(limit: Long): List<EventResponse> { // 인기검색어 리스트 가져와서 캐시에 등록된 내용 가져오기. 없으면 캐시에 등록
         val popKeys = getPopularKeywords(limit)
-
         val popList =
-            popKeys.map {keyword->
+            popKeys.map { keyword ->
                 getCachedEvent(CacheTarget.EVENT, keyword)
-                    ?:let{
-                        getEventByTitle(keyword).also{event ->
-                            putCache(CacheTarget.EVENT, keyword, event) // 캐시에 등록.
+                    ?: let {
+                        getEventByTitle(keyword).also { event ->
+                            putCache(CacheTarget.EVENT, keyword, event) // 인기 키워드 캐시에 단건 등록.
                         }
                     }
             }
+        putCache(CacheTarget.EVENT, "popularity", popList) // 캐시에 리스트 등록
         return popList
     }
 
-    fun chkCache(target: CacheTarget, key:String ): Boolean {
+    fun chkCache(target: CacheTarget, key: String): Boolean {
         logger.info("${target.name} 캐시 확인 시작")
         val cache = cacheManager.getCache(target.name)
         val value = cache?.get(key)?.get()
@@ -138,34 +162,39 @@ class RedisCacheService (
         }
     }
 
-    fun putCache(target:CacheTarget, key: String, value : Any){
+    fun putCache(target: CacheTarget, key: String, value: Any) {
         logger.info("캐시에 등록 :  $key , $value")
         val cache = cacheManager.getCache(target.name)
         cache?.put(key, value) // 등록
         logger.info("실제 등록 :  $key , ${cache?.get(key)}")
     }
 
-    fun delCache(target:CacheTarget, key: String){
+    fun delCache(target: CacheTarget, key: String) {
         val cache = cacheManager.getCache(target.name)
         cache?.evict(key)
     }
 
-    @Scheduled(cron = "0 0 * * * *") // 매 시간 0분 0초에 실행
-    fun updateCachedEventList() : List<List<EventResponse>>
-    {
+    @Scheduled(initialDelay = 0, fixedRate = 600000) // 서버 실행시, 10분 마다 실행됨
+    fun updateCachedEventList(): List<List<EventResponse>> {
         val listByPopularity = getPopularEventList(5)
         putCache(CacheTarget.EVENT, "popularity", listByPopularity)
 
-        val listByRating =eventService.getPaginatedEventList(PageRequest.of(0, 5),
-            "rating", "title", null, "" )!!.toList()
+        val listByRating = eventService.getPaginatedEventList(
+            PageRequest.of(0, 5),
+            "rating", "title", null, ""
+        )!!.toList()
         putCache(CacheTarget.EVENT, "rating", listByRating)
 
-        val listByReviews =eventService.getPaginatedEventList(PageRequest.of(0, 5),
-            "reviews", "title", null, "" )!!.toList()
+        val listByReviews = eventService.getPaginatedEventList(
+            PageRequest.of(0, 5),
+            "reviews", "title", null, ""
+        )!!.toList()
         putCache(CacheTarget.EVENT, "reviews", listByReviews)
 
-        val listByLikes =eventService.getPaginatedEventList(PageRequest.of(0, 5),
-            "likes", "title", null, "" )!!.toList()
+        val listByLikes = eventService.getPaginatedEventList(
+            PageRequest.of(0, 5),
+            "likes", "title", null, ""
+        )!!.toList()
         putCache(CacheTarget.EVENT, "likes", listByLikes)
 
         return listOf(listByPopularity, listByRating, listByReviews, listByLikes)
@@ -196,13 +225,13 @@ class RedisCacheService (
                 val searchKeyword = typedTuple.value as String
                 val currentScore = typedTuple.score!!.toInt()
 
-                // 현재 점수가 1 이상인 경우에만 점수를 1씩 감소
+                // 현재 점수가 1 이상인 경우에만 점수를 감소
                 if (currentScore > 0) {
-                    val newScore = currentScore - 1
-                    redisTemplate.opsForZSet().incrementScore(SEARCH_KEY, searchKeyword, -1.0)
+                    val newScore = currentScore - 5
+                    redisTemplate.opsForZSet().incrementScore(SEARCH_KEY, searchKeyword, -5.0)
 
                     // 점수가 0이 되면 해당 검색어를 삭제
-                    if (newScore == 0) {
+                    if (newScore <= 0) {
                         redisTemplate.opsForZSet().remove(SEARCH_KEY, searchKeyword)
                     }
                 }
@@ -210,7 +239,7 @@ class RedisCacheService (
         }
 
         redisTemplate.opsForZSet().rangeWithScores(SEARCH_KEY, 0, -1)
-            ?.map{
+            ?.map {
                 logger.info("${it.value}, ${it.score}")
             }
     }

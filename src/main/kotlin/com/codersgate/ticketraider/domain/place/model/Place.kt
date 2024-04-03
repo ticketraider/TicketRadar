@@ -37,7 +37,7 @@ class Place(
     @OneToMany(mappedBy = "place", fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
     var seatList: MutableList<AvailableSeat> = mutableListOf(),
 
-) : BaseEntity() {
+    ) : BaseEntity() {
 
     @Id
     @Column(name = "id")

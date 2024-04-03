@@ -1,61 +1,44 @@
 <template>
   <div>
-    <div
-        style="background-color: #392365; width: 980px; text-align: center; border-radius: 5px; margin-bottom: 20px; color: white">
-      <h2>좋아요한 글 모아보기</h2>
+    <div class="header" style="margin-bottom: 20px;">
+      <h2>좋아요한 이벤트 모아보기</h2>
     </div>
 
-    <div v-if="loading">로딩 중...</div>
-    <div v-else style="display: flex; justify-content: center">
+    <div v-if="loading" class="loading" style="text-align: center;">로딩 중...</div>
+    <div v-else style="display: flex; justify-content: center;">
 
-      <div v-if="likes.length === 0" style="color: white; text-align: center;">
+      <div v-if="likes.length === 0" class="no-tickets" style="text-align: center;">
         <h4>목록이 없습니다.</h4>
       </div>
 
       <div v-else>
-
-        <div v-for="like in likes" :key="like.id" class="review-card">
-          <div style="width: 900px; background-color: white; padding: 10px; border-radius: 10px; height: 60px; margin-bottom: 10px">
-            <div style="display:flex;">
+        <div v-for="like in likes" :key="like.id" class="ticket-card" style="width: 900px; margin-bottom: 20px;">
+          <div class="card-content" style="background-color: white; padding: 10px; border-radius: 10px; height: 60px;">
+            <div style="display:flex; align-items: center; justify-content: space-between;">
               <button
                   @mouseover="highlightEvent = like.id"
                   @mouseleave="highlightEvent = null"
                   @click="navigateToEventDetail(like.eventId)"
                   :class="{ highlight: highlightEvent === like.id }"
+                  class="event-name"
               >
                 <h5>{{ like.eventTitle }}</h5>
               </button>
-              <div style="width: 580px; display:flex; justify-content: right">
-                <a style="background-color: #392365; border-color: #392365;" class="btn btn-primary"
-                   @click="likeEvent(like.eventId)">좋아요 취소</a>
+              <div>
+                <button class="cancel-btn" style="background-color: #392365; border-color: #392365;" @click="likeEvent(like.eventId)">좋아요 취소</button>
               </div>
             </div>
           </div>
         </div>
-        <div style="width: 100%; margin: 10px; height: 100px">
-          <div class="pagination" style="margin-left: 580px">
-            <v-btn
-                style="background-color: #0a0925; color: white;"
-                @click="prevPage"
-            >
-              이전
-            </v-btn>
-            <div>
-              <h5 style="font-weight: bold; color: white; margin-left: 15px">현재 페이지 : {{ page + 1 }}</h5>
-            </div>
-            <v-btn
-                style="margin-left: 20px; background-color: #0a0925; color: white;"
-                @click="nextPage"
-            >
-              다음
-            </v-btn>
-          </div>
+        <div class="pagination" style="width: 100%; margin-top: 20px; display: flex; justify-content: center;">
+          <button @click="prevPage" :disabled="page === 0" class="btn btn-primary" style="background-color: #392365; margin-right: 20px;">이전</button>
+          <div class="current-page" style="color: white; font-weight: bold;">현재 페이지: {{ page + 1 }}</div>
+          <button @click="nextPage" :disabled="page === totalPages - 1" class="btn btn-primary" style="background-color: #392365; margin-left: 20px;">다음</button>
         </div>
       </div>
     </div>
   </div>
 </template>
-
 
 <script>
 import axios from 'axios';

@@ -7,7 +7,6 @@ import com.codersgate.ticketraider.global.common.BaseEntity
 import jakarta.persistence.*
 import org.hibernate.annotations.SQLDelete
 import org.hibernate.annotations.SQLRestriction
-import kotlin.reflect.jvm.internal.impl.descriptors.deserialization.PlatformDependentDeclarationFilter.All
 
 @Table(name = "members")
 @Entity
@@ -27,15 +26,15 @@ class Member(
     @Column(name = "role", nullable = false)
     val role: MemberRole,
 
-    @OneToMany(mappedBy = "member", fetch = FetchType.EAGER, cascade = [CascadeType.ALL], orphanRemoval = true)
-    val tickets: List<Ticket> = emptyList(),
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, orphanRemoval = true)
+    val tickets: List<Ticket> = mutableListOf(),
 
-    @OneToMany(mappedBy = "member", fetch = FetchType.EAGER)
-    val likes: List<Like> = emptyList(),
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
+    val likes: List<Like> = mutableListOf(),
 
 
-    @OneToMany(mappedBy = "member", fetch = FetchType.EAGER)
-    val reviews: List<Review> = emptyList(),
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
+    val reviews: List<Review> = mutableListOf(),
 
     ) : BaseEntity() {
     @Id

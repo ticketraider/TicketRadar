@@ -1,5 +1,6 @@
 package com.codersgate.ticketraider.domain.ticket.entity
 
+import com.amazonaws.services.ec2.model.Address
 import com.codersgate.ticketraider.domain.event.model.Event
 import com.codersgate.ticketraider.domain.member.entity.Member
 import com.codersgate.ticketraider.global.common.BaseEntity
@@ -16,17 +17,18 @@ import org.springframework.format.annotation.DateTimeFormat
 import java.time.LocalDate
 import java.time.LocalDateTime
 
-@Table(name = "tickets")
+
+@Entity
 @SQLDelete(sql = "UPDATE tickets SET is_deleted = true WHERE id = ?") // DELETE 쿼리 날아올 시 대신 실행
 @SQLRestriction("is_deleted = false")
-@Entity
+@Table(name = "tickets"
+//    , indexes = [
+//    Index(name = "idx_event_id", columnList = "event_id"),
+//    Index(name = "idx_id", columnList = "id")
+//]
+)
 class Ticket(
 
-    // DTO 를 저장하기로 했기 때문에 안써도 됨
-//    @JsonProperty("date")
-//    @JsonFormat(pattern = "yyyy-MM-dd")
-//    @JsonDeserialize(using = LocalDateDeserializer::class)
-//    @JsonSerialize(using = LocalDateSerializer::class)
     @Column(name = "date")
     val date: LocalDate,
 
@@ -37,14 +39,6 @@ class Ticket(
     @Column(name = "seatNo", nullable = false)
     val seatNo: Int,
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "event_id", nullable = false)
-    val event: Event,
-
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "member_id", nullable = false)
-    val member: Member,
-
     @Enumerated(EnumType.STRING)
     @Column(name = "ticket_status", nullable = false)
     var ticketStatus: TicketStatus= TicketStatus.UNPAID,
@@ -53,7 +47,18 @@ class Ticket(
     val price: Int,
 
     @Column(name = "place", nullable = false)
-    var place: String
+    var place: String,
+
+    @Column(name = "address", nullable = false)
+    var address: String,
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "event_id", nullable = false)
+    val event: Event,
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id", nullable = false)
+    val member: Member,
 
 ): BaseEntity() {
     @Id

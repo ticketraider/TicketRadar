@@ -12,29 +12,28 @@ import org.hibernate.annotations.SQLRestriction
 @Table(name = "reviews")
 @SQLDelete(sql = "UPDATE reviews SET is_deleted = true WHERE id = ?") // DELETE 쿼리 날아올 시 대신 실행
 @SQLRestriction("is_deleted = false")
-class Review (
+class Review(
     @Column(name = "title")
-    var title : String,
+    var title: String,
 
     @Column(name = "content")
-    var content : String,
+    var content: String,
 
     @Column(name = "rating")
-    var rating : Int,
+    var rating: Int,
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     val member: Member,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "event_id")
-    val event : Event,
+    val event: Event,
 
-    ) : BaseEntity()
-    {
-        @Id
-        @GeneratedValue( strategy = GenerationType.IDENTITY)
-        val id : Long? = null
+    ) : BaseEntity() {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    val id: Long? = null
 }
 
 

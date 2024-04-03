@@ -1,10 +1,8 @@
 package com.codersgate.ticketraider.domain.ticket.controller
 
-import com.codersgate.ticketraider.domain.review.dto.ReviewResponse
 import com.codersgate.ticketraider.domain.ticket.dto.BookedTicketResponse
 import com.codersgate.ticketraider.domain.ticket.dto.CreateTicketRequest
 import com.codersgate.ticketraider.domain.ticket.dto.TicketResponse
-import com.codersgate.ticketraider.domain.ticket.entity.TicketStatus
 import com.codersgate.ticketraider.domain.ticket.service.TicketService
 import com.codersgate.ticketraider.global.infra.security.jwt.UserPrincipal
 import io.swagger.v3.oas.annotations.Operation
@@ -15,7 +13,6 @@ import org.springframework.data.web.PageableDefault
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.scheduling.annotation.Scheduled
-import org.springframework.security.core.Authentication
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.*
@@ -84,18 +81,6 @@ class TicketController(
             .body(ticketService.getTicketListByUserId(pageable, userPrincipal.id))
     }
 
-    // 티켓 업데이트를 수동으로 할 일이 없어 생략
-//    @Operation(summary = "티켓 상태 변경")
-//    @PutMapping("/update")
-//    fun updateTicket(
-//        @RequestParam ticketId: Long,
-//        @RequestParam ticketStatus: TicketStatus
-//    ): ResponseEntity<Unit> {
-//        return ResponseEntity
-//            .status(HttpStatus.CREATED)
-//            .body(ticketService.updateTicketStatus(ticketId, ticketStatus))
-//    }
-
 
     @Scheduled(cron = "0 0 0 * * ?") // 매일 정오(12시)에 메서드가 실행
     @PatchMapping("/chkExpired")
@@ -107,17 +92,18 @@ class TicketController(
             .build()
     }
 
-    @PatchMapping("/makePayment")
+    @PostMapping("/makePayment")
     @Operation(summary = "티켓 결제하기")
     fun makePayment(
         @AuthenticationPrincipal userPrincipal: UserPrincipal,
-        @RequestParam ticketIdList: MutableList<Long>,
-    ): ResponseEntity<List<TicketResponse>> {
-
+        @RequestParam ticketId: Long,
+    ): ResponseEntity<TicketResponse> {
+        println(ticketId)
         return ResponseEntity
             .status(HttpStatus.OK)
-            .body(ticketService.makePayment(userPrincipal, ticketIdList))
+            .body(ticketService.makePayment(userPrincipal, ticketId))
     }
+
 
     // 멤버용
     // 복사됨
@@ -131,17 +117,5 @@ class TicketController(
             .status(HttpStatus.OK)
             .body(ticketService.cancelTicket(ticketId, userPrincipal))
     }
-
-    // 관리자용
-//    @Operation(summary = "티켓 삭제")
-//    @DeleteMapping("/delete/{ticketId}")
-//    fun deleteTicket(
-//        @PathVariable ticketId: Long,
-//    ): ResponseEntity<Unit> {
-//        return ResponseEntity
-//            .status(HttpStatus.OK)
-//            .body(ticketService.deleteTicket(ticketId))
-//    }
-
 
 }

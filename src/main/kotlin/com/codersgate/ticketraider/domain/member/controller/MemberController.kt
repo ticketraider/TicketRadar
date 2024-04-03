@@ -55,15 +55,14 @@ class MemberController(
     @PostMapping("/verify-password")
     fun verifyCurrentPassword(
         @RequestParam currentPassword: String,
-//        authentication: Authentication
         @AuthenticationPrincipal userPrincipal: UserPrincipal,
     ): ResponseEntity<VerifyCurrentPasswordResponse> {
         println("백엔드 도달함")
-//        val user = authentication.principal as UserPrincipal
         return ResponseEntity
             .status(HttpStatus.OK)
             .body(memberService.verifyCurrentPassword(currentPassword, userPrincipal.id))
     }
+
     @Operation(summary = "프로필 수정")
     @PreAuthorize("hasAnyRole('MEMBER', 'ADMIN')")
     @PutMapping("/update")
@@ -71,7 +70,6 @@ class MemberController(
         @Valid @RequestBody updateProfileRequest: UpdateProfileRequest,
         @AuthenticationPrincipal userPrincipal: UserPrincipal
     ): ResponseEntity<Unit> {
-//        val user = authentication.principal as UserPrincipal
         return ResponseEntity
             .status(HttpStatus.OK)
             .body(memberService.updateProfile(updateProfileRequest, userPrincipal.id))
@@ -88,6 +86,7 @@ class MemberController(
             .status(HttpStatus.OK)
             .body(memberService.unregister(user))
     }
+
     @Operation(summary = "재가입")
     @PutMapping("/rejoin")
     fun rejoin(
@@ -96,6 +95,16 @@ class MemberController(
         return ResponseEntity
             .status(HttpStatus.OK)
             .body(memberService.rejoin(loginRequest))
+    }
+
+    @Operation(summary = "소셜유저인지 체크")
+    @GetMapping("/isSocial")
+    fun isSocial(
+        @AuthenticationPrincipal userPrincipal: UserPrincipal
+    ): ResponseEntity<Boolean> {
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(memberService.isSocial(userPrincipal))
     }
 }
 

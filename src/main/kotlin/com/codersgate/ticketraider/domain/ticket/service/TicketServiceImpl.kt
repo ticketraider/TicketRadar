@@ -3,7 +3,6 @@ package com.codersgate.ticketraider.domain.ticket.service
 import com.codersgate.ticketraider.domain.event.model.seat.Bookable
 import com.codersgate.ticketraider.domain.event.repository.EventRepository
 import com.codersgate.ticketraider.domain.event.repository.seat.AvailableSeatRepository
-import com.codersgate.ticketraider.domain.member.entity.MemberRole
 import com.codersgate.ticketraider.domain.member.repository.MemberRepository
 import com.codersgate.ticketraider.domain.ticket.dto.BookedTicketResponse
 import com.codersgate.ticketraider.domain.ticket.dto.CreateTicketRequest
@@ -16,7 +15,6 @@ import com.codersgate.ticketraider.global.common.aop.redis.lock.PubSubLock
 import com.codersgate.ticketraider.global.error.exception.InvalidCredentialException
 import com.codersgate.ticketraider.global.error.exception.ModelNotFoundException
 import com.codersgate.ticketraider.global.error.exception.TicketReservationFailedException
-import com.codersgate.ticketraider.global.infra.redis.lock.RedissonLock
 import com.codersgate.ticketraider.global.infra.security.jwt.UserPrincipal
 import org.hibernate.Hibernate
 import org.slf4j.LoggerFactory
@@ -25,7 +23,6 @@ import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.time.Duration
 import java.time.LocalDate
 
 @Service
@@ -35,12 +32,8 @@ class TicketServiceImpl(
     private val eventRepository: EventRepository,
     private val availableSeatRepository: AvailableSeatRepository,
 ) : TicketService {
-    companion object {
-        val logger = LoggerFactory.getLogger(TicketServiceImpl::class.java)
-    }
 
     @PubSubLock
-    @Transactional
     override fun createTicket(memberId: Long, request: CreateTicketRequest) {
         val event = eventRepository.findByIdOrNull(request.eventId)
             ?: throw ModelNotFoundException("event", request.eventId)
@@ -91,7 +84,8 @@ class TicketServiceImpl(
                     TicketGrade.S -> event.price!!.seatSPrice
                     TicketGrade.A -> event.price!!.seatAPrice
                 },
-                place = event.place.name
+                place = event.place.name,
+                address = event.place.address
             )
 
             ticketRepository.save(ticket)
@@ -113,18 +107,32 @@ class TicketServiceImpl(
         val bookedTicketArray: Array<String> = ticketList.map { "${it!!.grade}${it.seatNo}" }.toTypedArray()
         return BookedTicketResponse(bookedTicketArray)
     }
+
     override fun getAllTicketList(pageable: Pageable, memberId: Long?, eventId: Long?): Page<TicketResponse> {
-        return ticketRepository.getAllTicketList(pageable, memberId, eventId).map { TicketResponse.from(it) }
+        return ticketRepository.getAllTicketList(pageable, memberId, eventId).map {
+            val event = eventRepository.findByIdOrNull(it.event.id!!)
+            val member = memberRepository.findByIdOrNull(it.member.id!!)
+            TicketResponse.from(it, event!!, member!!)
+        }
     }
 
     override fun getTicketById(ticketId: Long): TicketResponse {
         val ticket = ticketRepository.findByIdOrNull(ticketId)
             ?: throw ModelNotFoundException("Ticket", ticketId)
-        return TicketResponse.from(ticket)
+        val event = eventRepository.findByIdOrNull(ticket.event.id!!)
+        val member = memberRepository.findByIdOrNull(ticket.member.id!!)
+        return TicketResponse.from(ticket, event!!, member!!)
     }
 
     override fun getTicketListByUserId(pageable: Pageable, memberId: Long): Page<TicketResponse> {
-        return ticketRepository.getListByUserId(pageable, memberId).map{ TicketResponse.from(it) }
+        val ticketList = ticketRepository.getListByUserId(pageable, memberId)
+        val ticketListResponse = ticketList.map {
+            val event = eventRepository.findByIdOrNull(it.event.id!!)
+            val member = memberRepository.findByIdOrNull(it.member.id!!)
+            TicketResponse.from(it, event!!, member!!)
+        }
+        return ticketListResponse
+//        return ticketRepository.getListByUserId(pageable, memberId).map{ TicketResponse.from(it, it.event, it.member) }
     }
 
     override fun chkExpiredTickets() {
@@ -138,25 +146,31 @@ class TicketServiceImpl(
 
     override fun makePayment(
         userPrincipal: UserPrincipal,
-        ticketIdList: MutableList<Long>
-    ): MutableList<TicketResponse> {
+        ticketId: Long
+    ):TicketResponse? {
 
-        val paidTicketList: MutableList<TicketResponse> = mutableListOf()
+        val paidTicket : Ticket  = ticketRepository.findByIdOrNull(ticketId)
+            ?: throw ModelNotFoundException("Ticket", ticketId)
 
-        ticketRepository.findAllByMemberId(userPrincipal.id).map {
-            if (it.id in ticketIdList && it.ticketStatus == TicketStatus.UNPAID) {
+        val event = eventRepository.findByIdOrNull(paidTicket.event.id!!)
+        val member = memberRepository.findByIdOrNull(paidTicket.member.id!!)
 
-                // TODO() 결제로직
 
-                it.ticketStatus = TicketStatus.PAID
-                ticketRepository.save(it)
-                paidTicketList.add(TicketResponse.from(it))
-            }
+        if (userPrincipal.id == paidTicket.member.id && paidTicket.ticketStatus == TicketStatus.UNPAID) {
+
+            // TODO() 결제로직
+
+            paidTicket.ticketStatus = TicketStatus.PAID
+            ticketRepository.save(paidTicket)
         }
-        return paidTicketList
+
+        return TicketResponse.from( paidTicket, event!!, member!!)
     }
 
+    @Transactional
     override fun cancelTicket(ticketId: Long, userPrincipal: UserPrincipal) {
+//        val ticket = ticketRepository.findByIdOrNull(ticketId)
+//        ticketRepository.delete(ticket!!)
         if (userPrincipal.authorities.toString() != "ROLE_ADMIN") { // ADMIN 아닐 시
             ticketRepository.findByIdOrNull(ticketId)
                 ?.let { ticket ->
@@ -171,9 +185,9 @@ class TicketServiceImpl(
                         (seat.date == ticket.date) && (seat.event!!.id == ticket.event.id)  // 날짜, 이벤트 확인
                     }[0]
                     .let {
-                    it.decreaseSeat(ticket.grade)           // 좌석 수 줄임
-                    availableSeatRepository.save(it)
-                }
+                        it.decreaseSeat(ticket.grade)           // 좌석 수 줄임
+                        availableSeatRepository.save(it)
+                    }
                 ticketRepository.delete(ticket)
             }
             ?: throw ModelNotFoundException("Ticket", ticketId)

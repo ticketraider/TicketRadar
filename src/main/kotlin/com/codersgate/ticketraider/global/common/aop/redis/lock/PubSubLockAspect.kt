@@ -2,10 +2,10 @@ package com.codersgate.ticketraider.global.common.aop.redis.lock
 
 import com.codersgate.ticketraider.domain.ticket.dto.CreateTicketRequest
 import com.codersgate.ticketraider.domain.ticket.entity.TicketGrade
+import jakarta.transaction.Transactional
 import org.aspectj.lang.ProceedingJoinPoint
 import org.aspectj.lang.annotation.Around
 import org.aspectj.lang.annotation.Aspect
-import org.aspectj.lang.reflect.MethodSignature
 import org.redisson.api.RLock
 import org.redisson.api.RedissonClient
 import org.springframework.stereotype.Component
@@ -18,10 +18,9 @@ class PubSubLockAspect(
     private val redissonClient: RedissonClient,
 ) {
 
+    @Transactional
     @Around("@annotation(com.codersgate.ticketraider.global.common.aop.redis.lock.PubSubLock) && args(..,createTicketRequest)")
     fun runPubSubLock(joinPoint: ProceedingJoinPoint, createTicketRequest: CreateTicketRequest) {
-        val methodSignature = joinPoint.signature as MethodSignature
-        val annotation = methodSignature.method.getAnnotation(PubSubLock::class.java)
 
         val lockList = mutableListOf<RLock>()
         try {
@@ -38,7 +37,7 @@ class PubSubLockAspect(
                 lockList.add(lock)
 
                 if (!available) {
-                    println("lock 획득 실패")
+//                    println("lock 획득 실패")
                     return
                 }
             }
@@ -47,6 +46,7 @@ class PubSubLockAspect(
             lockList.map { it.unlock() }
         }
     }
+
     private fun generateKey(eventId: Long, date: LocalDate, grade: TicketGrade, seatNo: Int): String {
         val key = "ID : ${eventId}, $date : ${grade}-${seatNo}"
         return key

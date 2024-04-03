@@ -1,4 +1,4 @@
-<script setup>
+<script setup xmlns:background-color="http://www.w3.org/1999/xhtml">
 
 import ReviewList from "@/components/ReviewListComponent.vue";
 import {ref, onMounted} from 'vue';
@@ -56,28 +56,26 @@ onMounted(() => {
 
 <template>
   <div class="event-detail" v-if="event">
-    <div
-        style="width: 100%; height: 60px; background-color: #392365; border-radius: 10px; margin: auto auto 10px auto; text-align: center">
-      <h2 style="color: white; font-weight: bold">{{ event.title }}</h2>
+    <div style="width: 100%;  text-align: center; margin-bottom: 50px;">
+      <h2 style="color: #392365; font-weight: bold">{{ event.title }}</h2>
     </div>
     <div class="이미지포함이벤트설명" style="display: flex; margin: auto auto 10px auto;">
+      <div>
       <v-img class="img" :src="event.posterImage" cover alt="Event Poster">
+
       </v-img>
+      </div>
       <!-- 공연 정보를 담는 디브-->
-      <div
-          style="width: 800px; height: 500px; background-color: #392365; border-radius: 10px; margin: auto auto auto 10px;">
-        <!-- 안에 들어가는 정보들-->
-        <div class="공연정보담고있는디브">
-          <div class="공연정보1">
-            <h5></h5>
-          </div>
-          <div class="공연정보2">
-            <h5></h5>
-          </div>
+      <div style="width: 100%; height: 500px; margin-left:10px; background-color: #EEEAF1; border-radius: 10px; justify-content: center; align-items: center">
+        <div style="text-align: right;">
+          <button @click="checkLoginStatus" type="button" class="btn btn-light"
+                  style="background-color: #ffffff; border-radius: 20px; margin-top:30px; margin-right:30px">
+            <h5>좋아요 ❤️ {{ event.likeCount }} </h5>
+          </button>
         </div>
         <div class="공연정보담고있는디브">
           <div class="공연정보1">
-            <h5>장소</h5>
+            <h5 style = "font-weight: bold; ">장소</h5>
           </div>
           <div class="공연정보2">
             <h5>{{ event.place.name }}</h5>
@@ -85,7 +83,7 @@ onMounted(() => {
         </div>
         <div class="공연정보담고있는디브">
           <div class="공연정보1">
-            <h5>기간</h5>
+            <h5 style = "font-weight: bold; ">기간</h5>
           </div>
           <div class="공연정보2">
             <h5>{{ event.startDate }} ~ {{ event.endDate }}</h5>
@@ -93,7 +91,7 @@ onMounted(() => {
         </div>
         <div class="공연정보담고있는디브">
           <div class="공연정보1">
-            <h5>정보</h5>
+            <h5 style = "font-weight: bold; ">정보</h5>
           </div>
           <div class="공연정보2">
             <h5>{{ event.eventInfo }}</h5>
@@ -101,7 +99,7 @@ onMounted(() => {
         </div>
         <div class="공연정보담고있는디브">
           <div class="공연정보1">
-            <h5>평점</h5>
+            <h5 style = "font-weight: bold; ">평점</h5>
           </div>
           <div class="공연정보2">
             <h5>{{ event.averageRating }}</h5>
@@ -109,34 +107,25 @@ onMounted(() => {
         </div>
         <div class="공연정보담고있는디브">
           <div class="공연정보1">
-            <h5>가격</h5>
+            <h5 style = "font-weight: bold; ">가격</h5>
           </div>
           <div class="공연정보2">
-            <h5>R 석 - {{ event.price.seatRPrice }}</h5>
-            <h5>S 석 - {{ event.price.seatSPrice }}</h5>
-            <h5>A 석 - {{ event.price.seatAPrice }}</h5>
+            <h5>R 석 - {{ event.price.seatRPrice }} 원 </h5>
+            <h5>S 석 - {{ event.price.seatSPrice }} 원</h5>
+            <h5>A 석 - {{ event.price.seatAPrice }} 원</h5>
           </div>
         </div>
-      </div>
-    </div>
-    <div style="; width: 100%; height: 80px; display: flex">
-      <h3 style="color: white;text-align: center; width: 55px; height: 40px; margin-right: 10px; background-color: #392365; border-radius: 20px; ">{{event.likeCount}}</h3>
 
-      <button @click="checkLoginStatus" type="button" class="btn btn-light" style="width: 110px; height: 40px; border-radius: 20px; ">
-        <h5 style="font-weight: bold">좋아요</h5>
-      </button>
-    </div>
-
-
-    <!--        여기 아래로는 리뷰들-->
-    <div class="리뷰를담은디브">
-      <div style="height: 60px; background-color: #392365; border-radius: 10px">
-        <div style="display: flex;">
-          <h5 style="margin: 17px 10px auto auto; color: #aa98ba;">리뷰 개수 :</h5>
-          <h5 style="margin: 17px auto auto 10px; color: white;">{{ event.reviewCount }}</h5>
         </div>
+    </div>
+
+
+    <div class="리뷰를담은디브" style="margin-top: 50px;">
+      <div style="height: 1px; width: 100%; background-color: #ffffff; border-radius: 10px; border: 1px solid #ccc;"></div>
+      <div style="display: flex;">
+        <h4 style="margin-top: 30px; color: #5d3d9c;"> ✏️ {{ event.reviewCount }}</h4>
+        <h5 style="margin-top: 30px; margin-left: 5px; color: #1f1f1f;"> 건의 리뷰가 있습니다! </h5>
       </div>
-      <!--리뷰 추가될때마다 1개씩 추가-->
       <ReviewList/>
     </div>
   </div>
@@ -155,21 +144,23 @@ onMounted(() => {
 }
 
 .공연정보1 {
-  color: #aa98ba;
-  width: 160px;
+  color: #5d3d9c;
+  width: 85px;
   height: 100%;
   text-align: right;
+  font-weight: bold;
 }
 
 .공연정보2 {
-  color: white;
+  color: #0c0126;
   width: 530px;
   height: 100%;
   margin-left: 40px
 }
 
 .event-detail {
-  background-color: #aa98ba;
+  box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.2);
+  background-color : white;
   border-radius: 20px;
   width: 70%;
   padding: 50px;

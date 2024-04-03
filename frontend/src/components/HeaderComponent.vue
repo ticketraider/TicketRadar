@@ -2,6 +2,7 @@
 import {computed, ref} from 'vue';
 import { useRouter } from 'vue-router';
 import {jwtDecode} from "jwt-decode";
+import axios from "axios";
 
 const router = useRouter();
 const searchText = ref(''); // 검색어
@@ -9,6 +10,41 @@ const searchCriterion = ref(''); // 선택된 검색 기준의 실제 값 (예: 
 const sortingCriterion = ref(''); // 선택된 정렬 기준의 실제 값 (예: 'likes', 'reviews')
 const searchCriterionDisplay = ref('검색 기준'); // 화면에 표시될 검색 기준 텍스트
 const sortingCriterionDisplay = ref('정렬 기준'); // 화면에 표시될 정렬 기준 텍스트
+
+const searchResult = ref('');
+
+
+const searchEvent = async () => {
+  try {
+    console.log("요청 : ", searchText.value);
+    const response = await axios.get('http://localhost:8080/search', {
+      params: {
+        eventTitle: searchText.value
+      }
+    });
+
+    console.log("응답 : ", response);
+  } catch (error) {
+    console.error('Error:', error);
+    searchResult.value = 'Error occurred while searching.';
+  }
+};
+
+const cachingKeywords = async () => {
+  try {
+    console.log("요청 : ", searchText.value);
+    const response = await axios.get('http://localhost:8080/popularEventList', {
+      params: {
+        limit: 5
+      }
+    });
+
+    console.log("응답 : ", response);
+  } catch (error) {
+    console.error('Error:', error);
+    searchResult.value = 'Error occurred while searching.';
+  }
+};
 
 
 // 드롭다운에서 항목을 선택했을 때 호출할 메서드
@@ -23,7 +59,7 @@ function updateSortingCriterion(value, displayText) {
 }
 
 // 검색 실행 메서드
-function executeSearch() {
+async function executeSearch() {
   router.push({
     path: '/event-list',
     query: {
@@ -32,6 +68,9 @@ function executeSearch() {
       sort: sortingCriterion.value,
     }
   });
+  await searchEvent()
+  await cachingKeywords()
+
 }
 
 // 엔터 키가 눌렸을 때 검색을 실행하도록 하는 메서드
@@ -40,24 +79,23 @@ function onEnterPress(event) {
     executeSearch();
   }
 }
-// 가정: 로그인 상태와 토큰은 VueX, Pinia, 또는 localStorage 같은 곳에 저장되어 있다고 가정
-// 이 예시에서는 단순화를 위해 localStorage를 사용합니다.
+
 const token = localStorage.getItem('token');
 
 const isLoggedIn = computed(() => !!token);
 const userRole = computed(() => {
   if (!token) return null;
   const decoded = jwtDecode(token);
-  return decoded.role // 'role'은 토큰 내에 담겨있는 사용자 역할을 나타내는 속성입니다.
+  return decoded.role // 'role'은 토큰 내에 담겨있는 사용자 역할
 });
 const isAdmin = computed(() => userRole.value === 'ADMIN');
 
 function login() {
-  router.push({path: "/login"}); // 'login'은 로그인 페이지의 라우터 이름입니다.
+  router.push({path: "/login"});
 }
 
 function register() {
-  router.push({ path: "/sign-up" }); // 'register'는 회원가입 페이지의 라우터 이름입니다.
+  router.push({ path: "/sign-up" });
 }
 
 function logout() {
@@ -67,7 +105,7 @@ function logout() {
 }
 
 function goToMyPage() {
-  router.push({ path: "/my-page" }); // 'mypage'는 마이페이지의 라우터 이름입니다.
+  router.push({ path: "/my-page/tickets" });
 }
 function goEventList(categoryName) {
   router.push({
@@ -98,9 +136,7 @@ const goHome = () => {
         <li><a href="#" class="category" @click="goEventList('뮤지컬')">뮤지컬</a></li>
         <li><a href="#" class="category" @click="goEventList('콘서트')">콘서트</a></li>
         <li><a href="#" class="category" @click="goEventList('스포츠')">스포츠</a></li>
-        <li><a href="#" class="category" @click="goEventList('전시/행사')">전시/행사</a></li>
         <li><a href="#" class="category" @click="goEventList('클래식/무용')">클래식/무용</a></li>
-        <li><a href="#" class="category" @click="goEventList('아동/가족')">아동/가족</a></li>
         <li><a href="#" class="category" @click="goEventList('연극')">연극</a></li>
       </ul>
     </nav>
@@ -132,7 +168,7 @@ const goHome = () => {
       <button v-if="!isLoggedIn" class="btn btn-outline-secondary me-2" @click="login">로그인</button>
       <button v-if="!isLoggedIn" class="btn btn-outline-secondary" @click="register">회원가입</button>
       <!-- 로그인되었을 때 보여질 버튼들 -->
-      <button v-if="isLoggedIn" class="btn btn-outline-light me-2" @click="logout">로그아웃</button>
+      <button v-if="isLoggedIn" class="btn  btn-outline-secondary me-2" @click="logout">로그아웃</button>
       <button v-if="isLoggedIn" class="btn btn-outline-info" @click="goToMyPage">마이페이지</button>
       <!-- 관리자 역할일 때 보여질 버튼 -->
       <button v-if="isAdmin" class="btn btn-danger" style="margin-left: 8px" @click="goToAdminMode">관리자모드</button>

@@ -4,7 +4,6 @@ import com.codersgate.ticketraider.domain.category.model.Category
 import com.codersgate.ticketraider.domain.category.repository.CategoryRepository
 import com.codersgate.ticketraider.domain.event.dto.EventRequest
 import com.codersgate.ticketraider.domain.event.repository.EventRepository
-import com.codersgate.ticketraider.domain.event.repository.price.PriceRepository
 import com.codersgate.ticketraider.domain.event.service.EventService
 import com.codersgate.ticketraider.domain.member.entity.Member
 import com.codersgate.ticketraider.domain.member.entity.MemberRole
@@ -14,13 +13,7 @@ import com.codersgate.ticketraider.domain.place.repository.PlaceRepository
 import com.codersgate.ticketraider.domain.ticket.dto.CreateTicketRequest
 import com.codersgate.ticketraider.domain.ticket.dto.SeatInfo
 import com.codersgate.ticketraider.domain.ticket.entity.TicketGrade
-import com.codersgate.ticketraider.global.error.exception.ModelNotFoundException
-import com.codersgate.ticketraider.global.error.exception.TicketReservationFailedException
-import com.codersgate.ticketraider.global.infra.redis.lock.RedissonLockService
-import com.codersgate.ticketraider.global.infra.security.jwt.UserPrincipal
 import io.mockk.junit5.MockKExtension
-import kotlinx.coroutines.Delay
-import kotlinx.coroutines.delay
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -73,8 +66,8 @@ class TicketServiceImplTest(
             title = "오페라의 유령",
             categoryId = getCate.id!!,
             eventInfo = "String",
-            _startDate = "2024-03-28",
-            _endDate = "2024-03-30",
+            _startDate = "2024-04-01",
+            _endDate = "2024-04-03",
             place = "문화회관",
             seatRPrice = 150000,
             seatSPrice = 100000,
@@ -100,10 +93,10 @@ class TicketServiceImplTest(
         repeat(threadCount) {
             executorService.submit {
                 try {
-                //좌석선택
+                    //좌석선택
                     ticketService.createTicket(member.id!!, createTicketReq)
                     success++
-                }  finally {
+                } finally {
                     total++
                     countDownLatch.countDown()
                 }

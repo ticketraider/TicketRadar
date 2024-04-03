@@ -2,7 +2,7 @@ auth:
   jwt:
     issuer: team.sparta.com
     secret: c5t6gzuXneIM3d0Eafy2F3MrkK41BUfD
-    accessTokenExpirationHour: 168
+    accessTokenExpirationHour: 12
 cloud:
   aws:
     region:
@@ -22,6 +22,8 @@ spring:
     redis:
       host: 127.0.0.1
       port: 6379
+  #      repositories:
+  #        enabled: false
   #      password: ${REDIS_PASSWORD}
   servlet:
     multipart:
