@@ -14,7 +14,7 @@ interface MemberService {
     fun socialLogin(userInfo: OAuth2UserInfo): LoginResponse
     fun getProfile(memberId: Long): MemberResponse
     fun verifyCurrentPassword(currentPassword: String, memberId: Long): VerifyCurrentPasswordResponse
-    fun updateProfile(updateProfileRequest: UpdateProfileRequest, memberId: Long)
+    fun updateProfile(nickname: String, memberId: Long)
     fun unregister(user: UserPrincipal)
     fun rejoin(loginRequest: LoginRequest)
     fun isSocial(userPrincipal: UserPrincipal): Boolean

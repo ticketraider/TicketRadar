@@ -9,7 +9,6 @@ import io.swagger.v3.oas.annotations.Operation
 import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
-import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
@@ -66,12 +65,12 @@ class MemberController(
     @Operation(summary = "프로필 수정")
     @PutMapping("/update")
     fun updateProfile(
-        @Valid @RequestBody updateProfileRequest: UpdateProfileRequest,
+        @RequestParam nickname: String,
         @AuthenticationPrincipal userPrincipal: UserPrincipal
     ): ResponseEntity<Unit> {
         return ResponseEntity
             .status(HttpStatus.OK)
-            .body(memberService.updateProfile(updateProfileRequest, userPrincipal.id))
+            .body(memberService.updateProfile(nickname, userPrincipal.id))
     }
 
     @Operation(summary = "회원 탈퇴")
