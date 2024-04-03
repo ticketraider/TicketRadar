@@ -78,7 +78,11 @@ class Event(
         var totalRating = averageRating * reviewCount
         totalRating -= rating
         reviewCount--
-        averageRating = String.format("%.1f", (totalRating / reviewCount)).toFloat()
+        if (totalRating == 0F) {
+            averageRating = 0F
+        } else {
+            averageRating = String.format("%.1f", (totalRating / reviewCount)).toFloat()
+        }
     }
 }
 
