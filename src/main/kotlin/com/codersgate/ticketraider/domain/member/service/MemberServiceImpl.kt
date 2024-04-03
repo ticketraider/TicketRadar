@@ -128,8 +128,8 @@ class MemberServiceImpl(
     override fun updateProfile(updateProfileRequest: UpdateProfileRequest, memberId: Long) {
         val member = memberRepository.findByIdOrNull(memberId)
             ?: throw InvalidCredentialException("")
-        val changedPassword = passwordEncoder.encode(updateProfileRequest.password)
-        member.updateProfile(changedPassword, updateProfileRequest.nickname)
+//        val changedPassword = passwordEncoder.encode(updateProfileRequest.password)
+        member.updateProfile(updateProfileRequest.nickname)
     }
 
     override fun isSocial(userPrincipal: UserPrincipal): Boolean {
