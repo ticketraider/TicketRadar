@@ -19,7 +19,7 @@ class Member(
     @Column(name = "password")
     var password: String? = null,
 
-    @Column(name = "nickname", unique = true)
+    @Column(name = "nickname")
     var nickname: String,
 
     @Enumerated(EnumType.STRING)
@@ -41,8 +41,7 @@ class Member(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null
 
-    fun updateProfile(password: String, nickname: String) {
-        this.password = password
+    fun updateProfile(nickname: String) {
         this.nickname = nickname
     }
 }
