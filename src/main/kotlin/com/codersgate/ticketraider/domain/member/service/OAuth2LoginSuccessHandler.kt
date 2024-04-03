@@ -24,7 +24,12 @@ class OAuth2LoginSuccessHandler(
         val accessToken = memberService.socialLogin(userInfo).token
         val cookie = Cookie("token", accessToken)
         cookie.path = "/"
-        cookie.maxAge = 3600
+        cookie.domain = "ticketradar.net"
+        cookie.maxAge = 5
+        cookie.isHttpOnly = false
+        cookie.secure = false
         response.addCookie(cookie)
+        response.sendRedirect("https://www.ticketradar.net")
+
     }
 }
