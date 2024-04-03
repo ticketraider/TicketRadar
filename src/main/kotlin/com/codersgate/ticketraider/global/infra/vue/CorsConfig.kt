@@ -12,8 +12,7 @@ class CorsConfig {
     fun corsFilter(): CorsFilter {
         val config = CorsConfiguration()
         config.allowCredentials = true
-        config.addAllowedOrigin("http://localhost:3000")
-        config.addAllowedOrigin("https://localhost:3000")
+        config.addAllowedOrigin("https://www.ticketradar.net")
         config.addAllowedHeader("*")
         config.addAllowedMethod("*")
 

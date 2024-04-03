@@ -38,12 +38,19 @@ class SecurityConfig(
                 it.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             }.authorizeHttpRequests {
                 it.requestMatchers(
-                    "/**",
+                    "/search/**",
+                    "/PopularEventList",
+                    "/getCachedEventList",
+                    "/updateCachedEventList",
+                    "/likes/**",
+                    "/members/**",
+                    "/reviews/**",
+                    "/tickets/**",
+                    "/events/**",
                     "/members/login",
                     "/members/signUp",
                     "/swagger-ui/**",
                     "/v3/api-docs/**",
-                    "/oauth2/**"
                 ).permitAll()
                     .anyRequest().authenticated()
             }.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter::class.java)

@@ -36,7 +36,7 @@ spring:
         registration:
           kakao:
             client-id: ${KAKAO_CLIENT_ID}
-            redirect-uri: http://localhost:8080/oauth2/callback/kakao
+            redirect-uri: https://api.ticketradar.net/oauth2/callback/kakao
             authorization-grant-type: authorization_code
             client-authentication-method: client_secret_post
             client-name: kakao
@@ -47,7 +47,7 @@ spring:
           google:
             client-id: ${GOOGLE_CLIENT_ID}
             client-secret: ${GOOGLE_CLIENT_SECRET}
-            redirect-uri: http://localhost:8080/oauth2/callback/google
+            redirect-uri: https://api.ticketradar.net/oauth2/callback/google
             client-name: google
             scope:
               - profile
@@ -104,16 +104,16 @@ spring:
 #    url: jdbc:h2:mem:test
 #    username: sa
 #    password:
-logging:
-  level:
-    org:
-      hibernate:
-        SQL: debug
-        orm:
-          jdbc:
-            bind: trace
-      springframework:
-        security: debug
+#logging:
+#  level:
+#    org:
+#      hibernate:
+#        SQL: debug
+#        orm:
+#          jdbc:
+#            bind: trace
+#      springframework:
+#        security: debug
 
 #server:
 #  port: 8081
