@@ -64,7 +64,6 @@ class MemberController(
     }
 
     @Operation(summary = "프로필 수정")
-    @PreAuthorize("hasAnyRole('MEMBER', 'ADMIN')")
     @PutMapping("/update")
     fun updateProfile(
         @Valid @RequestBody updateProfileRequest: UpdateProfileRequest,
@@ -76,7 +75,6 @@ class MemberController(
     }
 
     @Operation(summary = "회원 탈퇴")
-    @PreAuthorize("hasAnyRole('MEMBER', 'ADMIN')")
     @DeleteMapping("/unregister")
     fun unregister(
         authentication: Authentication
