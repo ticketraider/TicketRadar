@@ -28,14 +28,15 @@ class EventRepositoryImpl : QueryDslSupport(), CustomEventRepository {
 
         if (category != null) {
             builder.and(event.category.title.eq(category))
-        }
-        if (searchStatus != null) {
+        } else if (searchStatus != null) {
             if (searchStatus == "title") {
                 builder.and(event.title.like("%$keyword%"))
             }
             if (searchStatus == "location") {
                 builder.and(event.place.address.like("%$keyword%"))
             }
+        } else {
+            builder.and(event.title.like("%$keyword%"))
         }
 
 
