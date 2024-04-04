@@ -64,7 +64,7 @@ jobs:
           aws deploy push \
             --application-name ${{ env.CODE_DEPLOY_APPLICATION_NAME }} \
             --ignore-hidden-files \ 
-            --s3-location s3://$S3_BUCKET_NAME/$GITHUB_SHA.zip \
+            --s3-location s3://${{ env.S3_BUCKET_NAME }}/$GITHUB_SHA.zip \
             --source .
   
       # (6) S3버킷에 있는 파일을 대상으로 CodeDeploy실행
