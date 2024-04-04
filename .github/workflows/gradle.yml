@@ -66,13 +66,6 @@ jobs:
             --ignore-hidden-files \ 
             --s3-location s3://ticketradar_codedeploy/$GITHUB_SHA.zip \
             --source .
-          
-          aws deploy push \
-            --application-name WordPress_App \
-            --description "This is a revision for the application WordPress_App" \
-            --ignore-hidden-files \
-            --s3-location s3://codedeploydemobucket/WordPressApp.zip \
-            --source .
 
       # (6) S3버킷에 있는 파일을 대상으로 CodeDeploy실행
       - name: Deploy to AWS EC2 from S3
