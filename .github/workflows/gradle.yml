@@ -15,7 +15,7 @@ on:
 
 env:
   AWS_REGION: ap-northeast-2
-  S3_BUCKET_NAME: ticketradar_codedeploy
+  S3_BUCKET_NAME: ticketradar-codedeploy
   CODE_DEPLOY_APPLICATION_NAME: ticketradar
   CODE_DEPLOY_DEPLOYMENT_GROUP_NAME: ticketradar-deploy-group
   
@@ -60,7 +60,7 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
           aws-region: ${{ env.AWS_REGION }}
       - name: Upload to AWS S3
-        run:
+        run: |
           aws deploy push \
             --application-name ${{ env.CODE_DEPLOY_APPLICATION_NAME }} \
             --ignore-hidden-files \ 
