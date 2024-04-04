@@ -37,12 +37,9 @@
   <img src="https://img.shields.io/badge/IntelliJIDEA-000000.svg?style=for-the-badge&logo=intellij-idea&logoColor=white">
 </div>
 
-## 👨🏻‍💻 Built With
+🏗 아키텍쳐
+![image](https://github.com/ticketraider/TicketRadar/assets/150113407/10115724-da69-4edc-b523-f29001b55365)
 
-* [김건우](https://github.com/hongdul) - 팀장
-* [장준혁](https://github.com/JangCoding) - 부팀장
-* [이시원](https://github.com/LSW990918) - 조원 
-* [장준용](https://github.com/tsdnhts) - 조원
 
 
 ## 와이어프레임
@@ -56,10 +53,34 @@
 
 
 
-## API
+## 🍀 주요 기술 및 역할 분담
+
+### [김건우](https://github.com/hongdul) - 팀장
+- CRUD - ticket, member
+- 인증, 인가 - 소셜 로그인
+- S3 - 이미지 파일 업로드 구현
+- 배포 - 프론트 엔드, 백 엔드
+
+### [장준혁](https://github.com/JangCoding) - 부팀장
+- CRUD - like, review
+- Redis - 인기 검색어 기능, 캐싱 기능
+- Vue - 프론트엔드 페이지 디자인 마무리, front-back 연결
+  
+### [이시원](https://github.com/LSW990918) - 조원
+- CRUD - category, place, availableSeat, price
+- Redisson - Pub-Sub Lock 구현, AOP를 활용해 Pub-Sub Lock 어노테이션화
+- Vue - 각종 프론트엔드 페이지 디자인 뼈대 작성, 티켓 예매시 좌석배치도 구현, front - back 연결
+  
+### [장준용](https://github.com/tsdnhts) - 조원
+- CRUD - event
+- QueryDsl - QueryDSL을 활용한 동적쿼리 구현(다양한 필터 적용)
+- 발표 - 중간발표 및 최종 발표간 대본 작성 및 발표
+
+
+
+
+## 팀 노션페이지
 
 https://www.notion.so/44f1197d79e04f1e8ac5437f86db634d?pvs=4#5e055bee96514a36b1638e2433fb3b70
-
-## 패키지 구조
 
 
