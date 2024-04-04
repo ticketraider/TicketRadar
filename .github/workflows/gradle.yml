@@ -16,8 +16,8 @@ on:
 env:
   AWS_REGION: ap-northeast-2
   S3_BUCKET_NAME: ticketradar-codedeploy
-  CODE_DEPLOY_APPLICATION_NAME: ticketradar
-  CODE_DEPLOY_DEPLOYMENT_GROUP_NAME: ticketradar-deploy-group
+  CODE_DEPLOY_APPLICATION_NAME: ticketradar-codedeploy
+  CODE_DEPLOY_DEPLOYMENT_GROUP_NAME: ticketradar-deploy
   
 jobs:
   build:
