@@ -43,7 +43,7 @@ jobs:
       - name: Build with Gradle Wrapper
         run: ./gradlew build -x test -Pprofile=dev
 
-      - name: Make zip file # build한 파일 모두 압축
+      - name: Make zip file
         run: zip -qq -r ./ticketradar.zip .
         shell: bash
 
