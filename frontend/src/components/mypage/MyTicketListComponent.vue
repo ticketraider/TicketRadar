@@ -41,7 +41,7 @@
               <div class="info-row" style="display: flex; justify-content: space-between; align-items: center;">
                 <h6 style="margin: 0;">티켓 상태: {{ ticket.ticketStatus }}</h6>
                 <div>
-                  <button  class="cancel-btn" @click="makePayment(ticket.id)" style="margin-right: 20px;">결제하기</button>
+                  <button v-if="ticket.ticketStatus === 'UNPAID'" class="cancel-btn" @click="makePayment(ticket.id)" style="margin-right: 20px;">결제하기</button>
                   <button  class="cancel-btn" @click="cancelTicket(ticket.id)">예매 취소하기</button>
                 </div>
               </div>
