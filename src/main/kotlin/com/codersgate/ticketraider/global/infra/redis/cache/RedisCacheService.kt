@@ -79,33 +79,33 @@ class RedisCacheService(
         val cache = cacheManager.getCache(CacheTarget.EVENT.name)
         val value = cache?.get(key) // 캐시에서 가져온 값. LinkedHashMap 형태.
 
-        val list = value?.get() as? List<Map<String, Any>> // 각 요소가 맵 형태이므로 타입을 지정합니다.
+        val list = value?.get() as? List<Map<String, Any>> // 각 요소가 맵 형태이므로 타입을 지정.
 
         return list?.map { item ->
             EventResponse(
                 id = (item["id"] as Int).toLong(),
                 title = item["title"] as String,
                 likeCount = item["likeCount"] as Int,
-                startDate = LocalDate.parse(item["startDate"] as String), // 문자열을 LocalDate로 변환합니다.
-                endDate = LocalDate.parse(item["endDate"] as String), // 문자열을 LocalDate로 변환합니다.
+                startDate = LocalDate.parse(item["startDate"] as String),
+                endDate = LocalDate.parse(item["endDate"] as String),
                 eventInfo = item["eventInfo"] as String,
                 averageRating = (item["averageRating"] as Double).toFloat(),
                 posterImage = item["posterImage"] as String,
-                place = PlaceResponse(
+                place = PlaceResponse(                          // Place 라는 엔티티를 저장하고 있어 별도 처리 필요
                     name = (item["place"] as Map<String, Any>)["name"] as String,
                     totalSeat = (item["place"] as Map<String, Any>)["totalSeat"] as Int,
                     seatR = (item["place"] as Map<String, Any>)["seatR"] as Int,
                     seatS = (item["place"] as Map<String, Any>)["seatS"] as Int,
                     seatA = (item["place"] as Map<String, Any>)["seatA"] as Int
                 ),
-                price = PriceResponse(
+                price = PriceResponse(                          // Price 라는 엔티티를 저장하고 있어 별도 처리 필요
                     seatRPrice = (item["price"] as Map<String, Int>)["seatRPrice"] ?: 0,
                     seatSPrice = (item["price"] as Map<String, Int>)["seatSPrice"] ?: 0,
                     seatAPrice = (item["price"] as Map<String, Int>)["seatAPrice"] ?: 0
                 ),
                 reviewCount = item["reviewCount"] as Int
             )
-        } ?: emptyList() // 만약 리스트가 null이면 빈 리스트를 반환합니다.
+        } ?: emptyList()
     }
 
     fun getPopularKeywords(limit: Long): List<String> {

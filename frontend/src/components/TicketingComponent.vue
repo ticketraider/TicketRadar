@@ -20,7 +20,7 @@
 
 
     <!-- Modal -->
-    <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+    <div class="modal fade" id="ticketing" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
          aria-labelledby="staticBackdropLabel" aria-hidden="true">
       <div class="modal-dialog">
         <div class="modal-content">
@@ -138,7 +138,7 @@
                     </tbody>
                   </v-table>
                 </v-sheet>
-                <div>
+                <div style="text-align: right; margin-top: 10px;">
                   <button type="button" class="btn btn-primary" @click="reservationFinished">예매하기</button>
                 </div>
               </template>
@@ -187,7 +187,7 @@ const checkLoginStatus = () => {
 }
 
 const openModal = () => {
-  const myModal = new Bootstrap.Modal(document.getElementById('staticBackdrop'), {
+  const myModal = new Bootstrap.Modal(document.getElementById('ticketing'), {
     keyboard: false
   });
   myModal.show();
