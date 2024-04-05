@@ -26,8 +26,8 @@ class OAuth2LoginSuccessHandler(
         cookie.path = "/"
         cookie.domain = "ticketradar.net"
         cookie.maxAge = 5
-        cookie.isHttpOnly = true
-//        cookie.secure = false
+        cookie.isHttpOnly = false
+        cookie.secure = false
         response.addCookie(cookie)
         response.sendRedirect("https://www.ticketradar.net")
 
