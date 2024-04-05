@@ -32,14 +32,14 @@ class SecurityConfig(
             .httpBasic { it.disable() }
             .formLogin { it.disable() }
             .csrf { it.disable() }
-            .cors { it.disable() }
+            .cors {}
             .headers { it.frameOptions { options -> options.sameOrigin() } }
             .sessionManagement {
                 it.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             }.authorizeHttpRequests {
                 it.requestMatchers(
                     "/search/**",
-                    "/PopularEventList",
+                    "/PopularEventList/**",
                     "/getCachedEventList",
                     "/updateCachedEventList",
                     "/likes/**",

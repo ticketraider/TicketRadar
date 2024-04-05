@@ -35,6 +35,9 @@ class EventRepositoryImpl : QueryDslSupport(), CustomEventRepository {
             if (searchStatus == "location") {
                 builder.and(event.place.address.like("%$keyword%"))
             }
+            if (searchStatus == "") {
+                builder.and(event.title.like("$keyword"))
+            }
         } else {
             builder.and(event.title.like("%$keyword%"))
         }
