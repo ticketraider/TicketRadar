@@ -32,7 +32,6 @@ class TicketServiceImpl(
     private val eventRepository: EventRepository,
     private val availableSeatRepository: AvailableSeatRepository,
 ) : TicketService {
-
     @PubSubLock
     override fun createTicket(memberId: Long, request: CreateTicketRequest) {
         val event = eventRepository.findByIdOrNull(request.eventId)
