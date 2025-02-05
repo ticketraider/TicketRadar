@@ -33,7 +33,7 @@ class PubSubLockAspect(
                     createTicketRequest.seatList[i].seatNumber
                 )   // Redisson 분산 락 Key 설정
                 val lock = redissonClient.getLock(key) // 해당 키의 Lock 객체 가져오기. 반환형 RLock
-                val available = lock.tryLock(10, 10, TimeUnit.SECONDS) //획득시도 시간, 락 점유 시간
+                val available = lock.tryLock(10, 60, TimeUnit.SECONDS) //획득시도 시간, 락 점유 시간
 
                 if (!available) {
                     throw LockAcquisitionException("현재 예약 진행 중인 좌석입니다. " +
@@ -45,7 +45,11 @@ class PubSubLockAspect(
             }
             joinPoint.proceed()
         } finally {
-            lockList.forEach { it.unlock() }
+            lockList.forEach { lock ->
+                // 현재 락이 설정된 상태인지, 현재 쓰레드가 이 락을 보유하고 있다면 해제
+                if (lock.isLocked && lock.isHeldByCurrentThread)
+                    lock.unlock()
+            }
         }
     }
 
