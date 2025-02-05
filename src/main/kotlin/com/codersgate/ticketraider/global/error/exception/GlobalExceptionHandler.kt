@@ -67,4 +67,9 @@ class GlobalExceptionHandler {
             .status(HttpStatus.NOT_FOUND)
             .body(ErrorResponse(e.message))
     }
+
+    @ExceptionHandler(LockAcquisitionException::class)
+    fun handleLockAcquisitionException(e: LockAcquisitionException) : ResponseEntity<String>{
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(e.message)
+    }
 }

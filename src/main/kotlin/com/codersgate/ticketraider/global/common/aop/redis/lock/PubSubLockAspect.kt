@@ -2,6 +2,7 @@ package com.codersgate.ticketraider.global.common.aop.redis.lock
 
 import com.codersgate.ticketraider.domain.ticket.dto.CreateTicketRequest
 import com.codersgate.ticketraider.domain.ticket.entity.TicketGrade
+import com.codersgate.ticketraider.global.error.exception.LockAcquisitionException
 import jakarta.transaction.Transactional
 import org.aspectj.lang.ProceedingJoinPoint
 import org.aspectj.lang.annotation.Around
@@ -35,8 +36,10 @@ class PubSubLockAspect(
                 val available = lock.tryLock(10, 10, TimeUnit.SECONDS) //획득시도 시간, 락 점유 시간
 
                 if (!available) {
-                            // 에러메세지 발생 필요
-                    return  // Lock 획득 실패
+                    throw LockAcquisitionException("현재 예약 진행 중인 좌석입니다. " +
+                            "${createTicketRequest.date} /" +
+                            "${createTicketRequest.seatList[i].ticketGrade} /" +
+                            "${createTicketRequest.seatList[i].seatNumber}  ")        // 에러메세지 발생 필요
                 }
                 lockList.add(lock)
             }
