@@ -17,6 +17,7 @@ class PlaceServiceImpl(
     private val ticketRepository: TicketRepository
 ) : PlaceService {
 
+    @Transactional
     override fun createPlace(request: PlaceRequest) {
         val place = request.toPlace()
         placeRepository.save(place)
@@ -50,6 +51,7 @@ class PlaceServiceImpl(
         }
     }
 
+    @Transactional
     override fun deletePlace(placeId: Long) {
         val place = placeRepository.findByIdOrNull(placeId)
             ?: throw ModelNotFoundException("place", placeId)

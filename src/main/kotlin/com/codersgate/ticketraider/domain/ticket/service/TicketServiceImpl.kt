@@ -33,6 +33,7 @@ class TicketServiceImpl(
     private val availableSeatRepository: AvailableSeatRepository,
 ) : TicketService {
     @PubSubLock
+    @Transactional
     override fun createTicket(memberId: Long, request: CreateTicketRequest) {
         val event = eventRepository.findByIdOrNull(request.eventId)
             ?: throw ModelNotFoundException("event", request.eventId)
@@ -134,6 +135,7 @@ class TicketServiceImpl(
 //        return ticketRepository.getListByUserId(pageable, memberId).map{ TicketResponse.from(it, it.event, it.member) }
     }
 
+    @Transactional
     override fun chkExpiredTickets() {
         // TODO() findAll 보다 동적쿼리로 대상만 찾을지?
         ticketRepository.findAll().map {
@@ -143,6 +145,7 @@ class TicketServiceImpl(
         }
     }
 
+    @Transactional
     override fun makePayment(
         userPrincipal: UserPrincipal,
         ticketId: Long

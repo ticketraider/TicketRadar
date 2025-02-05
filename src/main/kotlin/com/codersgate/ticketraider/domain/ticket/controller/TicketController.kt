@@ -24,7 +24,6 @@ class TicketController(
     val ticketService: TicketService
 ) {
     @Operation(summary = "티켓 생성")
-    @Transactional
     @PostMapping("/create")
     fun createTicket(
         @AuthenticationPrincipal userPrincipal: UserPrincipal,

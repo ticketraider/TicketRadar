@@ -10,6 +10,7 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 @Service
 class LikeServiceImpl(
@@ -33,6 +34,7 @@ class LikeServiceImpl(
         )
     }
 
+    @Transactional
     override fun chkLike(memberId: Long, eventId: Long) {
         val member = memberRepository.findByIdOrNull(memberId)
             ?: throw NotFoundException()
@@ -55,6 +57,7 @@ class LikeServiceImpl(
         eventRepository.save(event)
     }
 
+    @Transactional
     override fun updateLikeCount() {
         // 이벤트 id 리스트를 Like 에서 가져와서
         likeRepository.getEventIdList().map { e_id ->

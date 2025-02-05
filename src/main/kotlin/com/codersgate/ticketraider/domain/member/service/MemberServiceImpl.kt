@@ -89,6 +89,7 @@ class MemberServiceImpl(
     }
 
 
+    @Transactional
     override fun socialSignUpAndRegister(id: String, nickname: String, email: String, provider: Provider): Member {
         val member = memberRepository.save(
             Member(
