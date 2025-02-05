@@ -18,7 +18,6 @@ class PubSubLockAspect(
     private val redissonClient: RedissonClient,
 ) {
 
-    @Transactional
     @Around("@annotation(com.codersgate.ticketraider.global.common.aop.redis.lock.PubSubLock) && args(..,createTicketRequest)")
     fun runPubSubLock(joinPoint: ProceedingJoinPoint, createTicketRequest: CreateTicketRequest) {
 
@@ -31,19 +30,19 @@ class PubSubLockAspect(
                     createTicketRequest.date,
                     createTicketRequest.seatList[i].ticketGrade,
                     createTicketRequest.seatList[i].seatNumber
-                )
-                val lock = redissonClient.getLock(key)
-                val available = lock.tryLock(10, 3, TimeUnit.SECONDS) //획득시도 시간, 락 점유 시간
-                lockList.add(lock)
+                )   // Redisson 분산 락 Key 설정
+                val lock = redissonClient.getLock(key) // 해당 키의 Lock 객체 가져오기. 반환형 RLock
+                val available = lock.tryLock(10, 10, TimeUnit.SECONDS) //획득시도 시간, 락 점유 시간
 
                 if (!available) {
-//                    println("lock 획득 실패")
-                    return
+                            // 에러메세지 발생 필요
+                    return  // Lock 획득 실패
                 }
+                lockList.add(lock)
             }
             joinPoint.proceed()
         } finally {
-            lockList.map { it.unlock() }
+            lockList.forEach { it.unlock() }
         }
     }
 
