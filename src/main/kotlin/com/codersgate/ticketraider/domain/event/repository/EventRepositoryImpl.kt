@@ -44,7 +44,7 @@ class EventRepositoryImpl : QueryDslSupport(), CustomEventRepository {
 
 
         val query = queryFactory.selectFrom(event)
-            .leftJoin(event.price, price)
+            .leftJoin(event.price, price).fetchJoin()   // N+1 문제 해결.
             .offset(pageable.offset)
             .limit(pageable.pageSize.toLong())
             .where(builder)
