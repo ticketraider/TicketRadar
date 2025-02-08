@@ -10,8 +10,8 @@ cloud:
     stack:
       auto: false
     credentials:
-      access-key: ${AWS_ACCESS_KEY}
-      secret-key: ${AWS_SECRET_KEY}
+      access-key: ${AWS_ACCESS_KEY:dummy}
+      secret-key: ${AWS_SECRET_KEY:dummy}
     s3:
       bucket: ticketraider-event
       dir: /ticketraider-event-image
@@ -133,9 +133,15 @@ spring:
         format_sql: true
     open-in-view: false
     database-platform: org.hibernate.dialect.H2Dialect
+#  datasource:
+#    driver-class-name: org.h2.Driver
+#    url: jdbc:h2:tcp://localhost/~/test
+#    username: sa
+#    password:
+
   datasource:
     driver-class-name: org.h2.Driver
-    url: jdbc:h2:tcp://localhost/~/test
+    url: jdbc:h2:mem:testdb  # 메모리 모드
     username: sa
     password:
   h2:
